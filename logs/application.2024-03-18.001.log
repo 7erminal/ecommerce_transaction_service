@@ -1,0 +1,15 @@
+2024/03/17 10:56:12.861  [I] [server.go:280]  http server Running on http://:8080
+2024/03/17 10:56:28.774  [I] [server.go:280]  http server Running on http://:8085
+2024/03/17 10:57:53.191  [D] [router.go:1305]  |            ::1|[97;43m 404 [0m|   7.213333ms| nomatch|[97;44m GET     [0m /swagger
+2024/03/17 10:57:53.272  [D] [router.go:1305]  |            ::1|[97;43m 404 [0m|    252.917µs| nomatch|[97;44m GET     [0m /favicon.ico
+2024/03/17 10:58:25.472  [D] [router.go:1305]  |            ::1|[97;43m 404 [0m|     678.75µs| nomatch|[97;44m GET     [0m /swagger
+2024/03/17 10:59:26.549  [I] [server.go:280]  http server Running on http://:8085
+2024/03/17 10:59:31.274  [D] [router.go:1305]  |            ::1|[90;47m 302 [0m|     552.75µs|   match|[97;44m GET     [0m /swagger
+2024/03/17 10:59:31.286  [D] [router.go:1305]  |            ::1|[97;42m 200 [0m|    779.459µs|   match|[97;44m GET     [0m /swagger/
+2024/03/17 10:59:31.316  [D] [router.go:1305]  |            ::1|[97;42m 200 [0m|    739.125µs|   match|[97;44m GET     [0m /swagger/swagger-ui.css
+2024/03/17 10:59:31.321  [D] [router.go:1305]  |            ::1|[97;42m 200 [0m|   3.230875ms|   match|[97;44m GET     [0m /swagger/swagger-ui-bundle.js
+2024/03/17 10:59:31.322  [D] [router.go:1305]  |            ::1|[97;42m 200 [0m|   1.206334ms|   match|[97;44m GET     [0m /swagger/swagger-ui-standalone-preset.js
+2024/03/17 10:59:31.406  [D] [router.go:1305]  |            ::1|[90;47m 302 [0m|     45.084µs|   match|[97;44m GET     [0m /swagger
+2024/03/17 10:59:31.421  [D] [router.go:1305]  |            ::1|[97;42m 200 [0m|     48.167µs|   match|[97;44m GET     [0m /swagger/
+2024/03/17 11:00:14.878  [D] [router.go:1305]  |            ::1|[97;42m 200 [0m|    332.333µs|   match|[97;44m GET     [0m /swagger/
+2024/03/17 11:00:14.931  [D] [router.go:1305]  |            ::1|[97;42m 200 [0m|    486.625µs|   match|[97;44m GET     [0m /swagger/swagger.yml

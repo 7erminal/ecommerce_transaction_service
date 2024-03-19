@@ -1,0 +1,585 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "beego Test API",
+        "description": "beego has a very cool tools to autogenerate documents for your API\n",
+        "version": "1.0.0",
+        "termsOfService": "http://beego.me/",
+        "contact": {
+            "email": "astaxie@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/orders/": {
+            "get": {
+                "tags": [
+                    "orders"
+                ],
+                "description": "get Orders\n\u003cbr\u003e",
+                "operationId": "OrdersController.Get All",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "Fields returned. e.g. col1,col2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "Sorted-by fields. e.g. col1,col2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Limit the size of result set. Must be an integer",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Start position of result set. Must be an integer",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Orders"
+                        }
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "orders"
+                ],
+                "description": "create Orders\n\u003cbr\u003e",
+                "operationId": "OrdersController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Orders content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.OrdersRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.Orders"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/orders/{id}": {
+            "get": {
+                "tags": [
+                    "orders"
+                ],
+                "description": "get Orders by id\n\u003cbr\u003e",
+                "operationId": "OrdersController.Get One",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Orders"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "orders"
+                ],
+                "description": "update the Orders\n\u003cbr\u003e",
+                "operationId": "OrdersController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to update",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Orders content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Orders"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Orders"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is not int"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "orders"
+                ],
+                "description": "delete the Orders\n\u003cbr\u003e",
+                "operationId": "OrdersController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} delete success!"
+                    },
+                    "403": {
+                        "description": "id is empty"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "29665.\u003cnil\u003e.Cart": {
+            "title": "Cart",
+            "type": "object"
+        },
+        "models.Categories": {
+            "title": "Categories",
+            "type": "object",
+            "properties": {
+                "CategoryId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CategoryName": {
+                    "type": "string"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ImagePath": {
+                    "type": "string"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Currencies": {
+            "title": "Currencies",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Currency": {
+                    "type": "string"
+                },
+                "CurrencyId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Item_prices": {
+            "title": "Item_prices",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "AltItemPrice": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Currency": {
+                    "$ref": "#/definitions/models.Currencies"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ItemPrice": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "ItemPriceId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ShowAltPrice": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.Items": {
+            "title": "Items",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "AvailableColors": {
+                    "type": "string"
+                },
+                "AvailableSizes": {
+                    "type": "string"
+                },
+                "Category": {
+                    "$ref": "#/definitions/models.Categories"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ImagePath": {
+                    "type": "string"
+                },
+                "ItemId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ItemName": {
+                    "type": "string"
+                },
+                "ItemPrice": {
+                    "$ref": "#/definitions/models.Item_prices"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Quantity": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Order_items": {
+            "title": "Order_items",
+            "type": "object",
+            "properties": {
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Item": {
+                    "$ref": "#/definitions/models.Items"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Order": {
+                    "$ref": "#/definitions/models.Orders"
+                },
+                "OrderDate": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "OrderItemId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Quantity": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Orders": {
+            "title": "Orders",
+            "type": "object",
+            "properties": {
+                "Cost": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Currency": {
+                    "$ref": "#/definitions/models.Currencies"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "OrderDate": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "OrderId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Quantity": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.OrdersRequestDTO": {
+            "title": "OrdersRequestDTO",
+            "type": "object",
+            "properties": {
+                "Comment": {
+                    "type": "string"
+                },
+                "Cost": {
+                    "type": "string"
+                },
+                "CreatedBy": {
+                    "type": "string"
+                },
+                "Currency": {
+                    "type": "string"
+                },
+                "Items": {
+                    "$ref": "#/definitions/29665.\u003cnil\u003e.Cart"
+                },
+                "RecipientAccountNumber": {
+                    "type": "string"
+                },
+                "RequestType": {
+                    "type": "string"
+                },
+                "SenderAccountNumber": {
+                    "type": "string"
+                },
+                "TotalQuantity": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Transaction_details": {
+            "title": "Transaction_details",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Amount": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "Comment": {
+                    "type": "string"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "RecipientAccountNumber": {
+                    "type": "string"
+                },
+                "SenderAccountNumber": {
+                    "type": "string"
+                },
+                "SenderId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "StatusCode": {
+                    "type": "string"
+                },
+                "StatusMessage": {
+                    "type": "string"
+                },
+                "TansactionDetailId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TransactionId": {
+                    "$ref": "#/definitions/models.Transactions"
+                }
+            }
+        },
+        "models.Transactions": {
+            "title": "Transactions",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Amount": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Order": {
+                    "$ref": "#/definitions/models.Orders"
+                },
+                "Status": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TransactingCurrency": {
+                    "$ref": "#/definitions/models.Currencies"
+                },
+                "TransactionId": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "orders",
+            "description": "OrdersController operations for Orders\n"
+        }
+    ]
+}
