@@ -11,8 +11,8 @@ import (
 )
 
 type Transaction_details struct {
-	TansactionDetailId     int64         `orm:"auto"`
-	TransactionId          *Transactions `orm:"rel(fk)"`
+	TransactionDetailId    int64         `orm:"auto"`
+	TransactionId          *Transactions `orm:"rel(fk); column(transaction_id)"`
 	Amount                 float32
 	Comment                string `orm:"size(255); omitempty; null"`
 	SenderAccountNumber    string `orm:"size(255)"`
@@ -43,8 +43,19 @@ func AddTransaction_details(m *Transaction_details) (id int64, err error) {
 // Id doesn't exist
 func GetTransaction_detailsById(id int64) (v *Transaction_details, err error) {
 	o := orm.NewOrm()
-	v = &Transaction_details{TansactionDetailId: id}
-	if err = o.QueryTable(new(Transaction_details)).Filter("Id", id).RelatedSel().One(v); err == nil {
+	v = &Transaction_details{TransactionDetailId: id}
+	if err = o.QueryTable(new(Transaction_details)).Filter("TransactionId", id).RelatedSel().One(v); err == nil {
+		return v, nil
+	}
+	return nil, err
+}
+
+// GetTransaction_detailsByTransactionId retrieves Transaction_details by Id. Returns error if
+// Id doesn't exist
+func GetTransaction_detailsByTransaction(id *Transactions) (v *Transaction_details, err error) {
+	o := orm.NewOrm()
+	v = &Transaction_details{TransactionId: id}
+	if err = o.QueryTable(new(Transaction_details)).Filter("TransactionId", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
@@ -128,7 +139,7 @@ func GetAllTransaction_details(query map[string]string, fields []string, sortby 
 // the record to be updated doesn't exist
 func UpdateTransaction_detailsById(m *Transaction_details) (err error) {
 	o := orm.NewOrm()
-	v := Transaction_details{TansactionDetailId: m.TansactionDetailId}
+	v := Transaction_details{TransactionDetailId: m.TransactionDetailId}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -143,11 +154,11 @@ func UpdateTransaction_detailsById(m *Transaction_details) (err error) {
 // the record to be deleted doesn't exist
 func DeleteTransaction_details(id int64) (err error) {
 	o := orm.NewOrm()
-	v := Transaction_details{TansactionDetailId: id}
+	v := Transaction_details{TransactionDetailId: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Transaction_details{TansactionDetailId: id}); err == nil {
+		if num, err = o.Delete(&Transaction_details{TransactionDetailId: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}

@@ -11,15 +11,16 @@ import (
 )
 
 type Orders struct {
-	OrderId      int64 `orm:"auto"`
-	Quantity     int
-	Cost         float32
-	Currency     *Currencies `orm:"rel(fk)"`
-	OrderDate    time.Time   `orm:"type(datetime)"`
-	DateCreated  time.Time   `orm:"type(datetime)"`
-	DateModified time.Time   `orm:"type(datetime)"`
-	CreatedBy    int
-	ModifiedBy   int
+	OrderId  int64 `orm:"auto"`
+	Quantity int
+	Cost     float32
+	// Currency     *Currencies `orm:"rel(fk)"`
+	Currency     int64
+	OrderDate    time.Time `orm:"type(datetime)"`
+	DateCreated  time.Time `orm:"type(datetime)"`
+	DateModified time.Time `orm:"type(datetime)"`
+	CreatedBy    int64
+	ModifiedBy   int64
 }
 
 func init() {

@@ -14,8 +14,8 @@ type Transactions struct {
 	TransactionId       int64   `orm:"auto"`
 	Order               *Orders `orm:"rel(fk)"`
 	Amount              float32
-	TransactingCurrency *Currencies `orm:"rel(fk)"`
-	Status              int
+	TransactingCurrency int64
+	StatusId            int64
 	DateCreated         time.Time `orm:"type(datetime)"`
 	DateModified        time.Time `orm:"type(datetime)"`
 	CreatedBy           int

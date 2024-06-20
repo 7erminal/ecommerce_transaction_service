@@ -1,26 +1,30 @@
 package models
 
 type OrdersRequestDTO struct {
-	TotalQuantity          string
-	Currency               string
-	Items                  *[]Cart
-	RequestType            string
-	Comment                string
-	SenderAccountNumber    string
-	RecipientAccountNumber string
-	Cost                   string
-	CreatedBy              string
+	TotalQuantity string
+	Currency      string
+	Items         []Cart
+	RequestType   string
+	Comment       string
+	Cost          string
+	CreatedBy     string
 }
 
 type Cart struct {
-	ItemId   string
-	Quantity string
-	Price    string
-	Currency string
+	ItemId   int64
+	Quantity int64
+	Price    float64
+	Currency int64
 }
 
 type OrdersResponseDTO struct {
 	StatusCode int
 	Order      *Orders
 	StatusDesc string
+}
+
+type ConfirmOrderDTO struct {
+	TransactionId string
+	Status        string
+	Confirmedby   string
 }

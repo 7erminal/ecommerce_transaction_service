@@ -136,7 +136,7 @@ func (c *Transaction_detailsController) GetAll() {
 func (c *Transaction_detailsController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := models.Transaction_details{TansactionDetailId: id}
+	v := models.Transaction_details{TransactionDetailId: id}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err := models.UpdateTransaction_detailsById(&v); err == nil {
 		c.Data["json"] = "OK"

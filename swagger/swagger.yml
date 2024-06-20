@@ -137,130 +137,159 @@ paths:
           description: '{string} delete success!'
         "403":
           description: id is empty
+  /orders/confirm-order:
+    post:
+      tags:
+      - orders
+      description: |-
+        create Orders
+        <br>
+      operationId: OrdersController.ConfirmOrder
+      parameters:
+      - in: body
+        name: body
+        description: body for Orders content
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConfirmOrderDTO'
+      responses:
+        "201":
+          description: '{int} models.Orders'
+        "403":
+          description: body is empty
+  /transactions/:
+    get:
+      tags:
+      - transactions
+      description: |-
+        get Transactions
+        <br>
+      operationId: TransactionsController.Get All
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Transactions'
+        "403":
+          description: ""
+  /transactions/{id}:
+    get:
+      tags:
+      - transactions
+      description: |-
+        get Transactions by id
+        <br>
+      operationId: TransactionsController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Transactions'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - transactions
+      description: |-
+        update the Transactions
+        <br>
+      operationId: TransactionsController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Transactions content
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateTransactionRequestDTO'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Transactions'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - transactions
+      description: |-
+        delete the Transactions
+        <br>
+      operationId: TransactionsController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
 definitions:
-  29665.<nil>.Cart:
+  models.Cart:
     title: Cart
     type: object
-  models.Categories:
-    title: Categories
-    type: object
     properties:
-      CategoryId:
-        type: integer
-        format: int64
-      CategoryName:
-        type: string
-      CreatedBy:
-        type: integer
-        format: int64
-      DateCreated:
-        type: string
-        format: datetime
-      DateModified:
-        type: string
-        format: datetime
-      ImagePath:
-        type: string
-      ModifiedBy:
-        type: integer
-        format: int64
-  models.Currencies:
-    title: Currencies
-    type: object
-    properties:
-      Active:
-        type: integer
-        format: int64
-      CreatedBy:
-        type: integer
-        format: int64
       Currency:
-        type: string
-      CurrencyId:
         type: integer
         format: int64
-      DateCreated:
-        type: string
-        format: datetime
-      DateModified:
-        type: string
-        format: datetime
-      ModifiedBy:
-        type: integer
-        format: int64
-      Symbol:
-        type: string
-  models.Item_prices:
-    title: Item_prices
-    type: object
-    properties:
-      Active:
-        type: integer
-        format: int64
-      AltItemPrice:
-        type: number
-        format: float
-      CreatedBy:
-        type: integer
-        format: int64
-      Currency:
-        $ref: '#/definitions/models.Currencies'
-      DateCreated:
-        type: string
-        format: datetime
-      DateModified:
-        type: string
-        format: datetime
-      ItemPrice:
-        type: number
-        format: float
-      ItemPriceId:
-        type: integer
-        format: int64
-      ModifiedBy:
-        type: integer
-        format: int64
-      ShowAltPrice:
-        type: boolean
-  models.Items:
-    title: Items
-    type: object
-    properties:
-      Active:
-        type: integer
-        format: int64
-      AvailableColors:
-        type: string
-      AvailableSizes:
-        type: string
-      Category:
-        $ref: '#/definitions/models.Categories'
-      CreatedBy:
-        type: integer
-        format: int64
-      DateCreated:
-        type: string
-        format: datetime
-      DateModified:
-        type: string
-        format: datetime
-      Description:
-        type: string
-      ImagePath:
-        type: string
       ItemId:
         type: integer
         format: int64
-      ItemName:
-        type: string
-      ItemPrice:
-        $ref: '#/definitions/models.Item_prices'
-      ModifiedBy:
-        type: integer
-        format: int64
+      Price:
+        type: number
+        format: double
       Quantity:
         type: integer
         format: int64
+  models.ConfirmOrderDTO:
+    title: ConfirmOrderDTO
+    type: object
+    properties:
+      Confirmedby:
+        type: string
+      Status:
+        type: string
+      TransactionId:
+        type: string
   models.Order_items:
     title: Order_items
     type: object
@@ -275,7 +304,8 @@ definitions:
         type: string
         format: datetime
       Item:
-        $ref: '#/definitions/models.Items'
+        type: integer
+        format: int64
       ModifiedBy:
         type: integer
         format: int64
@@ -301,7 +331,8 @@ definitions:
         type: integer
         format: int64
       Currency:
-        $ref: '#/definitions/models.Currencies'
+        type: integer
+        format: int64
       DateCreated:
         type: string
         format: datetime
@@ -333,12 +364,10 @@ definitions:
       Currency:
         type: string
       Items:
-        $ref: '#/definitions/29665.<nil>.Cart'
-      RecipientAccountNumber:
-        type: string
+        type: array
+        items:
+          $ref: '#/definitions/models.Cart'
       RequestType:
-        type: string
-      SenderAccountNumber:
         type: string
       TotalQuantity:
         type: string
@@ -377,7 +406,7 @@ definitions:
         type: string
       StatusMessage:
         type: string
-      TansactionDetailId:
+      TransactionDetailId:
         type: integer
         format: int64
       TransactionId:
@@ -406,15 +435,27 @@ definitions:
         format: int64
       Order:
         $ref: '#/definitions/models.Orders'
-      Status:
+      StatusId:
         type: integer
         format: int64
       TransactingCurrency:
-        $ref: '#/definitions/models.Currencies'
+        type: integer
+        format: int64
       TransactionId:
         type: integer
         format: int64
+  requests.UpdateTransactionRequestDTO:
+    title: UpdateTransactionRequestDTO
+    type: object
+    properties:
+      RecipientAccountNumber:
+        type: string
+      SenderAccountNumber:
+        type: string
 tags:
 - name: orders
   description: |
     OrdersController operations for Orders
+- name: transactions
+  description: |
+    TransactionsController operations for Transactions

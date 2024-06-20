@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"transaction_service/models"
+	"transaction_service/structs/requests"
+	"transaction_service/structs/responses"
 
 	beego "github.com/beego/beego/v2/server/web"
 )
@@ -129,20 +131,40 @@ func (c *TransactionsController) GetAll() {
 // @Title Put
 // @Description update the Transactions
 // @Param	id		path 	string	true		"The id you want to update"
-// @Param	body		body 	models.Transactions	true		"body for Transactions content"
+// @Param	body		body 	requests.UpdateTransactionRequestDTO	true		"body for Transactions content"
 // @Success 200 {object} models.Transactions
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (c *TransactionsController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := models.Transactions{TransactionId: id}
+	var v requests.UpdateTransactionRequestDTO
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	if err := models.UpdateTransactionsById(&v); err == nil {
-		c.Data["json"] = "OK"
+
+	if z, err := models.GetTransactionsById(id); err == nil {
+		if td, err := models.GetTransaction_detailsByTransaction(z); err == nil {
+			td.SenderAccountNumber = v.SenderAccountNumber
+			td.RecipientAccountNumber = v.RecipientAccountNumber
+			if err := models.UpdateTransaction_detailsById(td); err == nil {
+				var resp = responses.TransactionResponseDTO{StatusCode: 200, Transaction: z, StatusDesc: "Transaction Updated"}
+				c.Ctx.Output.SetStatus(201)
+				c.Data["json"] = resp
+			} else {
+				var resp = responses.TransactionResponseDTO{StatusCode: 301, Transaction: z, StatusDesc: "Transaction Update failed. " + err.Error()}
+				c.Ctx.Output.SetStatus(201)
+				c.Data["json"] = resp
+			}
+		} else {
+			var resp = responses.TransactionResponseDTO{StatusCode: 301, Transaction: z, StatusDesc: "Transaction Update failed. " + err.Error()}
+			c.Ctx.Output.SetStatus(201)
+			c.Data["json"] = resp
+		}
 	} else {
-		c.Data["json"] = err.Error()
+		var resp = responses.TransactionResponseDTO{StatusCode: 301, Transaction: nil, StatusDesc: "Transaction Update failed. " + err.Error()}
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = resp
 	}
+
 	c.ServeJSON()
 }
 

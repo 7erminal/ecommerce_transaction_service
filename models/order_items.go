@@ -13,13 +13,13 @@ import (
 type Order_items struct {
 	OrderItemId  int64   `orm:"auto"`
 	Order        *Orders `orm:"rel(fk)"`
-	Item         *Items  `orm:"rel(fk)"`
-	Quantity     int
+	Item         int64   `orm:"column(item_id)"`
+	Quantity     int64
 	OrderDate    time.Time `orm:"type(datetime)"`
 	DateCreated  time.Time `orm:"type(datetime)"`
 	DateModified time.Time `orm:"type(datetime)"`
-	CreatedBy    int
-	ModifiedBy   int
+	CreatedBy    int64
+	ModifiedBy   int64
 }
 
 func init() {
