@@ -19,7 +19,7 @@ type Orders struct {
 	OrderDate    time.Time `orm:"type(datetime)"`
 	DateCreated  time.Time `orm:"type(datetime)"`
 	DateModified time.Time `orm:"type(datetime)"`
-	CreatedBy    int64
+	CreatedBy    *Users    `orm:"column(created_by);rel(fk);"`
 	ModifiedBy   int64
 }
 
@@ -41,6 +41,17 @@ func GetOrdersById(id int64) (v *Orders, err error) {
 	o := orm.NewOrm()
 	v = &Orders{OrderId: id}
 	if err = o.QueryTable(new(Orders)).Filter("OrderId", id).RelatedSel().One(v); err == nil {
+		return v, nil
+	}
+	return nil, err
+}
+
+// GetOrdersById retrieves Orders by Id. Returns error if
+// Id doesn't exist
+func GetOrdersByUser(id int64) (v *[]Orders, err error) {
+	o := orm.NewOrm()
+	v = &[]Orders{}
+	if _, err = o.QueryTable(new(Orders)).Filter("CreatedBy__UserId", id).RelatedSel().All(v); err == nil {
 		return v, nil
 	}
 	return nil, err

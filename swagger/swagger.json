@@ -127,6 +127,34 @@
                 }
             }
         },
+        "/orders/get-user-orders": {
+            "post": {
+                "tags": [
+                    "orders"
+                ],
+                "description": "get user orders\n\u003cbr\u003e",
+                "operationId": "OrdersController.Get User Orders",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Transactions content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.GetUserOrdersRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.OrdersResponseDTO"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/orders/{id}": {
             "get": {
                 "tags": [
@@ -270,6 +298,34 @@
                     },
                     "403": {
                         "description": ""
+                    }
+                }
+            }
+        },
+        "/transactions/get-user-transactions": {
+            "post": {
+                "tags": [
+                    "transactions"
+                ],
+                "description": "create Transactions\n\u003cbr\u003e",
+                "operationId": "TransactionsController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Transactions content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.GetUserTransactionsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.Transactions"
+                    },
+                    "403": {
+                        "description": "body is empty"
                     }
                 }
             }
@@ -452,8 +508,7 @@
                     "format": "float"
                 },
                 "CreatedBy": {
-                    "type": "integer",
-                    "format": "int64"
+                    "$ref": "#/definitions/models.Users"
                 },
                 "Currency": {
                     "type": "integer",
@@ -492,9 +547,6 @@
                 "Comment": {
                     "type": "string"
                 },
-                "Cost": {
-                    "type": "string"
-                },
                 "CreatedBy": {
                     "type": "string"
                 },
@@ -508,9 +560,6 @@
                     }
                 },
                 "RequestType": {
-                    "type": "string"
-                },
-                "TotalQuantity": {
                     "type": "string"
                 }
             }
@@ -613,6 +662,112 @@
                 "TransactionId": {
                     "type": "integer",
                     "format": "int64"
+                }
+            }
+        },
+        "models.Users": {
+            "title": "Users",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Address": {
+                    "type": "string"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Dob": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Email": {
+                    "type": "string"
+                },
+                "FullName": {
+                    "type": "string"
+                },
+                "Gender": {
+                    "type": "string"
+                },
+                "IdNumber": {
+                    "type": "string"
+                },
+                "IdType": {
+                    "type": "string"
+                },
+                "ImagePath": {
+                    "type": "string"
+                },
+                "IsVerified": {
+                    "type": "boolean"
+                },
+                "MaritalStatus": {
+                    "type": "string"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Password": {
+                    "type": "string"
+                },
+                "PhoneNumber": {
+                    "type": "string"
+                },
+                "UserId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "UserType": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Username": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.GetUserOrdersRequest": {
+            "title": "GetUserOrdersRequest",
+            "type": "object",
+            "properties": {
+                "FromDate": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ToDate": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.GetUserTransactionsRequest": {
+            "title": "GetUserTransactionsRequest",
+            "type": "object",
+            "properties": {
+                "FromDate": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ToDate": {
+                    "type": "string"
                 }
             }
         },

@@ -9,3 +9,9 @@ type TransactionResponseDTO struct {
 	Transaction *models.Transactions
 	StatusDesc  string
 }
+
+type TransactionsResponseDTO struct {
+	StatusCode   int
+	Transactions *[]models.Transactions
+	StatusDesc   string
+}

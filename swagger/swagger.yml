@@ -157,6 +157,26 @@ paths:
           description: '{int} models.Orders'
         "403":
           description: body is empty
+  /orders/get-user-orders:
+    post:
+      tags:
+      - orders
+      description: |-
+        get user orders
+        <br>
+      operationId: OrdersController.Get User Orders
+      parameters:
+      - in: body
+        name: body
+        description: body for Transactions content
+        required: true
+        schema:
+          $ref: '#/definitions/requests.GetUserOrdersRequest'
+      responses:
+        "201":
+          description: '{int} models.OrdersResponseDTO'
+        "403":
+          description: body is empty
   /transactions/:
     get:
       tags:
@@ -263,6 +283,26 @@ paths:
           description: '{string} delete success!'
         "403":
           description: id is empty
+  /transactions/get-user-transactions:
+    post:
+      tags:
+      - transactions
+      description: |-
+        create Transactions
+        <br>
+      operationId: TransactionsController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for Transactions content
+        required: true
+        schema:
+          $ref: '#/definitions/requests.GetUserTransactionsRequest'
+      responses:
+        "201":
+          description: '{int} models.Transactions'
+        "403":
+          description: body is empty
 definitions:
   models.Cart:
     title: Cart
@@ -328,8 +368,7 @@ definitions:
         type: number
         format: float
       CreatedBy:
-        type: integer
-        format: int64
+        $ref: '#/definitions/models.Users'
       Currency:
         type: integer
         format: int64
@@ -357,8 +396,6 @@ definitions:
     properties:
       Comment:
         type: string
-      Cost:
-        type: string
       CreatedBy:
         type: string
       Currency:
@@ -368,8 +405,6 @@ definitions:
         items:
           $ref: '#/definitions/models.Cart'
       RequestType:
-        type: string
-      TotalQuantity:
         type: string
   models.Transaction_details:
     title: Transaction_details
@@ -444,6 +479,80 @@ definitions:
       TransactionId:
         type: integer
         format: int64
+  models.Users:
+    title: Users
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      Address:
+        type: string
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Dob:
+        type: string
+        format: datetime
+      Email:
+        type: string
+      FullName:
+        type: string
+      Gender:
+        type: string
+      IdNumber:
+        type: string
+      IdType:
+        type: string
+      ImagePath:
+        type: string
+      IsVerified:
+        type: boolean
+      MaritalStatus:
+        type: string
+      ModifiedBy:
+        type: integer
+        format: int64
+      Password:
+        type: string
+      PhoneNumber:
+        type: string
+      UserId:
+        type: integer
+        format: int64
+      UserType:
+        type: integer
+        format: int64
+      Username:
+        type: string
+  requests.GetUserOrdersRequest:
+    title: GetUserOrdersRequest
+    type: object
+    properties:
+      FromDate:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      ToDate:
+        type: string
+  requests.GetUserTransactionsRequest:
+    title: GetUserTransactionsRequest
+    type: object
+    properties:
+      FromDate:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      ToDate:
+        type: string
   requests.UpdateTransactionRequestDTO:
     title: UpdateTransactionRequestDTO
     type: object

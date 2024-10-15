@@ -9,6 +9,8 @@ import (
 	"transaction_service/structs/requests"
 	"transaction_service/structs/responses"
 
+	"github.com/beego/beego/v2/core/logs"
+
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -44,6 +46,28 @@ func (c *TransactionsController) URLMapping() {
 // 	}
 // 	c.ServeJSON()
 // }
+
+// Post ...
+// @Title Post
+// @Description create Transactions
+// @Param	body		body 	requests.GetUserTransactionsRequest	true		"body for Transactions content"
+// @Success 201 {int} models.Transactions
+// @Failure 403 body is empty
+// @router /get-user-transactions [post]
+func (c *TransactionsController) GetUserTransactions() {
+	var v requests.GetUserTransactionsRequest
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	if transactions, err := models.GetTransactionsByUser(v.Id); err == nil {
+		logs.Debug("Item ID to get quantity is ", transactions)
+		var resp = responses.TransactionsResponseDTO{StatusCode: 200, Transactions: transactions, StatusDesc: "Transactions fetched successfully"}
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = resp
+	} else {
+		c.Data["json"] = err.Error()
+	}
+	c.ServeJSON()
+}
 
 // GetOne ...
 // @Title Get One
@@ -155,7 +179,7 @@ func (c *TransactionsController) Put() {
 				c.Data["json"] = resp
 			}
 		} else {
-			var resp = responses.TransactionResponseDTO{StatusCode: 301, Transaction: z, StatusDesc: "Transaction Update failed. " + err.Error()}
+			var resp = responses.TransactionResponseDTO{StatusCode: 303, Transaction: z, StatusDesc: "Transaction details not found. " + err.Error()}
 			c.Ctx.Output.SetStatus(201)
 			c.Data["json"] = resp
 		}

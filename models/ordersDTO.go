@@ -1,13 +1,11 @@
 package models
 
 type OrdersRequestDTO struct {
-	TotalQuantity string
-	Currency      string
-	Items         []Cart
-	RequestType   string
-	Comment       string
-	Cost          string
-	CreatedBy     string
+	Currency    string
+	Items       []Cart
+	RequestType string
+	Comment     string
+	CreatedBy   string
 }
 
 type Cart struct {
@@ -17,9 +15,15 @@ type Cart struct {
 	Currency int64
 }
 
-type OrdersResponseDTO struct {
+type OrderResponseDTO struct {
 	StatusCode int
 	Order      *Orders
+	StatusDesc string
+}
+
+type OrdersResponseDTO struct {
+	StatusCode int
+	Orders     *[]Orders
 	StatusDesc string
 }
 
