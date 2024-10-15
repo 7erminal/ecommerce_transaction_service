@@ -142,7 +142,7 @@ paths:
       tags:
       - orders
       description: |-
-        create Orders
+        Confirm Orders
         <br>
       operationId: OrdersController.ConfirmOrder
       parameters:

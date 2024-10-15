@@ -104,7 +104,7 @@
                 "tags": [
                     "orders"
                 ],
-                "description": "create Orders\n\u003cbr\u003e",
+                "description": "Confirm Orders\n\u003cbr\u003e",
                 "operationId": "OrdersController.ConfirmOrder",
                 "parameters": [
                     {

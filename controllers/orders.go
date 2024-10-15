@@ -145,7 +145,7 @@ func (c *OrdersController) Post() {
 
 // Post ...
 // @Title ConfirmOrder
-// @Description create Orders
+// @Description Confirm Orders
 // @Param	body		body 	models.ConfirmOrderDTO	true		"body for Orders content"
 // @Success 201 {int} models.Orders
 // @Failure 403 body is empty
