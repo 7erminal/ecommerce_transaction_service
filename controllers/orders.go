@@ -47,8 +47,8 @@ func (c *OrdersController) Post() {
 	quantity_ := 0
 	// cost_, _ := strconv.ParseFloat(v.Cost, 32)
 	cost_ := 0
-	currency_id, _ := strconv.ParseInt(v.Currency, 0, 64)
-	created_by, _ := strconv.ParseInt(v.CreatedBy, 0, 64)
+	currency_id := v.Currency
+	created_by := v.CreatedBy
 
 	logs.Info("Total quantity is ")
 
@@ -68,59 +68,65 @@ func (c *OrdersController) Post() {
 					logs.Info("q is ", q)
 					logs.Info("and r is ", r)
 					// item_id, _ := strconv.ParseInt(r.ItemId, 0, 64)
-					item_id := r.ItemId
-					// each_quantity_, _ := strconv.Atoi(r.Quantity)
-					each_quantity_ := r.Quantity
+					if item, err := models.GetItemsById(r.ItemId); err == nil {
+						item_id := item.ItemId
+						// each_quantity_, _ := strconv.Atoi(r.Quantity)
+						each_quantity_ := r.Quantity
 
-					// if item_, item_err := models.GetItemsById(item_id); item_err == nil {
-					var order_items = models.Order_items{Order: &order_, Item: item_id, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by}
+						// if item_, item_err := models.GetItemsById(item_id); item_err == nil {
+						var order_items = models.Order_items{Order: &order_, Item: item_id, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by}
 
-					// Add order item
-					if _, err := models.AddOrder_items(&order_items); err != nil {
-						logs.Error("Error adding order item::: ", err.Error())
-					} else {
-						// amount_ = float32(amount_) + float32(item_.ItemPrice.ItemPrice)
-						amount_ = float32(amount_) + (float32(r.Price) * float32(r.Quantity))
-						quantity_ = quantity_ + int(each_quantity_)
+						// Add order item
+						if _, err := models.AddOrder_items(&order_items); err != nil {
+							logs.Error("Error adding order item::: ", err.Error())
+						} else {
+							// amount_ = float32(amount_) + float32(item_.ItemPrice.ItemPrice)
+							amount_ = float32(amount_) + (float32(r.Price) * float32(r.Quantity))
+							quantity_ = quantity_ + int(each_quantity_)
+						}
+						// }
 					}
-					// }
 				}
 
-				if amount_ == 0 {
-					amount_ = float32(cost_)
-				}
+				if amount_ == 0 || quantity_ == 0 {
+					// amount_ = float32(cost_)
+					var resp = models.OrderResponseDTO{StatusCode: 400, Order: nil, StatusDesc: "Invalid request. Amount or quantity provided is invalid"}
+					logs.Error("Error thrown when adding transaction details::: ")
+					c.Ctx.Output.SetStatus(400)
+					c.Data["json"] = resp
+				} else {
+					order_.Cost = amount_
+					order_.Quantity = quantity_
 
-				order_.Cost = amount_
-				order_.Quantity = quantity_
+					if err := models.UpdateOrdersById(&order_); err != nil {
+						logs.Info("An error occurred when updating order")
+					}
 
-				if err := models.UpdateOrdersById(&order_); err != nil {
-					logs.Info("An error occurred when updating order")
-				}
+					logs.Info("About to move to transactions")
+					var transaction_ = models.Transactions{Order: &order_, Amount: amount_, TransactingCurrency: cur.CurrencyId, StatusId: 2, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: int(created_by), ModifiedBy: int(created_by)}
+					logs.Info("About to add transaction")
+					if _, txn_err := models.AddTransactions(&transaction_); txn_err == nil {
+						logs.Info("NO error adding transaction")
+						status_code := "1022"
+						var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1}
 
-				logs.Info("About to move to transactions")
-				var transaction_ = models.Transactions{Order: &order_, Amount: amount_, TransactingCurrency: cur.CurrencyId, StatusId: 2, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: int(created_by), ModifiedBy: int(created_by)}
-				logs.Info("About to add transaction")
-				if _, txn_err := models.AddTransactions(&transaction_); txn_err == nil {
-					logs.Info("NO error adding transaction")
-					status_code := "1022"
-					var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1}
+						if _, txn_d_err := models.AddTransaction_details((&txn_details)); txn_d_err == nil {
+							var resp = responses.TransactionResponseDTO{StatusCode: 200, Transaction: &transaction_, StatusDesc: "Order successfully placed"}
+							c.Ctx.Output.SetStatus(200)
+							c.Data["json"] = resp
 
-					if _, txn_d_err := models.AddTransaction_details((&txn_details)); txn_d_err == nil {
-						var resp = responses.TransactionResponseDTO{StatusCode: 200, Transaction: &transaction_, StatusDesc: "Order successfully placed"}
-						c.Ctx.Output.SetStatus(200)
-						c.Data["json"] = resp
-
+						} else {
+							var resp = models.OrderResponseDTO{StatusCode: 808, Order: nil, StatusDesc: "Transaction details error!"}
+							logs.Error("Error thrown when adding transaction details::: ", txn_d_err.Error())
+							c.Ctx.Output.SetStatus(304)
+							c.Data["json"] = resp
+						}
 					} else {
-						var resp = models.OrderResponseDTO{StatusCode: 808, Order: nil, StatusDesc: "Transaction details error!"}
-						logs.Error("Error thrown when adding transaction details::: ", txn_d_err.Error())
+						var resp = models.OrderResponseDTO{StatusCode: 807, Order: nil, StatusDesc: "Transaction error!"}
+						logs.Error("Error thrown when adding transaction::: ", txn_err.Error())
 						c.Ctx.Output.SetStatus(304)
 						c.Data["json"] = resp
 					}
-				} else {
-					var resp = models.OrderResponseDTO{StatusCode: 807, Order: nil, StatusDesc: "Transaction error!"}
-					logs.Error("Error thrown when adding transaction::: ", txn_err.Error())
-					c.Ctx.Output.SetStatus(304)
-					c.Data["json"] = resp
 				}
 
 			} else {

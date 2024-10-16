@@ -1,11 +1,11 @@
 package models
 
 type OrdersRequestDTO struct {
-	Currency    string
+	Currency    int64
 	Items       []Cart
 	RequestType string
 	Comment     string
-	CreatedBy   string
+	CreatedBy   int64
 }
 
 type Cart struct {
