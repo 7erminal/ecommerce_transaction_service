@@ -397,9 +397,11 @@ definitions:
       Comment:
         type: string
       CreatedBy:
-        type: string
+        type: integer
+        format: int64
       Currency:
-        type: string
+        type: integer
+        format: int64
       Items:
         type: array
         items:
