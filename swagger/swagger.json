@@ -308,7 +308,7 @@
                     "transactions"
                 ],
                 "description": "create Transactions\n\u003cbr\u003e",
-                "operationId": "TransactionsController.Post",
+                "operationId": "TransactionsController.GetUserTransactionsLimit",
                 "parameters": [
                     {
                         "in": "body",
@@ -321,8 +321,36 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "{int} models.Transactions"
+                    "200": {
+                        "description": "{int} responses.TransactionsCustomResponseDTO"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/transactions/get-user-transactions-by-date": {
+            "post": {
+                "tags": [
+                    "transactions"
+                ],
+                "description": "create Transactions\n\u003cbr\u003e",
+                "operationId": "TransactionsController.GetUserTransactions",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Transactions content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.GetUserTransactionsByDateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} responses.TransactionsCustomResponseDTO"
                     },
                     "403": {
                         "description": "body is empty"
@@ -757,8 +785,8 @@
                 }
             }
         },
-        "requests.GetUserTransactionsRequest": {
-            "title": "GetUserTransactionsRequest",
+        "requests.GetUserTransactionsByDateRequest": {
+            "title": "GetUserTransactionsByDateRequest",
             "type": "object",
             "properties": {
                 "FromDate": {
@@ -770,6 +798,20 @@
                 },
                 "ToDate": {
                     "type": "string"
+                }
+            }
+        },
+        "requests.GetUserTransactionsRequest": {
+            "title": "GetUserTransactionsRequest",
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Limit": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"time"
 	"transaction_service/models"
 	"transaction_service/structs/requests"
 	"transaction_service/structs/responses"
@@ -48,19 +49,73 @@ func (c *TransactionsController) URLMapping() {
 // }
 
 // Post ...
-// @Title Post
+// @Title GetUserTransactions
+// @Description create Transactions
+// @Param	body		body 	requests.GetUserTransactionsByDateRequest	true		"body for Transactions content"
+// @Success 200 {int} responses.TransactionsCustomResponseDTO
+// @Failure 403 body is empty
+// @router /get-user-transactions-by-date [post]
+func (c *TransactionsController) GetUserTransactionsByDate() {
+	var v requests.GetUserTransactionsByDateRequest
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	fromDate, error := time.Parse("2006-01-02", v.FromDate)
+
+	toDate, error2 := time.Parse("2006-01-02", v.ToDate)
+
+	if error != nil {
+		logs.Error("Error converting from date:::", error.Error())
+	}
+
+	if error2 != nil {
+		logs.Error("Error converting to date:::", error2.Error())
+	}
+
+	if transactions, err := models.GetTransactionsByUserWithDate(v.Id, fromDate, toDate); err == nil {
+		logs.Debug("Item ID to get quantity is ", transactions)
+
+		var customTxns []responses.TransactionsCustom = []responses.TransactionsCustom{}
+
+		for _, r := range *transactions {
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, Quantity: r.Order.Quantity, Cost: r.Order.Cost, Currency: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
+			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: r.TransactionId, Order: &customOrder, Amount: r.Amount, TransactingCurrency: r.TransactingCurrency, StatusId: r.StatusId, DateCreated: r.DateCreated, DateModified: r.DateModified, CreatedBy: r.CreatedBy, ModifiedBy: r.ModifiedBy, Active: r.Active}
+
+			customTxns = append(customTxns, customTxn)
+		}
+
+		var resp = responses.TransactionsCustomResponseDTO{StatusCode: 200, Transactions: &customTxns, StatusDesc: "Transactions fetched successfully"}
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = resp
+	} else {
+		c.Data["json"] = err.Error()
+	}
+	c.ServeJSON()
+}
+
+// Post ...
+// @Title GetUserTransactionsLimit
 // @Description create Transactions
 // @Param	body		body 	requests.GetUserTransactionsRequest	true		"body for Transactions content"
-// @Success 201 {int} models.Transactions
+// @Success 200 {int} responses.TransactionsCustomResponseDTO
 // @Failure 403 body is empty
 // @router /get-user-transactions [post]
 func (c *TransactionsController) GetUserTransactions() {
 	var v requests.GetUserTransactionsRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	if transactions, err := models.GetTransactionsByUser(v.Id); err == nil {
+	if transactions, err := models.GetTransactionsByUserWithLimit(v.Id, v.Limit); err == nil {
 		logs.Debug("Item ID to get quantity is ", transactions)
-		var resp = responses.TransactionsResponseDTO{StatusCode: 200, Transactions: transactions, StatusDesc: "Transactions fetched successfully"}
+
+		var customTxns []responses.TransactionsCustom = []responses.TransactionsCustom{}
+
+		for _, r := range *transactions {
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, Quantity: r.Order.Quantity, Cost: r.Order.Cost, Currency: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
+			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: r.TransactionId, Order: &customOrder, Amount: r.Amount, TransactingCurrency: r.TransactingCurrency, StatusId: r.StatusId, DateCreated: r.DateCreated, DateModified: r.DateModified, CreatedBy: r.CreatedBy, ModifiedBy: r.ModifiedBy, Active: r.Active}
+
+			customTxns = append(customTxns, customTxn)
+		}
+
+		var resp = responses.TransactionsCustomResponseDTO{StatusCode: 200, Transactions: &customTxns, StatusDesc: "Transactions fetched successfully"}
 		c.Ctx.Output.SetStatus(200)
 		c.Data["json"] = resp
 	} else {

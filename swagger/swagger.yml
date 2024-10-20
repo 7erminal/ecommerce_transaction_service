@@ -290,7 +290,7 @@ paths:
       description: |-
         create Transactions
         <br>
-      operationId: TransactionsController.Post
+      operationId: TransactionsController.GetUserTransactionsLimit
       parameters:
       - in: body
         name: body
@@ -299,8 +299,28 @@ paths:
         schema:
           $ref: '#/definitions/requests.GetUserTransactionsRequest'
       responses:
-        "201":
-          description: '{int} models.Transactions'
+        "200":
+          description: '{int} responses.TransactionsCustomResponseDTO'
+        "403":
+          description: body is empty
+  /transactions/get-user-transactions-by-date:
+    post:
+      tags:
+      - transactions
+      description: |-
+        create Transactions
+        <br>
+      operationId: TransactionsController.GetUserTransactions
+      parameters:
+      - in: body
+        name: body
+        description: body for Transactions content
+        required: true
+        schema:
+          $ref: '#/definitions/requests.GetUserTransactionsByDateRequest'
+      responses:
+        "200":
+          description: '{int} responses.TransactionsCustomResponseDTO'
         "403":
           description: body is empty
 definitions:
@@ -544,8 +564,8 @@ definitions:
         format: int64
       ToDate:
         type: string
-  requests.GetUserTransactionsRequest:
-    title: GetUserTransactionsRequest
+  requests.GetUserTransactionsByDateRequest:
+    title: GetUserTransactionsByDateRequest
     type: object
     properties:
       FromDate:
@@ -555,6 +575,16 @@ definitions:
         format: int64
       ToDate:
         type: string
+  requests.GetUserTransactionsRequest:
+    title: GetUserTransactionsRequest
+    type: object
+    properties:
+      Id:
+        type: integer
+        format: int64
+      Limit:
+        type: integer
+        format: int64
   requests.UpdateTransactionRequestDTO:
     title: UpdateTransactionRequestDTO
     type: object

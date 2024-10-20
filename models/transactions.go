@@ -57,6 +57,28 @@ func GetTransactionsByUser(id int64) (v *[]Transactions, err error) {
 	return nil, err
 }
 
+// GetOrdersById retrieves Orders by Id. Returns error if
+// Id doesn't exist
+func GetTransactionsByUserWithDate(id int64, fromDate time.Time, toDate time.Time) (v *[]Transactions, err error) {
+	o := orm.NewOrm()
+	v = &[]Transactions{}
+	if _, err = o.QueryTable(new(Transactions)).Filter("Order__CreatedBy__UserId", id).Filter("DateCreated__gte", fromDate).Filter("DateCreated__lte", toDate).RelatedSel().All(v); err == nil {
+		return v, nil
+	}
+	return nil, err
+}
+
+// GetOrdersById retrieves Orders by Id. Returns error if
+// Id doesn't exist
+func GetTransactionsByUserWithLimit(id int64, limit int) (v *[]Transactions, err error) {
+	o := orm.NewOrm()
+	v = &[]Transactions{}
+	if _, err = o.QueryTable(new(Transactions)).Filter("Order__CreatedBy__UserId", id).RelatedSel().Limit(limit).All(v); err == nil {
+		return v, nil
+	}
+	return nil, err
+}
+
 // GetAllTransactions retrieves all Transactions matches certain condition. Returns empty list if
 // no records exist
 func GetAllTransactions(query map[string]string, fields []string, sortby []string, order []string,

@@ -196,4 +196,13 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["transaction_service/controllers:TransactionsController"] = append(beego.GlobalControllerRouter["transaction_service/controllers:TransactionsController"],
+        beego.ControllerComments{
+            Method: "GetUserTransactionsByDate",
+            Router: `/get-user-transactions-by-date`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
 }

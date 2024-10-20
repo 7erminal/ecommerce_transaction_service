@@ -15,8 +15,13 @@ type UpdateTransactionRequestDTO struct {
 	RecipientAccountNumber string
 }
 
-type GetUserTransactionsRequest struct {
+type GetUserTransactionsByDateRequest struct {
 	Id       int64
 	FromDate string
 	ToDate   string
+}
+
+type GetUserTransactionsRequest struct {
+	Id    int64
+	Limit int
 }
