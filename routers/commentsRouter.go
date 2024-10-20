@@ -63,15 +63,6 @@ func init() {
 
     beego.GlobalControllerRouter["transaction_service/controllers:OrdersController"] = append(beego.GlobalControllerRouter["transaction_service/controllers:OrdersController"],
         beego.ControllerComments{
-            Method: "GetAll",
-            Router: `/`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["transaction_service/controllers:OrdersController"] = append(beego.GlobalControllerRouter["transaction_service/controllers:OrdersController"],
-        beego.ControllerComments{
             Method: "GetOne",
             Router: `/:id`,
             AllowHTTPMethods: []string{"get"},
@@ -147,15 +138,6 @@ func init() {
             Method: "Delete",
             Router: `/:id`,
             AllowHTTPMethods: []string{"delete"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["transaction_service/controllers:TransactionsController"] = append(beego.GlobalControllerRouter["transaction_service/controllers:TransactionsController"],
-        beego.ControllerComments{
-            Method: "GetAll",
-            Router: `/`,
-            AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
