@@ -35,7 +35,7 @@ func (c *OrdersController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *OrdersController) Post() {
-	var v models.OrdersRequestDTO
+	var v requests.OrdersRequestDTO
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
 	// Request Recieved. Processing ....
@@ -53,42 +53,60 @@ func (c *OrdersController) Post() {
 	if user, err := models.GetUsersById(created_by); err == nil {
 		if cur, cur_err := models.GetCurrenciesById(currency_id); cur_err == nil {
 			logs.Info("Currency found")
+			// logs.Info("Time is ", time.Now().Day())
+			// logs.Info("Time is ", int(time.Now().Month()))
+			// logs.Info("Time is ", time.Now().Year())
+			// logs.Info("Time is ", time.Now().Format("20060102"))
+
 			var order_ = models.Orders{Quantity: quantity_, Cost: float32(cost_), Currency: cur.CurrencyId, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: user, ModifiedBy: created_by}
 
 			// Add order
 			if _, err := models.AddOrders(&order_); err == nil {
+				orderNumber := time.Now().Format("20060102") + strconv.FormatInt(order_.OrderId, 10)
+				logs.Info("Order number is ", orderNumber)
+				onum, err := strconv.ParseInt(orderNumber, 10, 64)
+				if err != nil {
+					logs.Error("Unable to convert order number to int")
+					panic(err)
+				}
+				order_.OrderNumber = onum
 				cart_items := v.Items
 
 				amount_ := float32(0.0)
 				quantity_ = 0
 
-				for q, r := range cart_items {
-					logs.Info("q is ", q)
-					logs.Info("and r is ", r)
-					// item_id, _ := strconv.ParseInt(r.ItemId, 0, 64)
-					if item, err := models.GetItemsById(r.ItemId); err == nil {
-						item_id := item.ItemId
-						// each_quantity_, _ := strconv.Atoi(r.Quantity)
-						each_quantity_ := r.Quantity
+				if err := models.UpdateOrdersById(&order_); err == nil {
+					for q, r := range cart_items {
+						logs.Info("q is ", q)
+						logs.Info("and r is ", r)
+						// item_id, _ := strconv.ParseInt(r.ItemId, 0, 64)
+						if item, err := models.GetItemsById(r.ItemId); err == nil {
+							item_id := item.ItemId
+							// each_quantity_, _ := strconv.Atoi(r.Quantity)
+							each_quantity_ := r.Quantity
 
-						// if item_, item_err := models.GetItemsById(item_id); item_err == nil {
-						var order_items = models.Order_items{Order: &order_, Item: item_id, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by}
+							// if item_, item_err := models.GetItemsById(item_id); item_err == nil {
+							var order_items = models.Order_items{Order: &order_, Item: item_id, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by}
 
-						// Add order item
-						if _, err := models.AddOrder_items(&order_items); err != nil {
-							logs.Error("Error adding order item::: ", err.Error())
-						} else {
-							// amount_ = float32(amount_) + float32(item_.ItemPrice.ItemPrice)
-							amount_ = float32(amount_) + (float32(r.Price) * float32(r.Quantity))
-							quantity_ = quantity_ + int(each_quantity_)
+							// Add order item
+							if _, err := models.AddOrder_items(&order_items); err != nil {
+								logs.Error("Error adding order item::: ", err.Error())
+							} else {
+								// amount_ = float32(amount_) + float32(item_.ItemPrice.ItemPrice)
+								amount_ = float32(amount_) + (float32(r.Price) * float32(r.Quantity))
+								quantity_ = quantity_ + int(each_quantity_)
+							}
+							// }
 						}
-						// }
 					}
+				} else {
+					logs.Error("There was an error adding the order number ", err.Error())
+					panic(err)
 				}
 
 				if amount_ == 0 || quantity_ == 0 {
 					// amount_ = float32(cost_)
-					var resp = models.OrderResponseDTO{StatusCode: 400, Order: nil, StatusDesc: "Invalid request. Amount or quantity provided is invalid"}
+					var resp = responses.OrderResponseDTO{StatusCode: 400, Order: nil, StatusDesc: "Invalid request. Amount or quantity provided is invalid"}
 					logs.Error("Error thrown when adding transaction details::: ")
 					c.Ctx.Output.SetStatus(400)
 					c.Data["json"] = resp
@@ -109,18 +127,21 @@ func (c *OrdersController) Post() {
 						var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1}
 
 						if _, txn_d_err := models.AddTransaction_details((&txn_details)); txn_d_err == nil {
-							var resp = responses.TransactionResponseDTO{StatusCode: 200, Transaction: &transaction_, StatusDesc: "Order successfully placed"}
+							var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: order_.OrderId, OrderNumber: order_.OrderNumber, Quantity: order_.Quantity, Cost: order_.Cost, Currency: order_.Currency, OrderDate: order_.OrderDate, DateCreated: order_.DateCreated, DateModified: order_.DateModified}
+							var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: transaction_.TransactionId, Order: &customOrder, Amount: transaction_.Amount, TransactingCurrency: transaction_.TransactingCurrency, StatusId: transaction_.StatusId, DateCreated: transaction_.DateCreated, DateModified: transaction_.DateModified, CreatedBy: transaction_.CreatedBy, ModifiedBy: transaction_.ModifiedBy, Active: transaction_.Active}
+
+							var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
 							c.Ctx.Output.SetStatus(200)
 							c.Data["json"] = resp
 
 						} else {
-							var resp = models.OrderResponseDTO{StatusCode: 808, Order: nil, StatusDesc: "Transaction details error!"}
+							var resp = responses.OrderResponseDTO{StatusCode: 808, Order: nil, StatusDesc: "Transaction details error!"}
 							logs.Error("Error thrown when adding transaction details::: ", txn_d_err.Error())
 							c.Ctx.Output.SetStatus(304)
 							c.Data["json"] = resp
 						}
 					} else {
-						var resp = models.OrderResponseDTO{StatusCode: 807, Order: nil, StatusDesc: "Transaction error!"}
+						var resp = responses.OrderResponseDTO{StatusCode: 807, Order: nil, StatusDesc: "Transaction error!"}
 						logs.Error("Error thrown when adding transaction::: ", txn_err.Error())
 						c.Ctx.Output.SetStatus(304)
 						c.Data["json"] = resp
@@ -128,7 +149,7 @@ func (c *OrdersController) Post() {
 				}
 
 			} else {
-				var resp = models.OrderResponseDTO{StatusCode: 806, Order: nil, StatusDesc: "Order error!"}
+				var resp = responses.OrderResponseDTO{StatusCode: 806, Order: nil, StatusDesc: "Order error!"}
 				logs.Error("Error thrown when adding order::: ", err.Error())
 				c.Ctx.Output.SetStatus(304)
 				c.Data["json"] = resp
@@ -138,7 +159,7 @@ func (c *OrdersController) Post() {
 			logs.Info("Currency NOT found ", cur_err.Error())
 		}
 	} else {
-		var resp = models.OrderResponseDTO{StatusCode: 809, Order: nil, StatusDesc: "Error adding order"}
+		var resp = responses.OrderResponseDTO{StatusCode: 809, Order: nil, StatusDesc: "Error adding order"}
 		logs.Error("Error thrown when adding order::: ", err.Error())
 		c.Ctx.Output.SetStatus(304)
 		c.Data["json"] = resp
@@ -155,7 +176,7 @@ func (c *OrdersController) Post() {
 // @Failure 403 body is empty
 // @router /confirm-order [post]
 func (c *OrdersController) ConfirmOrder() {
-	var v models.ConfirmOrderDTO
+	var v requests.ConfirmOrderDTO
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
 	txn_id, _ := strconv.ParseInt(v.TransactionId, 0, 64)
@@ -167,7 +188,10 @@ func (c *OrdersController) ConfirmOrder() {
 		txn.CreatedBy, _ = strconv.Atoi(v.Confirmedby)
 		txn.Active = 1
 		if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
-			var resp = responses.TransactionResponseDTO{StatusCode: 200, Transaction: txn, StatusDesc: "Order successfully placed"}
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, Currency: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified}
+			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, StatusId: txn.StatusId, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active}
+
+			var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
 			c.Ctx.Output.SetStatus(201)
 			c.Data["json"] = resp
 		} else {
@@ -199,7 +223,7 @@ func (c *OrdersController) GetUserOrders() {
 
 	if orders, err := models.GetOrdersByUser(v.Id); err == nil {
 		logs.Debug("Item ID to get quantity is ", orders)
-		var resp = models.OrdersResponseDTO{StatusCode: 200, Orders: orders, StatusDesc: "Order details fetched successfully"}
+		var resp = responses.OrdersResponseDTO{StatusCode: 200, Orders: orders, StatusDesc: "Order details fetched successfully"}
 		c.Ctx.Output.SetStatus(200)
 		c.Data["json"] = resp
 	} else {

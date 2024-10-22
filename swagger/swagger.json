@@ -335,42 +335,9 @@
         }
     },
     "definitions": {
-        "models.Cart": {
-            "title": "Cart",
-            "type": "object",
-            "properties": {
-                "Currency": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "ItemId": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Price": {
-                    "type": "number",
-                    "format": "double"
-                },
-                "Quantity": {
-                    "type": "integer",
-                    "format": "int64"
-                }
-            }
-        },
         "models.ConfirmOrderDTO": {
             "title": "ConfirmOrderDTO",
-            "type": "object",
-            "properties": {
-                "Confirmedby": {
-                    "type": "string"
-                },
-                "Status": {
-                    "type": "string"
-                },
-                "TransactionId": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         },
         "models.Order_items": {
             "title": "Order_items",
@@ -448,6 +415,10 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "OrderNumber": {
+                    "type": "integer",
+                    "format": "int64"
+                },
                 "Quantity": {
                     "type": "integer",
                     "format": "int64"
@@ -456,29 +427,7 @@
         },
         "models.OrdersRequestDTO": {
             "title": "OrdersRequestDTO",
-            "type": "object",
-            "properties": {
-                "Comment": {
-                    "type": "string"
-                },
-                "CreatedBy": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Currency": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Cart"
-                    }
-                },
-                "RequestType": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         },
         "models.Transaction_details": {
             "title": "Transaction_details",

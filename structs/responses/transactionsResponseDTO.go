@@ -17,21 +17,16 @@ type TransactionsResponseDTO struct {
 	StatusDesc   string
 }
 
+type TransactionCustomResponseDTO struct {
+	StatusCode  int
+	Transaction *TransactionsCustom
+	StatusDesc  string
+}
+
 type TransactionsCustomResponseDTO struct {
 	StatusCode   int
 	Transactions *[]TransactionsCustom
 	StatusDesc   string
-}
-
-type OrdersCustom struct {
-	OrderId  int64 `orm:"auto"`
-	Quantity int
-	Cost     float32
-	// Currency     *Currencies `orm:"rel(fk)"`
-	Currency     int64
-	OrderDate    time.Time `orm:"type(datetime)"`
-	DateCreated  time.Time `orm:"type(datetime)"`
-	DateModified time.Time `orm:"type(datetime)"`
 }
 
 type TransactionsCustom struct {

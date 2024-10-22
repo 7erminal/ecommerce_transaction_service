@@ -11,9 +11,10 @@ import (
 )
 
 type Orders struct {
-	OrderId  int64 `orm:"auto"`
-	Quantity int
-	Cost     float32
+	OrderId     int64 `orm:"auto"`
+	OrderNumber int64
+	Quantity    int
+	Cost        float32
 	// Currency     *Currencies `orm:"rel(fk)"`
 	Currency     int64
 	OrderDate    time.Time `orm:"type(datetime)"`
