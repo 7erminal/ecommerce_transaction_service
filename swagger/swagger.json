@@ -411,9 +411,19 @@
                     "type": "string",
                     "format": "datetime"
                 },
+                "OrderDesc": {
+                    "type": "string"
+                },
+                "OrderEndDate": {
+                    "type": "string",
+                    "format": "datetime"
+                },
                 "OrderId": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "OrderLocation": {
+                    "type": "string"
                 },
                 "OrderNumber": {
                     "type": "integer",
@@ -428,6 +438,42 @@
         "models.OrdersRequestDTO": {
             "title": "OrdersRequestDTO",
             "type": "object"
+        },
+        "models.Services": {
+            "title": "Services",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ServiceDescription": {
+                    "type": "string"
+                },
+                "ServiceId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ServiceName": {
+                    "type": "string"
+                }
+            }
         },
         "models.Transaction_details": {
             "title": "Transaction_details",
@@ -482,6 +528,9 @@
                 },
                 "TransactionId": {
                     "$ref": "#/definitions/models.Transactions"
+                },
+                "TransactionType": {
+                    "type": "string"
                 }
             }
         },
@@ -515,6 +564,9 @@
                 },
                 "Order": {
                     "$ref": "#/definitions/models.Orders"
+                },
+                "ServicesId": {
+                    "$ref": "#/definitions/models.Services"
                 },
                 "StatusId": {
                     "type": "integer",

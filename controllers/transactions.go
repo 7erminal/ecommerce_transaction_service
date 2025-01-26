@@ -75,7 +75,7 @@ func (c *TransactionsController) GetUserTransactionsByDate() {
 		var customTxns []responses.TransactionsCustom = []responses.TransactionsCustom{}
 
 		for _, r := range *transactions {
-			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, OrderNumber: r.Order.OrderNumber, Quantity: r.Order.Quantity, Cost: r.Order.Cost, Currency: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, OrderNumber: r.Order.OrderNumber, Quantity: r.Order.Quantity, Cost: r.Order.Cost, CurrencyId: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
 			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: r.TransactionId, Order: &customOrder, Amount: r.Amount, TransactingCurrency: r.TransactingCurrency, StatusId: r.StatusId, DateCreated: r.DateCreated, DateModified: r.DateModified, CreatedBy: r.CreatedBy, ModifiedBy: r.ModifiedBy, Active: r.Active}
 
 			customTxns = append(customTxns, customTxn)
@@ -107,7 +107,7 @@ func (c *TransactionsController) GetUserTransactions() {
 		var customTxns []responses.TransactionsCustom = []responses.TransactionsCustom{}
 
 		for _, r := range *transactions {
-			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, Quantity: r.Order.Quantity, Cost: r.Order.Cost, Currency: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, Quantity: r.Order.Quantity, Cost: r.Order.Cost, CurrencyId: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
 			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: r.TransactionId, Order: &customOrder, Amount: r.Amount, TransactingCurrency: r.TransactingCurrency, StatusId: r.StatusId, DateCreated: r.DateCreated, DateModified: r.DateModified, CreatedBy: r.CreatedBy, ModifiedBy: r.ModifiedBy, Active: r.Active}
 
 			customTxns = append(customTxns, customTxn)

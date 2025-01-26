@@ -11,7 +11,7 @@ type OrdersCustom struct {
 	Quantity    int
 	Cost        float32
 	// Currency     *Currencies `orm:"rel(fk)"`
-	Currency     int64
+	CurrencyId   int64     `orm:"column(currency)"`
 	OrderDate    time.Time `orm:"type(datetime)"`
 	DateCreated  time.Time `orm:"type(datetime)"`
 	DateModified time.Time `orm:"type(datetime)"`

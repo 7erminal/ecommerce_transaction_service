@@ -48,6 +48,16 @@ func GetServicesById(id int64) (v *Services, err error) {
 	return nil, err
 }
 
+// GetServicesById retrieves Services by Id. Returns error if
+// Id doesn't exist
+func GetServicesByName(name string) (v *Services, err error) {
+	o := orm.NewOrm()
+	if err = o.QueryTable(new(Services)).Filter("ServiceName", name).RelatedSel().One(v); err == nil {
+		return v, nil
+	}
+	return nil, err
+}
+
 // GetAllServices retrieves all Services matches certain condition. Returns empty list if
 // no records exist
 func GetAllServices(query map[string]string, fields []string, sortby []string, order []string,
