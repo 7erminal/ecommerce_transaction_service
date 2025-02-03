@@ -11,7 +11,7 @@ import (
 )
 
 type Services struct {
-	ServiceId          int64     `orm:"auto"`
+	ServiceId          int64     `orm:"auto;column(service_id)"`
 	ServiceName        string    `orm:"size(100)"`
 	ServiceDescription string    `orm:"size(500)"`
 	DateCreated        time.Time `orm:"type(datetime)"`
@@ -52,6 +52,7 @@ func GetServicesById(id int64) (v *Services, err error) {
 // Id doesn't exist
 func GetServicesByName(name string) (v *Services, err error) {
 	o := orm.NewOrm()
+	v = &Services{ServiceName: name}
 	if err = o.QueryTable(new(Services)).Filter("ServiceName", name).RelatedSel().One(v); err == nil {
 		return v, nil
 	}

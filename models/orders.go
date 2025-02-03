@@ -11,7 +11,8 @@ import (
 )
 
 type Orders struct {
-	OrderId       int64 `orm:"auto"`
+	OrderId       int64      `orm:"auto"`
+	Customer      *Customers `orm:"rel(fk)"`
 	OrderNumber   int64
 	Quantity      int
 	Cost          float32

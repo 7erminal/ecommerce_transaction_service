@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 	"transaction_service/models"
@@ -72,7 +73,18 @@ func (c *OrdersController) Post() {
 				orderEndDate = time.Now()
 			}
 
-			var order_ = models.Orders{OrderDesc: v.RequestType, OrderLocation: v.OrderLocation, Quantity: quantity_, Cost: float32(cost_), Currency: cur.CurrencyId, OrderDate: orderDate, OrderEndDate: orderEndDate, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: user, ModifiedBy: created_by}
+			var customer models.Customers
+			customerId := v.Customer
+
+			logs.Info("Customer ID is ", customerId)
+
+			if cust, err := models.GetCustomerById(customerId); err != nil {
+				logs.Error("Customer not found ", err.Error())
+			} else {
+				customer = *cust
+			}
+
+			var order_ = models.Orders{OrderDesc: v.RequestType, Customer: &customer, OrderLocation: v.OrderLocation, Quantity: quantity_, Cost: float32(cost_), Currency: cur.CurrencyId, OrderDate: orderDate, OrderEndDate: orderEndDate, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: user, ModifiedBy: created_by}
 
 			// Add order
 			if _, err := models.AddOrders(&order_); err == nil {
@@ -86,31 +98,40 @@ func (c *OrdersController) Post() {
 				order_.OrderNumber = onum
 				cart_items := v.Items
 
+				logs.Info("Cart items are ", cart_items)
+
 				amount_ := float32(0.0)
 				quantity_ = 0
 
 				if err := models.UpdateOrdersById(&order_); err == nil {
 					for q, r := range cart_items {
 						logs.Info("q is ", q)
-						logs.Info("and r is ", r)
+						logs.Info("and r is ", r.ItemId)
 						// item_id, _ := strconv.ParseInt(r.ItemId, 0, 64)
 						if item, err := models.GetItemsById(r.ItemId); err == nil {
 							item_id := item.ItemId
 							// each_quantity_, _ := strconv.Atoi(r.Quantity)
 							each_quantity_ := r.Quantity
 
+							logs.Info("Quantity is ", each_quantity_)
+
 							// if item_, item_err := models.GetItemsById(item_id); item_err == nil {
 							var order_items = models.Order_items{Order: &order_, Item: item_id, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by}
 
+							logs.Info("About to add order items")
 							// Add order item
 							if _, err := models.AddOrder_items(&order_items); err != nil {
 								logs.Error("Error adding order item::: ", err.Error())
 							} else {
 								// amount_ = float32(amount_) + float32(item_.ItemPrice.ItemPrice)
+								logs.Info("Performing order calculations")
 								amount_ = float32(amount_) + (float32(item.ItemPrice.ItemPrice) * float32(r.Quantity))
 								quantity_ = quantity_ + int(each_quantity_)
+								logs.Info("Calculations completed. Amount is ", amount_, " and quantity is ", quantity_)
 							}
 							// }
+						} else {
+							logs.Error("Could not find this item ", err.Error())
 						}
 					}
 				} else {
@@ -146,6 +167,7 @@ func (c *OrdersController) Post() {
 								var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: order_.OrderId, OrderNumber: order_.OrderNumber, Quantity: order_.Quantity, Cost: order_.Cost, CurrencyId: order_.Currency, OrderDate: order_.OrderDate, DateCreated: order_.DateCreated, DateModified: order_.DateModified}
 								var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: transaction_.TransactionId, Order: &customOrder, Amount: transaction_.Amount, TransactingCurrency: transaction_.TransactingCurrency, StatusId: transaction_.StatusId, DateCreated: transaction_.DateCreated, DateModified: transaction_.DateModified, CreatedBy: transaction_.CreatedBy, ModifiedBy: transaction_.ModifiedBy, Active: transaction_.Active}
 
+								fmt.Printf("custom transaction of v: %+v\n", customTxn)
 								var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
 								c.Ctx.Output.SetStatus(200)
 								c.Data["json"] = resp

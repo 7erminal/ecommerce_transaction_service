@@ -339,6 +339,64 @@
             "title": "ConfirmOrderDTO",
             "type": "object"
         },
+        "models.Customers": {
+            "title": "Customers",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CustomerId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Dob": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Email": {
+                    "type": "string"
+                },
+                "FullName": {
+                    "type": "string"
+                },
+                "IdentificationNumber": {
+                    "type": "string"
+                },
+                "ImagePath": {
+                    "type": "string"
+                },
+                "Location": {
+                    "type": "string"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nickname": {
+                    "type": "string"
+                },
+                "PhoneNumber": {
+                    "type": "string"
+                },
+                "User": {
+                    "$ref": "#/definitions/models.Users"
+                }
+            }
+        },
         "models.Order_items": {
             "title": "Order_items",
             "type": "object",
@@ -394,6 +452,9 @@
                 "Currency": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "Customer": {
+                    "$ref": "#/definitions/models.Customers"
                 },
                 "DateCreated": {
                     "type": "string",

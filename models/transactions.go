@@ -21,7 +21,7 @@ type Transactions struct {
 	CreatedBy           int
 	ModifiedBy          int
 	Active              int
-	ServicesId          *Services `orm:"rel(fk)"`
+	ServicesId          *Services `orm:"rel(fk);column(service_id)"`
 }
 
 func init() {
