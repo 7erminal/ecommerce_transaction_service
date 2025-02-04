@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"transaction_service/controllers/functions"
 	"transaction_service/models"
 	"transaction_service/structs/requests"
 	"transaction_service/structs/responses"
@@ -59,18 +60,42 @@ func (c *OrdersController) Post() {
 			// logs.Info("Time is ", int(time.Now().Month()))
 			// logs.Info("Time is ", time.Now().Year())
 			// logs.Info("Time is ", time.Now().Format("20060102"))
-			orderDate, error := time.Parse("2006-01-02 00:00:00", v.OrderDate)
+			var orderDate time.Time
 
-			if error != nil {
-				logs.Error("Error parsing order date ", error.Error())
-				orderDate = time.Now()
+			var allowedDateList [4]string = [4]string{"2006-01-02", "2006/01/02", "2006-01-02 15:04:05.000", "2006/01/02 15:04:05.000"}
+
+			for _, date_ := range allowedDateList {
+				logs.Debug("About to convert ", v.OrderDate)
+				// Convert dob string to date
+				tOrderDate, error := time.Parse(date_, v.OrderDate)
+
+				if error != nil {
+					logs.Error("Error parsing date", error)
+					orderDate = time.Now()
+				} else {
+					logs.Error("Date converted to time successfully", tOrderDate)
+					orderDate = tOrderDate
+
+					break
+				}
 			}
 
-			orderEndDate, error := time.Parse("2006-01-02 00:00:00", v.OrderEndDate)
+			var orderEndDate time.Time
 
-			if error != nil {
-				logs.Error("Error parsing order date ", error.Error())
-				orderEndDate = time.Now()
+			for _, date_ := range allowedDateList {
+				logs.Debug("About to convert ", v.OrderEndDate)
+				// Convert dob string to date
+				tOrderDate, error := time.Parse(date_, v.OrderEndDate)
+
+				if error != nil {
+					logs.Error("Error parsing date", error)
+					orderEndDate = time.Now()
+				} else {
+					logs.Error("Date converted to time successfully", tOrderDate)
+					orderEndDate = tOrderDate
+
+					break
+				}
 			}
 
 			var customer models.Customers
@@ -88,6 +113,8 @@ func (c *OrdersController) Post() {
 
 			// Add order
 			if _, err := models.AddOrders(&order_); err == nil {
+				custId := strconv.FormatInt(customer.CustomerId, 10)
+				go functions.UpdateCustomer(&c.Controller, custId, time.Now().String())
 				orderNumber := time.Now().Format("20060102") + strconv.FormatInt(order_.OrderId, 10)
 				logs.Info("Order number is ", orderNumber)
 				onum, err := strconv.ParseInt(orderNumber, 10, 64)
