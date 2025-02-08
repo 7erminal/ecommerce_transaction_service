@@ -13,6 +13,46 @@ info:
 basePath: /v1
 paths:
   /orders/:
+    get:
+      tags:
+      - orders
+      description: |-
+        get Orders
+        <br>
+      operationId: OrdersController.Get All
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Orders'
+        "403":
+          description: ""
     post:
       tags:
       - orders
@@ -97,6 +137,47 @@ paths:
           description: '{string} delete success!'
         "403":
           description: id is empty
+  /orders/branch/{id}:
+    get:
+      tags:
+      - orders
+      description: |-
+        get Orders by branch
+        <br>
+      operationId: OrdersController.Get All Orders by Branch
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Orders'
+        "403":
+          description: ""
   /orders/confirm-order:
     post:
       tags:
@@ -117,6 +198,27 @@ paths:
           description: '{int} models.Orders'
         "403":
           description: body is empty
+  /orders/count/:
+    get:
+      tags:
+      - orders
+      description: |-
+        get Item_quantity by Item id
+        <br>
+      operationId: OrdersController.Get Item Quantity
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/responses.StringResponseDTO'
+        "403":
+          description: :id is empty
   /orders/get-user-orders:
     post:
       tags:
@@ -556,6 +658,17 @@ definitions:
       RecipientAccountNumber:
         type: string
       SenderAccountNumber:
+        type: string
+  responses.StringResponseDTO:
+    title: StringResponseDTO
+    type: object
+    properties:
+      StatusCode:
+        type: integer
+        format: int64
+      StatusDesc:
+        type: string
+      Value:
         type: string
 tags:
 - name: orders

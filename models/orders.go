@@ -62,6 +62,26 @@ func GetOrdersByUser(id int64) (v *[]Orders, err error) {
 	return nil, err
 }
 
+// GetOrderCount retrieves Items by Id. Returns error if
+// Id doesn't exist
+func GetOrderCount() (c int64, err error) {
+	o := orm.NewOrm()
+	if c, err = o.QueryTable(new(Orders)).Count(); err == nil {
+		return c, nil
+	}
+	return 0, err
+}
+
+// GetOrderCount retrieves Items by Id. Returns error if
+// Id doesn't exist
+func GetOrderCountByType() (c int64, err error) {
+	o := orm.NewOrm()
+	if c, err = o.QueryTable(new(Orders)).Count(); err == nil {
+		return c, nil
+	}
+	return 0, err
+}
+
 // GetAllOrders retrieves all Orders matches certain condition. Returns empty list if
 // no records exist
 func GetAllOrders(query map[string]string, fields []string, sortby []string, order []string,
