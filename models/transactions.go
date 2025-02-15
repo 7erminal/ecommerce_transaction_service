@@ -8,11 +8,13 @@ import (
 	"time"
 
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 )
 
 type Transactions struct {
-	TransactionId       int64   `orm:"auto"`
-	Order               *Orders `orm:"rel(fk)"`
+	TransactionId       int64     `orm:"auto"`
+	Order               *Orders   `orm:"rel(fk)"`
+	Branch              *Branches `orm:"rel(fk)"`
 	Amount              float32
 	TransactingCurrency int64
 	StatusId            int64
@@ -90,6 +92,7 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
 		k = strings.Replace(k, ".", "__", -1)
+		logs.Info("Modified query is ", k, " and ", v)
 		qs = qs.Filter(k, v)
 	}
 	// order by:
@@ -134,13 +137,20 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 	var l []Transactions
 	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
+		logs.Info("Data fetched ", qs)
+		fmt.Printf("Type of v: %T\n", qs)
+		fmt.Printf("Value of v: %+v\n", qs)
 		if len(fields) == 0 {
+			logs.Info("Data fetched for txns ", l)
 			for _, v := range l {
+				fmt.Printf("Value of vv: %+v\n", v)
 				ml = append(ml, v)
 			}
 		} else {
 			// trim unused fields
+			logs.Info("Data fetched for txns ", l)
 			for _, v := range l {
+				fmt.Printf("Value of vv: %+v\n", v)
 				m := make(map[string]interface{})
 				val := reflect.ValueOf(v)
 				for _, fname := range fields {
@@ -182,4 +192,23 @@ func DeleteTransactions(id int64) (err error) {
 		}
 	}
 	return
+}
+
+// GetTransactionCount retrieves Items by Id. Returns error if
+// Id doesn't exist
+func GetTransactionCount(query map[string]string) (c int64, err error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Transactions)).RelatedSel()
+	for k, v := range query {
+		// rewrite dot-notation to Object__Attribute
+		k = strings.Replace(k, ".", "__", -1)
+		qs = qs.Filter(k, v)
+		logs.Info("Modified query is ", k, " and ", v)
+	}
+
+	if c, err = qs.Count(); err == nil {
+		logs.Info("Count of transactions is ", c)
+		return c, nil
+	}
+	return 0, err
 }

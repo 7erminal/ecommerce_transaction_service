@@ -17,6 +17,7 @@ type OrdersRequestDTO struct {
 	OrderEndDate  string
 	OrderLocation string
 	Customer      int64
+	Branch        int64
 }
 
 type GetUserOrdersRequest struct {

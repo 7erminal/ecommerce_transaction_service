@@ -19,7 +19,7 @@ type Transaction_details struct {
 	RecipientAccountNumber string `orm:"size(255)"`
 	StatusCode             string `orm:"size(20)"`
 	StatusMessage          string `orm:"size(255)"`
-	SenderId               int
+	SenderId               int64
 	TransactionType        string    `orm:"size(255)"`
 	DateCreated            time.Time `orm:"type(datetime)"`
 	DateModified           time.Time `orm:"type(datetime)"`

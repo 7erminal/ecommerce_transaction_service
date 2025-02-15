@@ -13,7 +13,7 @@ type TransactionResponseDTO struct {
 
 type TransactionsResponseDTO struct {
 	StatusCode   int
-	Transactions *[]models.Transactions
+	Transactions *[]interface{}
 	StatusDesc   string
 }
 

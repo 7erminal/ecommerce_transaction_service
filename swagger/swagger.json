@@ -194,10 +194,9 @@
                 "operationId": "OrdersController.Get Item Quantity",
                 "parameters": [
                     {
-                        "in": "path",
-                        "name": "id",
-                        "description": "The key for staticblock",
-                        "required": true,
+                        "in": "query",
+                        "name": "query",
+                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
                         "type": "string"
                     }
                 ],
@@ -327,6 +326,92 @@
                     },
                     "403": {
                         "description": "id is empty"
+                    }
+                }
+            }
+        },
+        "/transactions/": {
+            "get": {
+                "tags": [
+                    "transactions"
+                ],
+                "description": "get Transactions\n\u003cbr\u003e",
+                "operationId": "TransactionsController.Get All",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "Fields returned. e.g. col1,col2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "Sorted-by fields. e.g. col1,col2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Limit the size of result set. Must be an integer",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Start position of result set. Must be an integer",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transactions"
+                        }
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/transactions/count/": {
+            "get": {
+                "tags": [
+                    "transactions"
+                ],
+                "description": "get transaction count\n\u003cbr\u003e",
+                "operationId": "TransactionsController.Get Transaction Count",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StringResponseDTO"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
                     }
                 }
             }
@@ -478,6 +563,49 @@
         }
     },
     "definitions": {
+        "models.Branches": {
+            "title": "Branches",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Branch": {
+                    "type": "string"
+                },
+                "BranchId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Country": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Location": {
+                    "type": "string"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "PhoneNumber": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ConfirmOrderDTO": {
             "title": "ConfirmOrderDTO",
             "type": "object"
@@ -749,6 +877,9 @@
                 "Amount": {
                     "type": "number",
                     "format": "float"
+                },
+                "Branch": {
+                    "$ref": "#/definitions/models.Branches"
                 },
                 "CreatedBy": {
                     "type": "integer",

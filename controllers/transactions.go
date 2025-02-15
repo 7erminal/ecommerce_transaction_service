@@ -2,7 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"strconv"
+	"strings"
 	"time"
 	"transaction_service/models"
 	"transaction_service/structs/requests"
@@ -22,9 +25,12 @@ type TransactionsController struct {
 func (c *TransactionsController) URLMapping() {
 	// c.Mapping("Post", c.Post)
 	c.Mapping("GetOne", c.GetOne)
-	// c.Mapping("GetAll", c.GetAll)
+	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("GetUserTransactionsByDate", c.GetUserTransactionsByDate)
+	c.Mapping("GetUserTransactions", c.GetUserTransactions)
+	c.Mapping("GetTransactionCount", c.GetTransactionCount)
 }
 
 // Post ...
@@ -141,68 +147,83 @@ func (c *TransactionsController) GetOne() {
 	c.ServeJSON()
 }
 
-// // GetAll ...
-// // @Title Get All
-// // @Description get Transactions
-// // @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
-// // @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
-// // @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
-// // @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
-// // @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
-// // @Param	offset	query	string	false	"Start position of result set. Must be an integer"
-// // @Success 200 {object} models.Transactions
-// // @Failure 403
-// // @router / [get]
-// func (c *TransactionsController) GetAll() {
-// 	var fields []string
-// 	var sortby []string
-// 	var order []string
-// 	var query = make(map[string]string)
-// 	var limit int64 = 10
-// 	var offset int64
+// GetAll ...
+// @Title Get All
+// @Description get Transactions
+// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
+// @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
+// @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
+// @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
+// @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
+// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
+// @Success 200 {object} models.Transactions
+// @Failure 403
+// @router / [get]
+func (c *TransactionsController) GetAll() {
+	var fields []string
+	var sortby []string
+	var order []string
+	var query = make(map[string]string)
+	var limit int64 = 10
+	var offset int64
 
-// 	// fields: col1,col2,entity.col3
-// 	if v := c.GetString("fields"); v != "" {
-// 		fields = strings.Split(v, ",")
-// 	}
-// 	// limit: 10 (default is 10)
-// 	if v, err := c.GetInt64("limit"); err == nil {
-// 		limit = v
-// 	}
-// 	// offset: 0 (default is 0)
-// 	if v, err := c.GetInt64("offset"); err == nil {
-// 		offset = v
-// 	}
-// 	// sortby: col1,col2
-// 	if v := c.GetString("sortby"); v != "" {
-// 		sortby = strings.Split(v, ",")
-// 	}
-// 	// order: desc,asc
-// 	if v := c.GetString("order"); v != "" {
-// 		order = strings.Split(v, ",")
-// 	}
-// 	// query: k:v,k:v
-// 	if v := c.GetString("query"); v != "" {
-// 		for _, cond := range strings.Split(v, ",") {
-// 			kv := strings.SplitN(cond, ":", 2)
-// 			if len(kv) != 2 {
-// 				c.Data["json"] = errors.New("Error: invalid query key/value pair")
-// 				c.ServeJSON()
-// 				return
-// 			}
-// 			k, v := kv[0], kv[1]
-// 			query[k] = v
-// 		}
-// 	}
+	// fields: col1,col2,entity.col3
+	if v := c.GetString("fields"); v != "" {
+		fields = strings.Split(v, ",")
+	}
+	// limit: 10 (default is 10)
+	if v, err := c.GetInt64("limit"); err == nil {
+		limit = v
+	}
+	// offset: 0 (default is 0)
+	if v, err := c.GetInt64("offset"); err == nil {
+		offset = v
+	}
+	// sortby: col1,col2
+	if v := c.GetString("sortby"); v != "" {
+		sortby = strings.Split(v, ",")
+	}
+	// order: desc,asc
+	if v := c.GetString("order"); v != "" {
+		order = strings.Split(v, ",")
+	}
+	// query: k:v,k:v
+	if v := c.GetString("query"); v != "" {
+		for _, cond := range strings.Split(v, ",") {
+			kv := strings.SplitN(cond, ":", 2)
+			if len(kv) != 2 {
+				c.Data["json"] = errors.New("Error: invalid query key/value pair")
+				c.ServeJSON()
+				return
+			}
+			k, v := kv[0], kv[1]
+			query[k] = v
+		}
+	}
 
-// 	l, err := models.GetAllTransactions(query, fields, sortby, order, offset, limit)
-// 	if err != nil {
-// 		c.Data["json"] = err.Error()
-// 	} else {
-// 		c.Data["json"] = l
-// 	}
-// 	c.ServeJSON()
-// }
+	message := "An error occurred adding this audit request"
+	statusCode := 308
+	l, err := models.GetAllTransactions(query, fields, sortby, order, offset, limit)
+	if err != nil {
+		logs.Info("Error fetching Transactions ", err.Error())
+		message = "Error fetching Transactions."
+		statusCode = 608
+		resp := responses.TransactionsResponseDTO{StatusCode: statusCode, Transactions: nil, StatusDesc: message}
+		c.Data["json"] = resp
+	} else {
+		if l == nil {
+			l = []interface{}{}
+		}
+		fmt.Printf("Type of transactions: %T\n", l)
+		fmt.Printf("Value of transactions: %+v\n", l)
+		statusCode = 200
+		message = "Transactions fetched successfully"
+
+		resp := responses.TransactionsResponseDTO{StatusCode: statusCode, Transactions: &l, StatusDesc: message}
+		c.Data["json"] = resp
+	}
+	c.ServeJSON()
+}
 
 // Put ...
 // @Title Put
@@ -259,6 +280,47 @@ func (c *TransactionsController) Delete() {
 		c.Data["json"] = "OK"
 	} else {
 		c.Data["json"] = err.Error()
+	}
+	c.ServeJSON()
+}
+
+// GetTransactionCount ...
+// @Title Get Transaction Count
+// @Description get transaction count
+// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
+// @Success 200 {object} responses.StringResponseDTO
+// @Failure 403 :id is empty
+// @router /count/ [get]
+func (c *TransactionsController) GetTransactionCount() {
+	// q, err := models.GetItemsById(id)
+
+	var query = make(map[string]string)
+
+	// query: k:v,k:v
+	if v := c.GetString("query"); v != "" {
+		for _, cond := range strings.Split(v, ",") {
+			kv := strings.SplitN(cond, ":", 2)
+			if len(kv) != 2 {
+				c.Data["json"] = errors.New("Error: invalid query key/value pair")
+				c.ServeJSON()
+				return
+			}
+			k, v := kv[0], kv[1]
+			query[k] = v
+		}
+	}
+
+	logs.Info("About to get transaction count")
+	v, err := models.GetTransactionCount(query)
+	count := strconv.FormatInt(v, 10)
+
+	if err != nil {
+		logs.Error("Error fetching count of customers ... ", err.Error())
+		resp := responses.StringResponseDTO{StatusCode: 301, Value: "", StatusDesc: err.Error()}
+		c.Data["json"] = resp
+	} else {
+		resp := responses.StringResponseDTO{StatusCode: 200, Value: count, StatusDesc: "Count fetched successfully"}
+		c.Data["json"] = resp
 	}
 	c.ServeJSON()
 }

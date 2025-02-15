@@ -25,10 +25,12 @@ type OrdersController struct {
 func (c *OrdersController) URLMapping() {
 	c.Mapping("Post", c.Post)
 	c.Mapping("GetOne", c.GetOne)
-	// c.Mapping("GetAll", c.GetAll)
+	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
 	c.Mapping("ConfirmOrder", c.ConfirmOrder)
+	c.Mapping("GetAllByBranch", c.GetAllByBranch)
+	c.Mapping("GetOrderCount", c.GetOrderCount)
 }
 
 // Post ...
@@ -184,8 +186,19 @@ func (c *OrdersController) Post() {
 
 					logs.Info("About to move to transactions")
 
+					branch := models.Branches{}
+
+					if v.Branch != 0 {
+						if branch_, err := models.GetBranchesById(v.Branch); err == nil {
+							branch = *branch_
+						} else {
+							logs.Error("Error getting branch. Continue.")
+						}
+
+					}
+
 					if service, err := models.GetServicesByName(serviceName); err == nil {
-						var transaction_ = models.Transactions{Order: &order_, Amount: amount_, TransactingCurrency: cur.CurrencyId, StatusId: 2, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: int(created_by), ModifiedBy: int(created_by), ServicesId: service}
+						var transaction_ = models.Transactions{Order: &order_, Branch: &branch, Amount: amount_, TransactingCurrency: cur.CurrencyId, StatusId: 2, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: int(created_by), ModifiedBy: int(created_by), ServicesId: service}
 						logs.Info("About to add transaction")
 						if _, txn_err := models.AddTransactions(&transaction_); txn_err == nil {
 							logs.Info("NO error adding transaction")
@@ -204,15 +217,17 @@ func (c *OrdersController) Post() {
 							} else {
 								var resp = responses.OrderResponseDTO{StatusCode: 808, Order: nil, StatusDesc: "Transaction details error!"}
 								logs.Error("Error thrown when adding transaction details::: ", txn_d_err.Error())
-								c.Ctx.Output.SetStatus(304)
 								c.Data["json"] = resp
 							}
 						} else {
 							var resp = responses.OrderResponseDTO{StatusCode: 807, Order: nil, StatusDesc: "Transaction error!"}
 							logs.Error("Error thrown when adding transaction::: ", txn_err.Error())
-							c.Ctx.Output.SetStatus(304)
 							c.Data["json"] = resp
 						}
+					} else {
+						var resp = responses.OrderResponseDTO{StatusCode: 807, Order: nil, StatusDesc: "Transaction error: service"}
+						logs.Error("Error thrown when adding transaction::: ", err.Error())
+						c.Data["json"] = resp
 					}
 				}
 
@@ -490,14 +505,32 @@ func (c *OrdersController) Delete() {
 // GetItemCount ...
 // @Title Get Item Quantity
 // @Description get Item_quantity by Item id
-// @Param	id		path 	string	true		"The key for staticblock"
+// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
 // @Success 200 {object} responses.StringResponseDTO
 // @Failure 403 :id is empty
 // @router /count/ [get]
 func (c *OrdersController) GetOrderCount() {
 	// q, err := models.GetItemsById(id)
-	v, err := models.GetOrderCount()
+
+	var query = make(map[string]string)
+
+	// query: k:v,k:v
+	if v := c.GetString("query"); v != "" {
+		for _, cond := range strings.Split(v, ",") {
+			kv := strings.SplitN(cond, ":", 2)
+			if len(kv) != 2 {
+				c.Data["json"] = errors.New("Error: invalid query key/value pair")
+				c.ServeJSON()
+				return
+			}
+			k, v := kv[0], kv[1]
+			query[k] = v
+		}
+	}
+
+	v, err := models.GetOrderCount(query)
 	count := strconv.FormatInt(v, 10)
+
 	if err != nil {
 		logs.Error("Error fetching count of customers ... ", err.Error())
 		resp := responses.StringResponseDTO{StatusCode: 301, Value: "", StatusDesc: err.Error()}
