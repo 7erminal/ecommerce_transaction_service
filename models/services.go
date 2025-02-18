@@ -42,7 +42,7 @@ func AddServices(m *Services) (id int64, err error) {
 func GetServicesById(id int64) (v *Services, err error) {
 	o := orm.NewOrm()
 	v = &Services{ServiceId: id}
-	if err = o.QueryTable(new(Services)).Filter("Id", id).RelatedSel().One(v); err == nil {
+	if err = o.QueryTable(new(Services)).Filter("ServiceId", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err

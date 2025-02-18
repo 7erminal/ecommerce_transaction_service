@@ -245,7 +245,7 @@ func (c *TransactionsController) Put() {
 			td.RecipientAccountNumber = v.RecipientAccountNumber
 			if err := models.UpdateTransaction_detailsById(td); err == nil {
 				var resp = responses.TransactionResponseDTO{StatusCode: 200, Transaction: z, StatusDesc: "Transaction Updated"}
-				c.Ctx.Output.SetStatus(201)
+				c.Ctx.Output.SetStatus(200)
 				c.Data["json"] = resp
 			} else {
 				var resp = responses.TransactionResponseDTO{StatusCode: 301, Transaction: z, StatusDesc: "Transaction Update failed. " + err.Error()}
