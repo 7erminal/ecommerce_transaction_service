@@ -11,18 +11,18 @@ import (
 )
 
 type Items struct {
-	ItemId          int64        `orm:"auto" orm:"omitempty"`
+	ItemId          int64        `orm:"auto"`
 	ItemName        string       `orm:"size(80)"`
-	Description     string       `orm:"size(250)" orm:"omitempty"`
+	Description     string       `orm:"size(250);omitempty"`
 	Category        *Categories  `orm:"rel(fk)"`
-	ItemPrice       *Item_prices `orm:"rel(fk)" orm:"omitempty"`
-	AvailableSizes  string       `orm:"size(250)" orm:"omitempty"`
-	AvailableColors string       `orm:"size(250)" orm:"omitempty"`
-	ImagePath       string       `orm:"size(250)" orm:"omitempty"`
+	ItemPrice       *Item_prices `orm:"rel(fk);omitempty"`
+	AvailableSizes  string       `orm:"size(250);omitempty"`
+	AvailableColors string       `orm:"size(250);omitempty"`
+	ImagePath       string       `orm:"size(250);omitempty"`
 	Quantity        int          `orm:"omitempty"`
 	Active          int          `orm:"omitempty"`
-	DateCreated     time.Time    `orm:"type(datetime)" orm:"omitempty"`
-	DateModified    time.Time    `orm:"type(datetime)" orm:"omitempty"`
+	DateCreated     time.Time    `orm:"type(datetime);omitempty"`
+	DateModified    time.Time    `orm:"type(datetime);omitempty"`
 	CreatedBy       int          `orm:"omitempty"`
 	ModifiedBy      int          `orm:"omitempty"`
 }

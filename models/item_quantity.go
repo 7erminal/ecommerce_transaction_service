@@ -12,7 +12,7 @@ import (
 
 type Item_quantity struct {
 	ItemQuantityId int64  `orm:"auto"`
-	ItemId         *Items `orm:"rel(fk)"`
+	ItemId         *Items `orm:"rel(fk);column(item_id)"`
 	Quantity       int
 	Active         int
 	DateCreated    time.Time `orm:"type(datetime)"`
@@ -48,6 +48,7 @@ func GetItem_quantityById(id int64) (v *Item_quantity, err error) {
 // Id doesn't exist
 func GetItem_quantityByItemId(id int64) (v *Item_quantity, err error) {
 	o := orm.NewOrm()
+	v = &Item_quantity{}
 	if err = o.QueryTable(new(Item_quantity)).Filter("ItemId", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
