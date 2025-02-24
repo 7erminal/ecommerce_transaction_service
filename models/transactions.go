@@ -17,13 +17,14 @@ type Transactions struct {
 	Branch              *Branches `orm:"rel(fk)"`
 	Amount              float32
 	TransactingCurrency int64
-	StatusId            int64
+	Status              *Status   `orm:"rel(fk);column(status_id)"`
 	DateCreated         time.Time `orm:"type(datetime)"`
 	DateModified        time.Time `orm:"type(datetime)"`
 	CreatedBy           int
 	ModifiedBy          int
 	Active              int
-	ServicesId          *Services `orm:"rel(fk);column(service_id)"`
+	Services            *Services   `orm:"rel(fk);column(service_id)"`
+	Payments            []*Payments `orm:"reverse(many);null;"`
 }
 
 func init() {
@@ -42,8 +43,92 @@ func AddTransactions(m *Transactions) (id int64, err error) {
 // Id doesn't exist
 func GetTransactionsById(id int64) (v *Transactions, err error) {
 	o := orm.NewOrm()
+	qs := o.QueryTable(new(Transactions))
+
 	v = &Transactions{TransactionId: id}
-	if err = o.QueryTable(new(Transactions)).Filter("TransactionId", id).RelatedSel().One(v); err == nil {
+	if err = qs.Filter("TransactionId", id).RelatedSel().One(v); err == nil {
+		// q := Transactions{TransactionId: id}
+		_, err := o.LoadRelated(v, "Payments")
+
+		if err == nil {
+			logs.Info("Loaded payments ", v)
+			fmt.Printf("Payments loaded is: %+v\n", v.Payments)
+
+			for _, payment := range v.Payments {
+				// payment_ := Payments{PaymentId: payment.PaymentId}
+				err = o.Read(payment)
+				if err == nil {
+					_, err := o.LoadRelated(payment, "PaymentMethod")
+					if err == nil {
+						// payment.PaymentMethod = &paymentMethod
+						logs.Info("Payment method is ", payment.PaymentMethod)
+						fmt.Printf("Payment method loaded is: %+v\n", payment.PaymentMethod)
+					}
+				}
+			}
+		}
+
+		order := Orders{OrderId: v.Order.OrderId}
+		err = o.Read(&order)
+		if err == nil {
+			_, err = o.LoadRelated(&order, "OrderDetails")
+			if err == nil {
+				logs.Info("No error. Continue to loop through orders ", order)
+				fmt.Printf("Order loop: %+v\n", order)
+				// orderitems := []Order_items{}
+				for _, orderD := range order.OrderDetails {
+					logs.Info("Each order detail is ", orderD)
+					orderitem := Order_items{OrderItemId: orderD.OrderItemId}
+					err := o.Read(&orderitem)
+					if err == nil {
+						_, err := o.LoadRelated(&orderitem, "Item")
+						logs.Info("No error getting item details")
+						// _, err := o.LoadRelated(&orderitem, "Item")
+						if err == nil {
+							// orderitems = append(orderitems, orderitem)
+							item := Items{ItemId: orderitem.Item.ItemId}
+							err := o.Read(&item)
+							if err == nil {
+								_, err := o.LoadRelated(&item, "Category")
+								if err != nil {
+									logs.Error("Failed loading category")
+								}
+								logs.Info("Item loaded is ", item)
+								fmt.Printf("Category loaded is: %+v\n", item.Category)
+								orderitem.Item.Category = item.Category
+
+								_, err = o.LoadRelated(&item, "ItemPrice")
+								if err != nil {
+									logs.Error("Failed loading item price")
+								}
+								logs.Info("Item price is ", item.ItemPrice)
+								orderitem.Item.ItemPrice = item.ItemPrice
+							}
+							orderD.Item = orderitem.Item
+						} else {
+							logs.Error("Error loading related")
+						}
+					} else {
+						logs.Error("An error occurred when reading order item ", err.Error())
+					}
+				}
+			} else {
+				logs.Error("Error loading related..", err.Error())
+			}
+
+			_, err = o.LoadRelated(&order, "Customer")
+			if err == nil {
+				logs.Info("No error. Continue to loop through orders ", order)
+				fmt.Printf("Order loop: %+v\n", order)
+				// orderitems := []Order_items{}
+			} else {
+				logs.Error("Error loading related..", err.Error())
+			}
+			v.Order = &order
+		} else {
+			logs.Error("Error loading related..", err.Error())
+		}
+
 		return v, nil
 	}
 	return nil, err
@@ -88,6 +173,8 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Transactions))
+
+	logs.Info("Getting all transactions")
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -143,7 +230,49 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 		if len(fields) == 0 {
 			logs.Info("Data fetched for txns ", l)
 			for _, v := range l {
-				fmt.Printf("Value of vv: %+v\n", v)
+				fmt.Printf("Value of this guy: %+v\n", v)
+				// transaction := Transactions{TransactionId: v.TransactionId}
+				logs.Info("Order ID is ", v.Order.OrderId)
+				order := Orders{OrderId: v.Order.OrderId}
+				ordercustomer := Orders{OrderId: v.Order.OrderId}
+				err := o.Read(&order)
+				if err == nil {
+					logs.Info("Error is nil. Proceeding with ")
+					fmt.Printf("Value of order: %+v\n", order)
+					_, err := o.LoadRelated(&ordercustomer, "Customer")
+					if err == nil {
+						order.Customer = ordercustomer.Customer
+						_, err := o.LoadRelated(&order, "OrderDetails")
+						if err == nil {
+							logs.Info("No error. Continue to loop through orders ", order)
+							fmt.Printf("Order loop: %+v\n", order)
+							// orderitems := []Order_items{}
+							for _, orderD := range order.OrderDetails {
+								logs.Info("Each order detail is ", orderD)
+								orderitem := Order_items{OrderItemId: orderD.OrderItemId}
+								err := o.Read(&orderitem)
+								if err == nil {
+									_, err := o.LoadRelated(&orderitem, "Item")
+									logs.Info("No error getting item details")
+									// _, err := o.LoadRelated(&orderitem, "Item")
+									if err == nil {
+										// orderitems = append(orderitems, orderitem)
+										orderD.Item = orderitem.Item
+									} else {
+										logs.Error("Error loading related")
+									}
+								} else {
+									logs.Error("An error occurred when reading order item ", err.Error())
+								}
+							}
+							v.Order = &order
+						} else {
+							logs.Error("Error loading related..", err.Error())
+						}
+					}
+				} else {
+					logs.Error("Error reading transaction related. ", err.Error())
+				}
 				ml = append(ml, v)
 			}
 		} else {
@@ -152,6 +281,19 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 			for _, v := range l {
 				fmt.Printf("Value of vv: %+v\n", v)
 				m := make(map[string]interface{})
+				transaction := Transactions{TransactionId: v.TransactionId}
+				err := o.Read(&transaction)
+				if err == nil {
+					logs.Info("Error is not nil. Proceeding")
+					_, err := o.LoadRelated(&transaction, "Order__OrderDetails")
+					if err == nil {
+						for _, order := range transaction.Order.OrderDetails {
+							logs.Info("Each order detail is ", order)
+						}
+					}
+				} else {
+					logs.Error("Error reading transaction related. ", err.Error())
+				}
 				val := reflect.ValueOf(v)
 				for _, fname := range fields {
 					m[fname] = val.FieldByName(fname).Interface()

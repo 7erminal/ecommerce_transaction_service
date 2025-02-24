@@ -34,7 +34,7 @@ type TransactionsCustom struct {
 	Order               *OrdersCustom `orm:"rel(fk)"`
 	Amount              float32
 	TransactingCurrency int64
-	StatusId            int64
+	Status              string
 	DateCreated         time.Time `orm:"type(datetime)"`
 	DateModified        time.Time `orm:"type(datetime)"`
 	CreatedBy           int

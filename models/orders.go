@@ -26,6 +26,7 @@ type Orders struct {
 	DateModified time.Time `orm:"type(datetime)"`
 	CreatedBy    *Users    `orm:"column(created_by);rel(fk);"`
 	ModifiedBy   int64
+	OrderDetails []*Order_items `orm:"reverse(many);null;"`
 }
 
 func init() {

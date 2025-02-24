@@ -13,7 +13,7 @@ import (
 type Order_items struct {
 	OrderItemId  int64   `orm:"auto"`
 	Order        *Orders `orm:"rel(fk)"`
-	Item         int64   `orm:"column(item_id)"`
+	Item         *Items  `orm:"rel(fk);column(item_id)"`
 	Quantity     int64
 	OrderDate    time.Time `orm:"type(datetime)"`
 	DateCreated  time.Time `orm:"type(datetime)"`

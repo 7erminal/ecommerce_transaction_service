@@ -165,7 +165,7 @@ func (c *OrdersController) Post() {
 
 									break forLoop
 								}
-								var order_items = models.Order_items{Order: &order_, Item: item_id, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by}
+								var order_items = models.Order_items{Order: &order_, Item: item, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by}
 
 								logs.Info("About to add order items")
 								// Add order item
@@ -230,34 +230,41 @@ func (c *OrdersController) Post() {
 						}
 
 						if service, err := models.GetServicesByName(serviceName); err == nil {
-							var transaction_ = models.Transactions{Order: &order_, Branch: &branch, Amount: amount_, TransactingCurrency: cur.CurrencyId, StatusId: 2, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: int(created_by), ModifiedBy: int(created_by), ServicesId: service}
-							logs.Info("About to add transaction")
-							if _, txn_err := models.AddTransactions(&transaction_); txn_err == nil {
-								logs.Info("NO error adding transaction")
-								status_code := "1022"
-								var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1}
+							status_ := "PENDING"
+							if status, err := models.GetStatusByName(status_); err == nil {
+								var transaction_ = models.Transactions{Order: &order_, Branch: &branch, Amount: amount_, TransactingCurrency: cur.CurrencyId, Status: status, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: int(created_by), ModifiedBy: int(created_by), Services: service}
+								logs.Info("About to add transaction")
+								if _, txn_err := models.AddTransactions(&transaction_); txn_err == nil {
+									logs.Info("NO error adding transaction")
+									status_code := "1022"
+									var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1}
 
-								if _, txn_d_err := models.AddTransaction_details((&txn_details)); txn_d_err == nil {
-									itemid := strconv.FormatInt(item_id, 10)
-									go functions.CheckItemAfterOrder(itemid)
-									var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: order_.OrderId, OrderNumber: order_.OrderNumber, Quantity: order_.Quantity, Cost: order_.Cost, CurrencyId: order_.Currency, OrderDate: order_.OrderDate, DateCreated: order_.DateCreated, DateModified: order_.DateModified}
-									var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: transaction_.TransactionId, Order: &customOrder, Amount: transaction_.Amount, TransactingCurrency: transaction_.TransactingCurrency, StatusId: transaction_.StatusId, DateCreated: transaction_.DateCreated, DateModified: transaction_.DateModified, CreatedBy: transaction_.CreatedBy, ModifiedBy: transaction_.ModifiedBy, Active: transaction_.Active}
+									if _, txn_d_err := models.AddTransaction_details((&txn_details)); txn_d_err == nil {
+										itemid := strconv.FormatInt(item_id, 10)
+										go functions.CheckItemAfterOrder(itemid)
+										var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: order_.OrderId, OrderNumber: order_.OrderNumber, Quantity: order_.Quantity, Cost: order_.Cost, CurrencyId: order_.Currency, OrderDate: order_.OrderDate, DateCreated: order_.DateCreated, DateModified: order_.DateModified}
+										var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: transaction_.TransactionId, Order: &customOrder, Amount: transaction_.Amount, TransactingCurrency: transaction_.TransactingCurrency, Status: transaction_.Status.Status, DateCreated: transaction_.DateCreated, DateModified: transaction_.DateModified, CreatedBy: transaction_.CreatedBy, ModifiedBy: transaction_.ModifiedBy, Active: transaction_.Active}
 
-									fmt.Printf("custom transaction of v: %+v\n", customTxn)
-									statusCode = 200
-									message = "Order successfully placed"
-									var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: message}
-									c.Ctx.Output.SetStatus(200)
-									c.Data["json"] = resp
+										fmt.Printf("custom transaction of v: %+v\n", customTxn)
+										statusCode = 200
+										message = "Order successfully placed"
+										var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: message}
+										c.Ctx.Output.SetStatus(200)
+										c.Data["json"] = resp
 
+									} else {
+										var resp = responses.OrderResponseDTO{StatusCode: 808, Order: nil, StatusDesc: "Transaction details error!"}
+										logs.Error("Error thrown when adding transaction details::: ", txn_d_err.Error())
+										c.Data["json"] = resp
+									}
 								} else {
-									var resp = responses.OrderResponseDTO{StatusCode: 808, Order: nil, StatusDesc: "Transaction details error!"}
-									logs.Error("Error thrown when adding transaction details::: ", txn_d_err.Error())
+									var resp = responses.OrderResponseDTO{StatusCode: 807, Order: nil, StatusDesc: "Transaction error!"}
+									logs.Error("Error thrown when adding transaction::: ", txn_err.Error())
 									c.Data["json"] = resp
 								}
 							} else {
 								var resp = responses.OrderResponseDTO{StatusCode: 807, Order: nil, StatusDesc: "Transaction error!"}
-								logs.Error("Error thrown when adding transaction::: ", txn_err.Error())
+								logs.Error("Error thrown when adding transaction::: ", err.Error())
 								c.Data["json"] = resp
 							}
 						} else {
@@ -308,21 +315,24 @@ func (c *OrdersController) ConfirmOrder() {
 	logs.Info("Transaction ID is ", v.TransactionId)
 
 	if txn, txn_err := models.GetTransactionsById(txn_id); txn_err == nil {
-		txn.StatusId = 1
-		txn.CreatedBy, _ = strconv.Atoi(v.Confirmedby)
-		txn.Active = 1
-		if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
-			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified}
-			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, StatusId: txn.StatusId, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active}
+		status_ := "SUCCESS"
+		if status, err := models.GetStatusByName(status_); err == nil {
+			txn.CreatedBy, _ = strconv.Atoi(v.Confirmedby)
+			txn.Status = status
+			txn.Active = 1
+			if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
+				var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified}
+				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, Status: txn.Status.Status, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active}
 
-			var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
-			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = resp
-		} else {
-			var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error!"}
-			logs.Error("Error thrown when updating transaction::: ", utxn_err.Error())
-			c.Ctx.Output.SetStatus(304)
-			c.Data["json"] = resp
+				var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
+				c.Ctx.Output.SetStatus(201)
+				c.Data["json"] = resp
+			} else {
+				var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error!"}
+				logs.Error("Error thrown when updating transaction::: ", utxn_err.Error())
+				c.Ctx.Output.SetStatus(304)
+				c.Data["json"] = resp
+			}
 		}
 	} else {
 		var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error!"}
@@ -395,7 +405,7 @@ func (c *OrdersController) GetAll() {
 	var sortby []string
 	var order []string
 	var query = make(map[string]string)
-	var limit int64 = 10
+	var limit int64 = 100
 	var offset int64
 
 	// fields: col1,col2,entity.col3

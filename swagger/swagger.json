@@ -606,9 +606,77 @@
                 }
             }
         },
+        "models.Categories": {
+            "title": "Categories",
+            "type": "object",
+            "properties": {
+                "CategoryId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CategoryName": {
+                    "type": "string"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ImagePath": {
+                    "type": "string"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
         "models.ConfirmOrderDTO": {
             "title": "ConfirmOrderDTO",
             "type": "object"
+        },
+        "models.Currencies": {
+            "title": "Currencies",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Currency": {
+                    "type": "string"
+                },
+                "CurrencyId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Symbol": {
+                    "type": "string"
+                }
+            }
         },
         "models.Customers": {
             "title": "Customers",
@@ -668,6 +736,105 @@
                 }
             }
         },
+        "models.Item_prices": {
+            "title": "Item_prices",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "AltItemPrice": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Currency": {
+                    "$ref": "#/definitions/models.Currencies"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ItemPrice": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "ItemPriceId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ShowAltPrice": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.Items": {
+            "title": "Items",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "AvailableColors": {
+                    "type": "string"
+                },
+                "AvailableSizes": {
+                    "type": "string"
+                },
+                "Category": {
+                    "$ref": "#/definitions/models.Categories"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ImagePath": {
+                    "type": "string"
+                },
+                "ItemId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ItemName": {
+                    "type": "string"
+                },
+                "ItemPrice": {
+                    "$ref": "#/definitions/models.Item_prices"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Quantity": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
         "models.Order_items": {
             "title": "Order_items",
             "type": "object",
@@ -685,8 +852,7 @@
                     "format": "datetime"
                 },
                 "Item": {
-                    "type": "integer",
-                    "format": "int64"
+                    "$ref": "#/definitions/models.Items"
                 },
                 "ModifiedBy": {
                     "type": "integer",
@@ -746,6 +912,12 @@
                 "OrderDesc": {
                     "type": "string"
                 },
+                "OrderDetails": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Order_items"
+                    }
+                },
                 "OrderEndDate": {
                     "type": "string",
                     "format": "datetime"
@@ -770,6 +942,100 @@
         "models.OrdersRequestDTO": {
             "title": "OrdersRequestDTO",
             "type": "object"
+        },
+        "models.Payment_methods": {
+            "title": "Payment_methods",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "PaymentMethod": {
+                    "type": "string"
+                },
+                "PaymentMethodId": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Payments": {
+            "title": "Payments",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Amount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "InitiatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "PaymentAccount": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "PaymentId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "PaymentMethod": {
+                    "$ref": "#/definitions/models.Payment_methods"
+                },
+                "PaymentProof": {
+                    "type": "string"
+                },
+                "Reciever": {
+                    "$ref": "#/definitions/models.Users"
+                },
+                "Sender": {
+                    "$ref": "#/definitions/models.Customers"
+                },
+                "Status": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Transaction": {
+                    "$ref": "#/definitions/models.Transactions"
+                }
+            }
         },
         "models.Services": {
             "title": "Services",
@@ -804,6 +1070,42 @@
                 },
                 "ServiceName": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Status": {
+            "title": "Status",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "StatusCode": {
+                    "type": "string"
+                },
+                "StatusId": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },
@@ -900,12 +1202,17 @@
                 "Order": {
                     "$ref": "#/definitions/models.Orders"
                 },
-                "ServicesId": {
+                "Payments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Payments"
+                    }
+                },
+                "Services": {
                     "$ref": "#/definitions/models.Services"
                 },
-                "StatusId": {
-                    "type": "integer",
-                    "format": "int64"
+                "Status": {
+                    "$ref": "#/definitions/models.Status"
                 },
                 "TransactingCurrency": {
                     "type": "integer",
