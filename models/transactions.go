@@ -170,11 +170,30 @@ func GetTransactionsByUserWithLimit(id int64, limit int) (v *[]Transactions, err
 // GetAllTransactions retrieves all Transactions matches certain condition. Returns empty list if
 // no records exist
 func GetAllTransactions(query map[string]string, fields []string, sortby []string, order []string,
-	offset int64, limit int64) (ml []interface{}, err error) {
+	offset int64, limit int64, search map[string]string) (ml []interface{}, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Transactions))
 
 	logs.Info("Getting all transactions")
+
+	if len(search) > 0 {
+		cond := orm.NewCondition()
+		for k, v := range search {
+			// rewrite dot-notation to Object__Attribute
+			k = strings.Replace(k, ".", "__", -1)
+			if strings.Contains(k, "isnull") {
+				qs = qs.Filter(k, (v == "true" || v == "1"))
+			} else {
+				logs.Info("Adding or statement")
+				cond = cond.Or(k+"__icontains", v)
+
+				// qs = qs.Filter(k+"__icontains", v)
+
+			}
+		}
+		logs.Info("Condition set ", qs)
+		qs = qs.SetCond(cond)
+	}
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -338,9 +357,28 @@ func DeleteTransactions(id int64) (err error) {
 
 // GetTransactionCount retrieves Items by Id. Returns error if
 // Id doesn't exist
-func GetTransactionCount(query map[string]string) (c int64, err error) {
+func GetTransactionCount(query map[string]string, search map[string]string) (c int64, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Transactions)).RelatedSel()
+	qs := o.QueryTable(new(Transactions))
+	if len(search) > 0 {
+		cond := orm.NewCondition()
+		for k, v := range search {
+			// rewrite dot-notation to Object__Attribute
+			k = strings.Replace(k, ".", "__", -1)
+			if strings.Contains(k, "isnull") {
+				qs = qs.Filter(k, (v == "true" || v == "1"))
+			} else {
+				logs.Info("Adding or statement")
+				cond = cond.Or(k+"__icontains", v)
+
+				// qs = qs.Filter(k+"__icontains", v)
+
+			}
+		}
+		logs.Info("Condition set ", qs)
+		qs = qs.SetCond(cond)
+	}
+
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
 		k = strings.Replace(k, ".", "__", -1)
@@ -348,7 +386,7 @@ func GetTransactionCount(query map[string]string) (c int64, err error) {
 		logs.Info("Modified query is ", k, " and ", v)
 	}
 
-	if c, err = qs.Count(); err == nil {
+	if c, err = qs.RelatedSel().Count(); err == nil {
 		logs.Info("Count of transactions is ", c)
 		return c, nil
 	}

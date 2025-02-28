@@ -160,6 +160,7 @@ func (c *TransactionsController) GetOne() {
 // @Title Get All
 // @Description get Transactions
 // @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
+// @Param	search	query	string	false	"Filter. e.g. camera ..."
 // @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
 // @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
 // @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
@@ -173,6 +174,7 @@ func (c *TransactionsController) GetAll() {
 	var sortby []string
 	var order []string
 	var query = make(map[string]string)
+	var search = make(map[string]string)
 	var limit int64 = 10
 	var offset int64
 
@@ -210,9 +212,23 @@ func (c *TransactionsController) GetAll() {
 		}
 	}
 
+	// search: k:v,k:v
+	if v := c.GetString("search"); v != "" {
+		for _, cond := range strings.Split(v, ",") {
+			kv := strings.SplitN(cond, ":", 2)
+			if len(kv) != 2 {
+				c.Data["json"] = errors.New("Error: invalid search key/value pair")
+				c.ServeJSON()
+				return
+			}
+			k, v := kv[0], kv[1]
+			search[k] = v
+		}
+	}
+
 	message := "An error occurred adding this audit request"
 	statusCode := 308
-	l, err := models.GetAllTransactions(query, fields, sortby, order, offset, limit)
+	l, err := models.GetAllTransactions(query, fields, sortby, order, offset, limit, search)
 	if err != nil {
 		logs.Info("Error fetching Transactions ", err.Error())
 		message = "Error fetching Transactions."
@@ -297,6 +313,7 @@ func (c *TransactionsController) Delete() {
 // @Title Get Transaction Count
 // @Description get transaction count
 // @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
+// @Param	search	query	string	false	"Filter. e.g. camera ..."
 // @Success 200 {object} responses.StringResponseDTO
 // @Failure 403 :id is empty
 // @router /count/ [get]
@@ -304,6 +321,7 @@ func (c *TransactionsController) GetTransactionCount() {
 	// q, err := models.GetItemsById(id)
 
 	var query = make(map[string]string)
+	var search = make(map[string]string)
 
 	// query: k:v,k:v
 	if v := c.GetString("query"); v != "" {
@@ -319,8 +337,22 @@ func (c *TransactionsController) GetTransactionCount() {
 		}
 	}
 
+	// search: k:v,k:v
+	if v := c.GetString("search"); v != "" {
+		for _, cond := range strings.Split(v, ",") {
+			kv := strings.SplitN(cond, ":", 2)
+			if len(kv) != 2 {
+				c.Data["json"] = errors.New("Error: invalid search key/value pair")
+				c.ServeJSON()
+				return
+			}
+			k, v := kv[0], kv[1]
+			search[k] = v
+		}
+	}
+
 	logs.Info("About to get transaction count")
-	v, err := models.GetTransactionCount(query)
+	v, err := models.GetTransactionCount(query, search)
 	count := strconv.FormatInt(v, 10)
 
 	if err != nil {

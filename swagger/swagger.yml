@@ -252,6 +252,10 @@ paths:
         description: Filter. e.g. col1:v1,col2:v2 ...
         type: string
       - in: query
+        name: search
+        description: Filter. e.g. camera ...
+        type: string
+      - in: query
         name: fields
         description: Fields returned. e.g. col1,col2 ...
         type: string
@@ -356,6 +360,10 @@ paths:
       - in: query
         name: query
         description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: search
+        description: Filter. e.g. camera ...
         type: string
       responses:
         "200":
