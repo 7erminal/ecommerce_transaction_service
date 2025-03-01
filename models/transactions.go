@@ -106,7 +106,7 @@ func GetTransactionsById(id int64) (v *Transactions, err error) {
 							}
 							orderD.Item = orderitem.Item
 						} else {
-							logs.Error("Error loading related")
+							logs.Error("Error loading related item ", err.Error())
 						}
 					} else {
 						logs.Error("An error occurred when reading order item ", err.Error())
@@ -276,9 +276,27 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 									// _, err := o.LoadRelated(&orderitem, "Item")
 									if err == nil {
 										// orderitems = append(orderitems, orderitem)
+										item := Items{ItemId: orderitem.Item.ItemId}
+										err := o.Read(&item)
+										if err == nil {
+											_, err := o.LoadRelated(&item, "Category")
+											if err != nil {
+												logs.Error("Failed loading category")
+											}
+											logs.Info("Item loaded is ", item)
+											fmt.Printf("Category loaded is: %+v\n", item.Category)
+											orderitem.Item.Category = item.Category
+
+											_, err = o.LoadRelated(&item, "ItemPrice")
+											if err != nil {
+												logs.Error("Failed loading item price")
+											}
+											logs.Info("Item price is ", item.ItemPrice)
+											orderitem.Item.ItemPrice = item.ItemPrice
+										}
 										orderD.Item = orderitem.Item
 									} else {
-										logs.Error("Error loading related")
+										logs.Error("Error loading related item ", err.Error())
 									}
 								} else {
 									logs.Error("An error occurred when reading order item ", err.Error())
