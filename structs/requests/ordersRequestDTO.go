@@ -31,3 +31,9 @@ type ConfirmOrderDTO struct {
 	Status        string
 	Confirmedby   string
 }
+
+type UpdateOrderItemDTO struct {
+	OrderItemId int64
+	Status      string
+	ModifiedBy  int64
+}

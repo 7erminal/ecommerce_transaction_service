@@ -14,7 +14,7 @@ type UserExtraDetails struct {
 	UserDetailsId int64     `orm:"auto"`
 	User          int64     `orm:"column(user_id)"`
 	Branch        *Branches `orm:"rel(fk);column(branch);omitempty;null"`
-	Shop          int64
+	Shop          int64     `orm:"column(shop_id);omitempty;null"`
 	Nickname      string    `orm:"size(100);omitempty;null"`
 	DateCreated   time.Time `orm:"type(datetime)"`
 	DateModified  time.Time `orm:"type(datetime)"`

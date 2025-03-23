@@ -12,6 +12,131 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /order-items/:
+    get:
+      tags:
+      - order-items
+      description: |-
+        get Order_items
+        <br>
+      operationId: Order_itemsController.Get All
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Order_items'
+        "403":
+          description: ""
+    post:
+      tags:
+      - order-items
+      description: |-
+        create Order_items
+        <br>
+      operationId: Order_itemsController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for Order_items content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Order_items'
+      responses:
+        "201":
+          description: '{int} models.Order_items'
+        "403":
+          description: body is empty
+  /order-items/{id}:
+    get:
+      tags:
+      - order-items
+      description: |-
+        get Order_items by id
+        <br>
+      operationId: Order_itemsController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Order_items'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - order-items
+      description: |-
+        update the Order_items
+        <br>
+      operationId: Order_itemsController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Order_items content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Order_items'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/responses.OrderItemsCustom'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - order-items
+      description: |-
+        delete the Order_items
+        <br>
+      operationId: Order_itemsController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
   /orders/:
     get:
       tags:
@@ -637,6 +762,8 @@ definitions:
       Quantity:
         type: integer
         format: int64
+      Status:
+        $ref: '#/definitions/models.Status'
   models.Orders:
     title: Orders
     type: object
@@ -888,6 +1015,38 @@ definitions:
       TransactionId:
         type: integer
         format: int64
+  models.UserExtraDetails:
+    title: UserExtraDetails
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      Branch:
+        $ref: '#/definitions/models.Branches'
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      ModifiedBy:
+        type: integer
+        format: int64
+      Nickname:
+        type: string
+      Shop:
+        type: integer
+        format: int64
+      User:
+        type: integer
+        format: int64
+      UserDetailsId:
+        type: integer
+        format: int64
   models.Users:
     title: Users
     type: object
@@ -932,6 +1091,8 @@ definitions:
         type: string
       PhoneNumber:
         type: string
+      UserDetails:
+        $ref: '#/definitions/models.UserExtraDetails'
       UserId:
         type: integer
         format: int64
@@ -980,6 +1141,59 @@ definitions:
         type: string
       SenderAccountNumber:
         type: string
+  responses.OrderItemsCustom:
+    title: OrderItemsCustom
+    type: object
+    properties:
+      Item:
+        $ref: '#/definitions/models.Items'
+      Order:
+        $ref: '#/definitions/responses.OrdersCustom'
+      OrderDate:
+        type: string
+        format: datetime
+      OrderItemId:
+        type: integer
+        format: int64
+      Quantity:
+        type: integer
+        format: int64
+      Status:
+        type: string
+  responses.OrdersCustom:
+    title: OrdersCustom
+    type: object
+    properties:
+      Cost:
+        type: number
+        format: float
+      CurrencyId:
+        type: integer
+        format: int64
+      Customer:
+        $ref: '#/definitions/models.Customers'
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      OrderDate:
+        type: string
+        format: datetime
+      OrderDetails:
+        type: array
+        items:
+          $ref: '#/definitions/models.Order_items'
+      OrderId:
+        type: integer
+        format: int64
+      OrderNumber:
+        type: integer
+        format: int64
+      Quantity:
+        type: integer
+        format: int64
   responses.StringResponseDTO:
     title: StringResponseDTO
     type: object
@@ -998,3 +1212,6 @@ tags:
 - name: transactions
   description: |
     TransactionsController operations for Transactions
+- name: order-items
+  description: |
+    Order_itemsController operations for Order_items

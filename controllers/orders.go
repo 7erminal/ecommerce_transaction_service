@@ -163,26 +163,31 @@ func (c *OrdersController) Post() {
 									message = "Item quantity is less than ordered quantity."
 									proceed = false
 
-									break forLoop
+									continue forLoop
 								}
-								var order_items = models.Order_items{Order: &order_, Item: item, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by}
 
-								logs.Info("About to add order items")
-								// Add order item
-								if _, err := models.AddOrder_items(&order_items); err != nil {
-									logs.Error("Error adding order item::: ", err.Error())
-								} else {
-									// amount_ = float32(amount_) + float32(item_.ItemPrice.ItemPrice)
-									logs.Info("Performing order calculations")
-									iq.Quantity = tempQuantity
-									if err := models.UpdateItem_quantityById(iq); err != nil {
-										logs.Error("Error upating item quantity")
-										message = "Error updating the item quantity"
+								if status, err := models.GetStatusByName("PENDING"); err == nil {
+									var order_items = models.Order_items{Order: &order_, Item: item, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by, Status: status}
+
+									logs.Info("About to add order items")
+									// Add order item
+									if _, err := models.AddOrder_items(&order_items); err != nil {
+										logs.Error("Error adding order item::: ", err.Error())
+									} else {
+										// amount_ = float32(amount_) + float32(item_.ItemPrice.ItemPrice)
+										logs.Info("Performing order calculations")
+										iq.Quantity = tempQuantity
+										if err := models.UpdateItem_quantityById(iq); err != nil {
+											logs.Error("Error upating item quantity")
+											message = "Error updating the item quantity"
+										}
+										proceed = true
+										amount_ = float32(amount_) + (float32(item.ItemPrice.ItemPrice) * float32(r.Quantity))
+										quantity_ = quantity_ + int(each_quantity_)
+										logs.Info("Calculations completed. Amount is ", amount_, " and quantity is ", quantity_)
 									}
-									proceed = true
-									amount_ = float32(amount_) + (float32(item.ItemPrice.ItemPrice) * float32(r.Quantity))
-									quantity_ = quantity_ + int(each_quantity_)
-									logs.Info("Calculations completed. Amount is ", amount_, " and quantity is ", quantity_)
+								} else {
+									logs.Error("Error adding order item. Could not find status::: ", err.Error())
 								}
 							} else {
 								logs.Error("Error adding order item. Could not find quantity::: ", err.Error())
@@ -315,22 +320,48 @@ func (c *OrdersController) ConfirmOrder() {
 	logs.Info("Transaction ID is ", v.TransactionId)
 
 	if txn, txn_err := models.GetTransactionsById(txn_id); txn_err == nil {
-		status_ := "SUCCESS"
-		if status, err := models.GetStatusByName(status_); err == nil {
+		// status_ := "SUCCESS"
+		if status, err := models.GetStatusByName(v.Status); err == nil {
 			txn.CreatedBy, _ = strconv.Atoi(v.Confirmedby)
 			txn.Status = status
 			txn.Active = 1
 			if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
-				var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified}
+				var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified, Customer: txn.Order.Customer, OrderDetails: txn.Order.OrderDetails}
 				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, Status: txn.Status.Status, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active}
 
-				var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
-				c.Ctx.Output.SetStatus(201)
-				c.Data["json"] = resp
+				if order, err := models.GetOrdersById(txn.Order.OrderId); err == nil {
+					if order_items, err := models.GetOrder_itemsByOrder(*order); err == nil {
+						logs.Info("Order items are ", order_items)
+						if order_items != nil {
+							for _, item := range *order_items {
+								item.Status = status
+								if updateOrderId := models.UpdateOrder_itemsById(&item); updateOrderId == nil {
+									logs.Info("Order item updated successfully")
+								} else {
+									logs.Error("Error updating order item::: ", updateOrderId.Error())
+								}
+							}
+						}
+					} else {
+						var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error. Unable to find order!"}
+						logs.Error("Error thrown when updating transaction::: ", err.Error())
+						c.Ctx.Output.SetStatus(200)
+						c.Data["json"] = resp
+					}
+
+					var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
+					c.Ctx.Output.SetStatus(200)
+					c.Data["json"] = resp
+				} else {
+					var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error. Unable to find order!"}
+					logs.Error("Error thrown when updating transaction::: ", utxn_err.Error())
+					c.Ctx.Output.SetStatus(200)
+					c.Data["json"] = resp
+				}
 			} else {
 				var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error!"}
 				logs.Error("Error thrown when updating transaction::: ", utxn_err.Error())
-				c.Ctx.Output.SetStatus(304)
+				c.Ctx.Output.SetStatus(200)
 				c.Data["json"] = resp
 			}
 		}

@@ -6,7 +6,10 @@ import (
 	"strconv"
 	"strings"
 	"transaction_service/models"
+	"transaction_service/structs/requests"
+	"transaction_service/structs/responses"
 
+	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -130,18 +133,55 @@ func (c *Order_itemsController) GetAll() {
 // @Description update the Order_items
 // @Param	id		path 	string	true		"The id you want to update"
 // @Param	body		body 	models.Order_items	true		"body for Order_items content"
-// @Success 200 {object} models.Order_items
+// @Success 200 {object} responses.OrderItemsCustom
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (c *Order_itemsController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := models.Order_items{OrderItemId: id}
+	v := requests.UpdateOrderItemDTO{OrderItemId: id}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	if err := models.UpdateOrder_itemsById(&v); err == nil {
-		c.Data["json"] = "OK"
+	if orderItem, err := models.GetOrder_itemsById(id); err != nil {
+		logs.Info("Order item not found: ", err.Error())
+
 	} else {
-		c.Data["json"] = err.Error()
+		logs.Info("Order item found: ", orderItem)
+		logs.Info("Order item status: ", v.Status)
+		if status, err := models.GetStatusByName(v.Status); err == nil {
+			orderItem.Status = status
+			orderItem.ModifiedBy = v.ModifiedBy
+			if err := models.UpdateOrder_itemsById(orderItem); err == nil {
+				o := responses.OrdersCustom{
+					OrderId:      orderItem.Order.OrderId,
+					OrderNumber:  orderItem.Order.OrderNumber,
+					Quantity:     orderItem.Order.Quantity,
+					Cost:         orderItem.Order.Cost,
+					CurrencyId:   orderItem.Order.Currency,
+					OrderDate:    orderItem.Order.OrderDate,
+					DateCreated:  orderItem.Order.DateCreated,
+					DateModified: orderItem.Order.DateModified,
+				}
+				oi := responses.OrderItemsCustom{
+					OrderItemId: orderItem.OrderItemId,
+					Order:       &o,
+					Item:        orderItem.Item,
+					Quantity:    orderItem.Quantity,
+					Status:      orderItem.Status.Status,
+					OrderDate:   orderItem.OrderDate,
+				}
+				resp := responses.OrderItemResponseDTO{StatusCode: 200, StatusDesc: "Order item updated successfully", OrderItem: &oi}
+				c.Data["json"] = resp
+			} else {
+				// c.Data["json"] = err.Error()
+				logs.Error("An Error occurred while updating order item: ", err.Error())
+				resp := responses.OrderItemResponseDTO{StatusCode: 608, StatusDesc: "Order item update failed", OrderItem: nil}
+				c.Data["json"] = resp
+			}
+		} else {
+			logs.Error("An Error occurred while updating order item: ", err.Error())
+			resp := responses.OrderItemResponseDTO{StatusCode: 608, StatusDesc: "Order item update failed. Status not found", OrderItem: nil}
+			c.Data["json"] = resp
+		}
 	}
 	c.ServeJSON()
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 )
 
 type Order_items struct {
@@ -15,6 +16,7 @@ type Order_items struct {
 	Order        *Orders `orm:"rel(fk)"`
 	Item         *Items  `orm:"rel(fk);column(item_id)"`
 	Quantity     int64
+	Status       *Status   `orm:"rel(fk);column(item_status)"`
 	OrderDate    time.Time `orm:"type(datetime)"`
 	DateCreated  time.Time `orm:"type(datetime)"`
 	DateModified time.Time `orm:"type(datetime)"`
@@ -39,8 +41,18 @@ func AddOrder_items(m *Order_items) (id int64, err error) {
 func GetOrder_itemsById(id int64) (v *Order_items, err error) {
 	o := orm.NewOrm()
 	v = &Order_items{OrderItemId: id}
-	if err = o.QueryTable(new(Order_items)).Filter("Id", id).RelatedSel().One(v); err == nil {
+	if err = o.QueryTable(new(Order_items)).Filter("OrderItemId", id).RelatedSel().One(v); err == nil {
 		return v, nil
+	}
+	return nil, err
+}
+
+func GetOrder_itemsByOrder(order Orders) (q *[]Order_items, err error) {
+	o := orm.NewOrm()
+	v := []Order_items{}
+	if _, err := o.QueryTable(new(Order_items)).Filter("Order", order).RelatedSel().All(&v); err == nil {
+		logs.Info("Order_items: ", v)
+		return &v, nil
 	}
 	return nil, err
 }

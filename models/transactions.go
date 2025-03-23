@@ -116,11 +116,13 @@ func GetTransactionsById(id int64) (v *Transactions, err error) {
 				logs.Error("Error loading related..", err.Error())
 			}
 
+			logs.Info("About to load related for customer involved")
 			_, err = o.LoadRelated(&order, "Customer")
 			if err == nil {
 				logs.Info("No error. Continue to loop through orders ", order)
-				fmt.Printf("Order loop: %+v\n", order)
+				fmt.Printf("Order loop: %+v\n", order.Customer)
 				// orderitems := []Order_items{}
+
 			} else {
 				logs.Error("Error loading related..", err.Error())
 			}

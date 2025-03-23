@@ -150,6 +150,7 @@ func (c *TransactionsController) GetOne() {
 	} else {
 		message = "Transaction fetched successfully"
 		statusCode = 200
+		fmt.Printf("Returning Order: %+v\n", v.Order)
 		resp := responses.TransactionResponseDTO{StatusCode: statusCode, Transaction: v, StatusDesc: message}
 		c.Data["json"] = resp
 	}
