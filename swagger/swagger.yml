@@ -727,6 +727,9 @@ definitions:
         type: string
       ItemPrice:
         $ref: '#/definitions/models.Item_prices'
+      LastOrderDate:
+        type: string
+        format: datetime
       ModifiedBy:
         type: integer
         format: int64
@@ -805,8 +808,7 @@ definitions:
       OrderLocation:
         type: string
       OrderNumber:
-        type: integer
-        format: int64
+        type: string
       Quantity:
         type: integer
         format: int64
@@ -1189,8 +1191,7 @@ definitions:
         type: integer
         format: int64
       OrderNumber:
-        type: integer
-        format: int64
+        type: string
       Quantity:
         type: integer
         format: int64

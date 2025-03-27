@@ -68,23 +68,25 @@ func (c *OrdersController) Post() {
 			// logs.Info("Time is ", int(time.Now().Month()))
 			// logs.Info("Time is ", time.Now().Year())
 			// logs.Info("Time is ", time.Now().Format("20060102"))
-			var orderDate time.Time
+			var orderDate time.Time = time.Now()
 
 			var allowedDateList [4]string = [4]string{"2006-01-02", "2006/01/02", "2006-01-02 15:04:05.000", "2006/01/02 15:04:05.000"}
 
-			for _, date_ := range allowedDateList {
-				logs.Debug("About to convert ", v.OrderDate)
-				// Convert dob string to date
-				tOrderDate, error := time.Parse(date_, v.OrderDate)
+			if v.OrderDate != "" {
+				for _, date_ := range allowedDateList {
+					logs.Debug("About to convert ", v.OrderDate)
+					// Convert dob string to date
+					tOrderDate, error := time.Parse(date_, v.OrderDate)
 
-				if error != nil {
-					logs.Error("Error parsing date", error)
-					orderDate = time.Now()
-				} else {
-					logs.Error("Date converted to time successfully", tOrderDate)
-					orderDate = tOrderDate
+					if error != nil {
+						logs.Error("Error parsing date", error)
+						orderDate = time.Now()
+					} else {
+						logs.Error("Date converted to time successfully", tOrderDate)
+						orderDate = tOrderDate
 
-					break
+						break
+					}
 				}
 			}
 
@@ -130,7 +132,7 @@ func (c *OrdersController) Post() {
 					logs.Error("Unable to convert order number to int")
 					panic(err)
 				}
-				order_.OrderNumber = onum
+				order_.OrderNumber = strconv.FormatInt(onum, 10)
 				cart_items := v.Items
 
 				logs.Info("Cart items are ", cart_items)
@@ -149,6 +151,7 @@ func (c *OrdersController) Post() {
 							item_id = item.ItemId
 							// each_quantity_, _ := strconv.Atoi(r.Quantity)
 							each_quantity_ := r.Quantity
+							finalQuantity := item.Quantity
 
 							logs.Info("Quantity is ", each_quantity_)
 
@@ -156,6 +159,7 @@ func (c *OrdersController) Post() {
 								// if item_, item_err := models.GetItemsById(item_id); item_err == nil {
 								tempQuantity := iq.Quantity
 								tempQuantity = tempQuantity - int(each_quantity_)
+								finalQuantity = tempQuantity
 
 								if tempQuantity < 0 {
 									logs.Error("Quantity is less ", tempQuantity)
@@ -184,6 +188,7 @@ func (c *OrdersController) Post() {
 										proceed = true
 										amount_ = float32(amount_) + (float32(item.ItemPrice.ItemPrice) * float32(r.Quantity))
 										quantity_ = quantity_ + int(each_quantity_)
+										// each_quantity_ = int64(quantity_)
 										logs.Info("Calculations completed. Amount is ", amount_, " and quantity is ", quantity_)
 									}
 								} else {
@@ -192,7 +197,13 @@ func (c *OrdersController) Post() {
 							} else {
 								logs.Error("Error adding order item. Could not find quantity::: ", err.Error())
 							}
-							// }
+							item.Quantity = finalQuantity
+							item.LastOrderDate = orderDate
+
+							if err := models.UpdateItemsById(item); err != nil {
+								logs.Error("Error updating item::: ", err.Error())
+								message = "Error updating the item quantity"
+							}
 						} else {
 							logs.Error("Could not find this item ", err.Error())
 						}

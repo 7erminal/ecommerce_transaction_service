@@ -25,6 +25,7 @@ type Items struct {
 	DateModified    time.Time    `orm:"type(datetime);omitempty"`
 	CreatedBy       int          `orm:"omitempty"`
 	ModifiedBy      int          `orm:"omitempty"`
+	LastOrderDate   time.Time    `orm:"type(datetime);null"`
 }
 
 func init() {

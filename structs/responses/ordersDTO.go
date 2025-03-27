@@ -7,7 +7,7 @@ import (
 
 type OrdersCustom struct {
 	OrderId     int64 `orm:"auto"`
-	OrderNumber int64
+	OrderNumber string
 	Quantity    int
 	Cost        float32
 	Customer    *models.Customers
