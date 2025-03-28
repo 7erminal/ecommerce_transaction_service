@@ -253,16 +253,36 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 			for _, v := range l {
 				fmt.Printf("Value of this guy: %+v\n", v)
 				// transaction := Transactions{TransactionId: v.TransactionId}
+				_, err := o.LoadRelated(&v, "Payments")
+
+				if err == nil {
+					logs.Info("Loaded payments ", v)
+					fmt.Printf("Payments loaded is: %+v\n", v.Payments)
+
+					for _, payment := range v.Payments {
+						// payment_ := Payments{PaymentId: payment.PaymentId}
+						err = o.Read(payment)
+						if err == nil {
+							_, err := o.LoadRelated(payment, "PaymentMethod")
+							if err == nil {
+								// payment.PaymentMethod = &paymentMethod
+								logs.Info("Payment method is ", payment.PaymentMethod)
+								fmt.Printf("Payment method loaded is: %+v\n", payment.PaymentMethod)
+							}
+						}
+					}
+				}
+
 				logs.Info("Order ID is ", v.Order.OrderId)
 				order := Orders{OrderId: v.Order.OrderId}
-				ordercustomer := Orders{OrderId: v.Order.OrderId}
-				err := o.Read(&order)
+				// ordercustomer := Orders{OrderId: v.Order.OrderId}
+				err = o.Read(&order)
 				if err == nil {
 					logs.Info("Error is nil. Proceeding with ")
 					fmt.Printf("Value of order: %+v\n", order)
-					_, err := o.LoadRelated(&ordercustomer, "Customer")
+					_, err := o.LoadRelated(&order, "Customer")
 					if err == nil {
-						order.Customer = ordercustomer.Customer
+						// order.Customer = order.Customer
 						_, err := o.LoadRelated(&order, "OrderDetails")
 						if err == nil {
 							logs.Info("No error. Continue to loop through orders ", order)
@@ -312,11 +332,30 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 				} else {
 					logs.Error("Error reading transaction related. ", err.Error())
 				}
+
+				_, err = o.LoadRelated(&v, "Payments")
+				if err == nil {
+					logs.Info("Loaded payments ", v)
+					fmt.Printf("Payments loaded is: %+v\n", v.Payments)
+
+					for _, payment := range v.Payments {
+						// payment_ := Payments{PaymentId: payment.PaymentId}
+						err = o.Read(payment)
+						if err == nil {
+							_, err := o.LoadRelated(payment, "PaymentMethod")
+							if err == nil {
+								// payment.PaymentMethod = &paymentMethod
+								logs.Info("Payment method is ", payment.PaymentMethod)
+								fmt.Printf("Payment method loaded is: %+v\n", payment.PaymentMethod)
+							}
+						}
+					}
+				}
 				ml = append(ml, v)
 			}
 		} else {
 			// trim unused fields
-			logs.Info("Data fetched for txns ", l)
+			logs.Info("Data fetched for txns 2 ", l)
 			for _, v := range l {
 				fmt.Printf("Value of vv: %+v\n", v)
 				m := make(map[string]interface{})

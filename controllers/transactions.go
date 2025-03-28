@@ -176,7 +176,7 @@ func (c *TransactionsController) GetAll() {
 	var order []string
 	var query = make(map[string]string)
 	var search = make(map[string]string)
-	var limit int64 = 10
+	var limit int64 = 20
 	var offset int64
 
 	// fields: col1,col2,entity.col3
