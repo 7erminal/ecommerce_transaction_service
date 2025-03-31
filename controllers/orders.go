@@ -70,7 +70,7 @@ func (c *OrdersController) Post() {
 			// logs.Info("Time is ", time.Now().Format("20060102"))
 			var orderDate time.Time = time.Now()
 
-			var allowedDateList [4]string = [4]string{"2006-01-02", "2006/01/02", "2006-01-02 15:04:05.000", "2006/01/02 15:04:05.000"}
+			var allowedDateList [5]string = [5]string{"2006-01-02", "2006/01/02", "2006-01-02 15:04:05.000", "2006/01/02 15:04:05.000", "2006-01-02T15:04:05.000Z"}
 
 			if v.OrderDate != "" {
 				for _, date_ := range allowedDateList {
@@ -139,7 +139,6 @@ func (c *OrdersController) Post() {
 
 				amount_ := float32(0.0)
 				quantity_ = 0
-				var item_id int64
 
 				if err := models.UpdateOrdersById(&order_); err == nil {
 				forLoop:
@@ -148,7 +147,6 @@ func (c *OrdersController) Post() {
 						logs.Info("and r is ", r.ItemId)
 						// item_id, _ := strconv.ParseInt(r.ItemId, 0, 64)
 						if item, err := models.GetItemsById(r.ItemId); err == nil {
-							item_id = item.ItemId
 							// each_quantity_, _ := strconv.Atoi(r.Quantity)
 							each_quantity_ := r.Quantity
 							finalQuantity := item.Quantity
@@ -256,8 +254,6 @@ func (c *OrdersController) Post() {
 									var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1}
 
 									if _, txn_d_err := models.AddTransaction_details((&txn_details)); txn_d_err == nil {
-										itemid := strconv.FormatInt(item_id, 10)
-										go functions.CheckItemAfterOrder(itemid)
 										var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: order_.OrderId, OrderNumber: order_.OrderNumber, Quantity: order_.Quantity, Cost: order_.Cost, CurrencyId: order_.Currency, OrderDate: order_.OrderDate, DateCreated: order_.DateCreated, DateModified: order_.DateModified}
 										var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: transaction_.TransactionId, Order: &customOrder, Amount: transaction_.Amount, TransactingCurrency: transaction_.TransactingCurrency, Status: transaction_.Status.Status, DateCreated: transaction_.DateCreated, DateModified: transaction_.DateModified, CreatedBy: transaction_.CreatedBy, ModifiedBy: transaction_.ModifiedBy, Active: transaction_.Active}
 
