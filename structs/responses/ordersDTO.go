@@ -14,6 +14,8 @@ type OrdersCustom struct {
 	// Currency     *Currencies `orm:"rel(fk)"`
 	CurrencyId   int64                 `orm:"column(currency)"`
 	OrderDate    time.Time             `orm:"type(datetime)"`
+	OrderEndDate time.Time             `orm:"type(datetime)"`
+	ReturnedDate time.Time             `orm:"type(datetime)"`
 	DateCreated  time.Time             `orm:"type(datetime)"`
 	DateModified time.Time             `orm:"type(datetime)"`
 	OrderDetails []*models.Order_items `orm:"reverse(many);null;"`

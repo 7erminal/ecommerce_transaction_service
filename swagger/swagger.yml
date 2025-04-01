@@ -1226,6 +1226,9 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/models.Order_items'
+      OrderEndDate:
+        type: string
+        format: datetime
       OrderId:
         type: integer
         format: int64
@@ -1234,6 +1237,9 @@ definitions:
       Quantity:
         type: integer
         format: int64
+      ReturnedDate:
+        type: string
+        format: datetime
   responses.StringResponseDTO:
     title: StringResponseDTO
     type: object

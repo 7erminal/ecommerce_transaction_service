@@ -31,6 +31,7 @@ func (c *OrdersController) URLMapping() {
 	c.Mapping("ConfirmOrder", c.ConfirmOrder)
 	c.Mapping("GetAllByBranch", c.GetAllByBranch)
 	c.Mapping("GetOrderCount", c.GetOrderCount)
+	c.Mapping("ReturnOrder", c.ReturnOrder)
 }
 
 // Post ...
@@ -382,7 +383,7 @@ func (c *OrdersController) ConfirmOrder() {
 	c.ServeJSON()
 }
 
-// Post ...
+// ReturnOrder ...
 // @Title ReturnOrder
 // @Description Return Order
 // @Param	body		body 	requests.ConfirmOrderDTO	true		"body for Orders content"
@@ -398,17 +399,20 @@ func (c *OrdersController) ReturnOrder() {
 	logs.Info("Transaction ID is ", v.TransactionId)
 
 	if txn, txn_err := models.GetTransactionsById(txn_id); txn_err == nil {
+		logs.Info("Returned date is ", txn.Order.ReturnedDate)
 		// status_ := "SUCCESS"
 		if status, err := models.GetStatusByName(v.Status); err == nil {
 			txn.CreatedBy, _ = strconv.Atoi(v.Confirmedby)
 			txn.Status = status
 			txn.Active = 1
 			if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
-				var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified, Customer: txn.Order.Customer, OrderDetails: txn.Order.OrderDetails}
+				var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified, Customer: txn.Order.Customer, OrderDetails: txn.Order.OrderDetails, ReturnedDate: txn.Order.ReturnedDate, OrderEndDate: txn.Order.OrderEndDate}
 				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, Status: txn.Status.Status, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active}
 
 				if order, err := models.GetOrdersById(txn.Order.OrderId); err == nil {
+
 					order.ReturnedDate = time.Now()
+					logs.Info("Updating return date to ", order.ReturnedDate)
 					if err := models.UpdateOrdersById(order); err != nil {
 						logs.Error("Error updating order::: ", err.Error())
 					}

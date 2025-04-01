@@ -133,6 +133,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["transaction_service/controllers:OrdersController"] = append(beego.GlobalControllerRouter["transaction_service/controllers:OrdersController"],
+        beego.ControllerComments{
+            Method: "ReturnOrder",
+            Router: `/return-order`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["transaction_service/controllers:Transaction_detailsController"] = append(beego.GlobalControllerRouter["transaction_service/controllers:Transaction_detailsController"],
         beego.ControllerComments{
             Method: "GetAll",
