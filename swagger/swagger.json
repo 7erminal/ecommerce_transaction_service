@@ -414,6 +414,34 @@
                 }
             }
         },
+        "/orders/return-order": {
+            "post": {
+                "tags": [
+                    "orders"
+                ],
+                "description": "Return Order\n\u003cbr\u003e",
+                "operationId": "OrdersController.ReturnOrder",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Orders content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.ConfirmOrderDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.Orders"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/orders/{id}": {
             "get": {
                 "tags": [
@@ -1133,6 +1161,10 @@
                 "Quantity": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "ReturnedDate": {
+                    "type": "string",
+                    "format": "datetime"
                 }
             }
         },
@@ -1538,6 +1570,21 @@
                     "format": "int64"
                 },
                 "Username": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.ConfirmOrderDTO": {
+            "title": "ConfirmOrderDTO",
+            "type": "object",
+            "properties": {
+                "Confirmedby": {
+                    "type": "string"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "TransactionId": {
                     "type": "string"
                 }
             }

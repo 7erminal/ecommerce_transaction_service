@@ -363,6 +363,26 @@ paths:
           description: '{int} models.OrdersResponseDTO'
         "403":
           description: body is empty
+  /orders/return-order:
+    post:
+      tags:
+      - orders
+      description: |-
+        Return Order
+        <br>
+      operationId: OrdersController.ReturnOrder
+      parameters:
+      - in: body
+        name: body
+        description: body for Orders content
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ConfirmOrderDTO'
+      responses:
+        "201":
+          description: '{int} models.Orders'
+        "403":
+          description: body is empty
   /transactions/:
     get:
       tags:
@@ -816,6 +836,9 @@ definitions:
       Quantity:
         type: integer
         format: int64
+      ReturnedDate:
+        type: string
+        format: datetime
   models.OrdersRequestDTO:
     title: OrdersRequestDTO
     type: object
@@ -1106,6 +1129,16 @@ definitions:
         type: integer
         format: int64
       Username:
+        type: string
+  requests.ConfirmOrderDTO:
+    title: ConfirmOrderDTO
+    type: object
+    properties:
+      Confirmedby:
+        type: string
+      Status:
+        type: string
+      TransactionId:
         type: string
   requests.GetUserOrdersRequest:
     title: GetUserOrdersRequest
