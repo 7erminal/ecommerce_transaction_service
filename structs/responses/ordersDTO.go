@@ -38,6 +38,7 @@ type OrderItemsCustom struct {
 	Quantity    int64
 	Status      string
 	OrderDate   time.Time
+	Comment     string
 }
 
 type OrderItemsResponseDTO struct {

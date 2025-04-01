@@ -141,6 +141,8 @@ func (c *TransactionsController) GetOne() {
 	v, err := models.GetTransactionsById(id)
 	message := "An error occurred adding this audit request"
 	statusCode := 308
+
+	logs.Info("Getting transaction by ID ", id)
 	if err != nil {
 		c.Data["json"] = err.Error()
 		message = "Error fetching Transactions."

@@ -35,5 +35,6 @@ type ConfirmOrderDTO struct {
 type UpdateOrderItemDTO struct {
 	OrderItemId int64
 	Status      string
+	Comment     string
 	ModifiedBy  int64
 }

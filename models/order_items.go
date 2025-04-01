@@ -22,6 +22,7 @@ type Order_items struct {
 	DateModified time.Time `orm:"type(datetime)"`
 	CreatedBy    int64
 	ModifiedBy   int64
+	Comment      string
 }
 
 func init() {

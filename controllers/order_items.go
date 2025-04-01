@@ -149,8 +149,18 @@ func (c *Order_itemsController) Put() {
 		logs.Info("Order item status: ", v.Status)
 		if status, err := models.GetStatusByName(v.Status); err == nil {
 			orderItem.Status = status
+			orderItem.Comment = v.Comment
 			orderItem.ModifiedBy = v.ModifiedBy
 			if err := models.UpdateOrder_itemsById(orderItem); err == nil {
+				logs.Info("Order item updated successfully: ", orderItem)
+				if item, err := models.GetItemsById(orderItem.Item.ItemId); err != nil {
+					logs.Error("An Error occurred while getting item: ", err.Error())
+				} else {
+					item.ItemStatus = status
+					if err := models.UpdateItemsById(item); err != nil {
+						logs.Error("An Error occurred while updating item: ", err.Error())
+					}
+				}
 				o := responses.OrdersCustom{
 					OrderId:      orderItem.Order.OrderId,
 					OrderNumber:  orderItem.Order.OrderNumber,
@@ -168,6 +178,7 @@ func (c *Order_itemsController) Put() {
 					Quantity:    orderItem.Quantity,
 					Status:      orderItem.Status.Status,
 					OrderDate:   orderItem.OrderDate,
+					Comment:     orderItem.Comment,
 				}
 				resp := responses.OrderItemResponseDTO{StatusCode: 200, StatusDesc: "Order item updated successfully", OrderItem: &oi}
 				c.Data["json"] = resp

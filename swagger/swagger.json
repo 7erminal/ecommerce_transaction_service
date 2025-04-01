@@ -1010,6 +1010,9 @@
                 "ItemPrice": {
                     "$ref": "#/definitions/models.Item_prices"
                 },
+                "ItemStatus": {
+                    "$ref": "#/definitions/models.Status"
+                },
                 "LastOrderDate": {
                     "type": "string",
                     "format": "datetime"
@@ -1028,6 +1031,9 @@
             "title": "Order_items",
             "type": "object",
             "properties": {
+                "Comment": {
+                    "type": "string"
+                },
                 "CreatedBy": {
                     "type": "integer",
                     "format": "int64"
@@ -1598,6 +1604,9 @@
             "title": "OrderItemsCustom",
             "type": "object",
             "properties": {
+                "Comment": {
+                    "type": "string"
+                },
                 "Item": {
                     "$ref": "#/definitions/models.Items"
                 },
