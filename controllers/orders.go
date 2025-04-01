@@ -383,6 +383,82 @@ func (c *OrdersController) ConfirmOrder() {
 }
 
 // Post ...
+// @Title ReturnOrder
+// @Description Return Order
+// @Param	body		body 	requests.ConfirmOrderDTO	true		"body for Orders content"
+// @Success 201 {int} models.Orders
+// @Failure 403 body is empty
+// @router /return-order [post]
+func (c *OrdersController) ReturnOrder() {
+	var v requests.ConfirmOrderDTO
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	txn_id, _ := strconv.ParseInt(v.TransactionId, 0, 64)
+
+	logs.Info("Transaction ID is ", v.TransactionId)
+
+	if txn, txn_err := models.GetTransactionsById(txn_id); txn_err == nil {
+		// status_ := "SUCCESS"
+		if status, err := models.GetStatusByName(v.Status); err == nil {
+			txn.CreatedBy, _ = strconv.Atoi(v.Confirmedby)
+			txn.Status = status
+			txn.Active = 1
+			if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
+				var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified, Customer: txn.Order.Customer, OrderDetails: txn.Order.OrderDetails}
+				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, Status: txn.Status.Status, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active}
+
+				if order, err := models.GetOrdersById(txn.Order.OrderId); err == nil {
+					order.ReturnedDate = time.Now()
+					if err := models.UpdateOrdersById(order); err != nil {
+						logs.Error("Error updating order::: ", err.Error())
+					}
+					logs.Info("Order items are ", order)
+					if order_items, err := models.GetOrder_itemsByOrder(*order); err == nil {
+						logs.Info("Order items are ", order_items)
+						if order_items != nil {
+							for _, item := range *order_items {
+								item.Status = status
+								if updateOrderId := models.UpdateOrder_itemsById(&item); updateOrderId == nil {
+									logs.Info("Order item updated successfully")
+								} else {
+									logs.Error("Error updating order item::: ", updateOrderId.Error())
+								}
+							}
+						}
+					} else {
+						var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error. Unable to find order!"}
+						logs.Error("Error thrown when updating transaction::: ", err.Error())
+						c.Ctx.Output.SetStatus(200)
+						c.Data["json"] = resp
+					}
+
+					var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
+					c.Ctx.Output.SetStatus(200)
+					c.Data["json"] = resp
+				} else {
+					var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error. Unable to find order!"}
+					logs.Error("Error thrown when updating transaction::: ", utxn_err.Error())
+					c.Ctx.Output.SetStatus(200)
+					c.Data["json"] = resp
+				}
+			} else {
+				var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error!"}
+				logs.Error("Error thrown when updating transaction::: ", utxn_err.Error())
+				c.Ctx.Output.SetStatus(200)
+				c.Data["json"] = resp
+			}
+		}
+	} else {
+		var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: "Order error!"}
+		logs.Error("Error fetching transaction::: ", txn_err.Error())
+		c.Ctx.Output.SetStatus(304)
+		c.Data["json"] = resp
+	}
+
+	c.ServeJSON()
+}
+
+// Post ...
 // @Title Get User Orders
 // @Description get user orders
 // @Param	body		body 	requests.GetUserOrdersRequest	true		"body for Transactions content"

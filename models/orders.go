@@ -22,6 +22,7 @@ type Orders struct {
 	Currency     int64
 	OrderDate    time.Time `orm:"type(datetime)"`
 	OrderEndDate time.Time `orm:"type(datetime)"`
+	ReturnedDate time.Time `orm:"type(datetime)"`
 	DateCreated  time.Time `orm:"type(datetime)"`
 	DateModified time.Time `orm:"type(datetime)"`
 	CreatedBy    *Users    `orm:"column(created_by);rel(fk);"`
