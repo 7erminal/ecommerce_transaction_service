@@ -931,6 +931,10 @@
                 "ImagePath": {
                     "type": "string"
                 },
+                "LastTxnDate": {
+                    "type": "string",
+                    "format": "datetime"
+                },
                 "Location": {
                     "type": "string"
                 },

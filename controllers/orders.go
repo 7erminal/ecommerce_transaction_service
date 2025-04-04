@@ -71,7 +71,7 @@ func (c *OrdersController) Post() {
 			// logs.Info("Time is ", time.Now().Format("20060102"))
 			var orderDate time.Time = time.Now()
 
-			var allowedDateList [5]string = [5]string{"2006-01-02", "2006/01/02", "2006-01-02 15:04:05.000", "2006/01/02 15:04:05.000", "2006-01-02T15:04:05.000Z"}
+			var allowedDateList [6]string = [6]string{"2006-01-02", "2006/01/02", "2006-01-02 15:04:05.000", "2006/01/02 15:04:05.000", "2006-01-02T15:04:05.000Z", "2006-01-02 15:04:05.000000 -0700 MST"}
 
 			if v.OrderDate != "" {
 				for _, date_ := range allowedDateList {

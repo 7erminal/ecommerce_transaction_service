@@ -22,6 +22,7 @@ type Customers struct {
 	Dob                  time.Time `orm:"column(dob);type(datetime)"`
 	DateCreated          time.Time `orm:"type(datetime)"`
 	DateModified         time.Time `orm:"type(datetime)"`
+	LastTxnDate          time.Time `orm:"type(datetime);null;column(last_txn_date);"`
 	CreatedBy            int
 	ModifiedBy           int
 	Active               int

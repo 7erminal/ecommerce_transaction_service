@@ -19,7 +19,7 @@ func UpdateCustomer(c *beego.Controller, customerid string, transactionDate stri
 		host,
 		"/v1/customers/last-txn/"+customerid,
 		api.PUT)
-	request.InterfaceParams["TransactionDate"] = transactionDate
+	request.Params["TransactionDate"] = transactionDate
 	// request.Params["Dob"] = req.Dob
 	// request.Params["Gender"] = req.Gender
 	// request.Params["PhoneNumber"] = req.PhoneNumber
@@ -28,7 +28,7 @@ func UpdateCustomer(c *beego.Controller, customerid string, transactionDate stri
 	// request.Params = {"UserId": strconv.Itoa(int(userid))}
 	client := api.Client{
 		Request: request,
-		Type_:   "body",
+		Type_:   "params",
 	}
 	res, err := client.SendRequest()
 	if err != nil {

@@ -250,25 +250,6 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 			for _, v := range l {
 				fmt.Printf("Value of this guy: %+v\n", v)
 				// transaction := Transactions{TransactionId: v.TransactionId}
-				_, err := o.LoadRelated(&v, "Payments")
-
-				if err == nil {
-					logs.Info("Loaded payments ", v)
-					fmt.Printf("Payments loaded is: %+v\n", v.Payments)
-
-					for _, payment := range v.Payments {
-						// payment_ := Payments{PaymentId: payment.PaymentId}
-						err = o.Read(payment)
-						if err == nil {
-							_, err := o.LoadRelated(payment, "PaymentMethod")
-							if err == nil {
-								// payment.PaymentMethod = &paymentMethod
-								logs.Info("Payment method is ", payment.PaymentMethod)
-								fmt.Printf("Payment method loaded is: %+v\n", payment.PaymentMethod)
-							}
-						}
-					}
-				}
 
 				logs.Info("Order ID is ", v.Order.OrderId)
 
