@@ -185,6 +185,9 @@ func (c *OrdersController) Post() {
 											message = "Error updating the item quantity"
 										}
 										proceed = true
+										logs.Info("Quantity is ", r.Quantity)
+										logs.Info("Item price is ", item.ItemPrice.ItemPrice)
+										logs.Info("Amount is ", amount_)
 										amount_ = float32(amount_) + (float32(item.ItemPrice.ItemPrice) * float32(r.Quantity))
 										quantity_ = quantity_ + int(each_quantity_)
 										// each_quantity_ = int64(quantity_)
@@ -412,6 +415,7 @@ func (c *OrdersController) ReturnOrder() {
 				if order, err := models.GetOrdersById(txn.Order.OrderId); err == nil {
 
 					order.ReturnedDate = time.Now()
+					customOrder.ReturnedDate = order.ReturnedDate
 					logs.Info("Updating return date to ", order.ReturnedDate)
 					if err := models.UpdateOrdersById(order); err != nil {
 						logs.Error("Error updating order::: ", err.Error())
@@ -435,6 +439,8 @@ func (c *OrdersController) ReturnOrder() {
 						c.Ctx.Output.SetStatus(200)
 						c.Data["json"] = resp
 					}
+
+					logs.Info("Order returned date is ", order.ReturnedDate)
 
 					var resp = responses.TransactionCustomResponseDTO{StatusCode: 200, Transaction: &customTxn, StatusDesc: "Order successfully placed"}
 					c.Ctx.Output.SetStatus(200)
