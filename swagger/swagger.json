@@ -1011,6 +1011,9 @@
                 "AvailableSizes": {
                     "type": "string"
                 },
+                "Branch": {
+                    "$ref": "#/definitions/models.Branches"
+                },
                 "Category": {
                     "$ref": "#/definitions/models.Categories"
                 },

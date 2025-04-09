@@ -27,6 +27,7 @@ type Items struct {
 	ModifiedBy      int          `orm:"omitempty"`
 	LastOrderDate   time.Time    `orm:"type(datetime);null"`
 	ItemStatus      *Status      `orm:"rel(fk);column(item_status);null"`
+	Branch          *Branches    `orm:"rel(fk);null"`
 }
 
 func init() {

@@ -98,6 +98,12 @@ func GetTransactionsById(id int64) (v *Transactions, err error) {
 						logs.Error("Failed loading item price")
 					}
 					logs.Info("Item price is ", orderD.Item.ItemPrice)
+
+					_, err = o.LoadRelated(orderD.Item, "Branch")
+					if err != nil {
+						logs.Error("Failed loading branch")
+					}
+					logs.Info("Item price is ", orderD.Item.Branch)
 					// }
 				} else {
 					logs.Error("Error loading related item ", err.Error())
@@ -287,6 +293,12 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 								logs.Error("Failed loading item price")
 							}
 							logs.Info("Item price is ", orderD.Item.ItemPrice)
+
+							_, err = o.LoadRelated(orderD.Item, "Branch")
+							if err != nil {
+								logs.Error("Failed loading branch")
+							}
+							logs.Info("Item price is ", orderD.Item.Branch)
 							// }
 						} else {
 							logs.Error("Error loading related item ", err.Error())
