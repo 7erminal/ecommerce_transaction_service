@@ -426,6 +426,35 @@ func (c *OrdersController) ReturnOrder() {
 						if order_items != nil {
 							for _, item := range *order_items {
 								item.Status = status
+								if oItem, err := models.GetItem_quantityByItemId(item.Item.ItemId); err == nil {
+									logs.Info("Item quantity is ", oItem.Quantity)
+									logs.Info("Item quantity is ", item.Quantity)
+									oItem.Quantity = oItem.Quantity + int(item.Quantity)
+									if err := models.UpdateItem_quantityById(oItem); err != nil {
+										logs.Error("Error updating item::: ", err.Error())
+										message := "Error updating the item quantity"
+										var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: message}
+										logs.Error("Error thrown when updating transaction::: ", err.Error())
+										c.Ctx.Output.SetStatus(200)
+										c.Data["json"] = resp
+										c.ServeJSON()
+									} else {
+										logs.Info("Item quantity updated successfully")
+										item.Item.Quantity = int(item.Quantity) + item.Item.Quantity
+										if err := models.UpdateItemsById(item.Item); err != nil {
+											logs.Error("Error updating item::: ", err.Error())
+											message := "Error updating the item quantity"
+											var resp responses.TransactionResponseDTO = responses.TransactionResponseDTO{StatusCode: 806, Transaction: nil, StatusDesc: message}
+											logs.Error("Error thrown when updating transaction::: ", err.Error())
+											c.Ctx.Output.SetStatus(200)
+											c.Data["json"] = resp
+											c.ServeJSON()
+										} else {
+											logs.Info("Item updated successfully")
+										}
+									}
+								}
+								item.Item.Quantity = int(item.Quantity) + item.Item.Quantity
 								if updateOrderId := models.UpdateOrder_itemsById(&item); updateOrderId == nil {
 									logs.Info("Order item updated successfully")
 								} else {
