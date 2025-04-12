@@ -141,6 +141,7 @@ func (c *OrdersController) Post() {
 				amount_ := float32(0.0)
 				quantity_ = 0
 
+				orderItems := make([]*models.Order_items, len(cart_items))
 				if err := models.UpdateOrdersById(&order_); err == nil {
 				forLoop:
 					for q, r := range cart_items {
@@ -192,6 +193,7 @@ func (c *OrdersController) Post() {
 										quantity_ = quantity_ + int(each_quantity_)
 										// each_quantity_ = int64(quantity_)
 										logs.Info("Calculations completed. Amount is ", amount_, " and quantity is ", quantity_)
+										orderItems[q] = &order_items
 									}
 								} else {
 									logs.Error("Error adding order item. Could not find status::: ", err.Error())
@@ -258,8 +260,32 @@ func (c *OrdersController) Post() {
 									var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1}
 
 									if _, txn_d_err := models.AddTransaction_details((&txn_details)); txn_d_err == nil {
-										var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: order_.OrderId, OrderNumber: order_.OrderNumber, Quantity: order_.Quantity, Cost: order_.Cost, CurrencyId: order_.Currency, OrderDate: order_.OrderDate, DateCreated: order_.DateCreated, DateModified: order_.DateModified}
-										var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: transaction_.TransactionId, Order: &customOrder, Amount: transaction_.Amount, TransactingCurrency: transaction_.TransactingCurrency, Status: transaction_.Status.Status, DateCreated: transaction_.DateCreated, DateModified: transaction_.DateModified, CreatedBy: transaction_.CreatedBy, ModifiedBy: transaction_.ModifiedBy, Active: transaction_.Active}
+										var customOrder responses.OrdersCustom = responses.OrdersCustom{
+											OrderId:      order_.OrderId,
+											OrderNumber:  order_.OrderNumber,
+											Quantity:     order_.Quantity,
+											Cost:         order_.Cost,
+											CurrencyId:   order_.Currency,
+											OrderDate:    order_.OrderDate,
+											DateCreated:  order_.DateCreated,
+											DateModified: order_.DateModified,
+											OrderEndDate: order_.OrderEndDate,
+											Customer:     order_.Customer,
+											OrderDetails: orderItems,
+											ReturnedDate: order_.ReturnedDate,
+										}
+										var customTxn responses.TransactionsCustom = responses.TransactionsCustom{
+											TransactionId:       transaction_.TransactionId,
+											Order:               &customOrder,
+											Amount:              transaction_.Amount,
+											TransactingCurrency: transaction_.TransactingCurrency,
+											Status:              transaction_.Status.Status,
+											DateCreated:         transaction_.DateCreated,
+											DateModified:        transaction_.DateModified,
+											CreatedBy:           transaction_.CreatedBy,
+											ModifiedBy:          transaction_.ModifiedBy,
+											Active:              transaction_.Active,
+										}
 
 										fmt.Printf("custom transaction of v: %+v\n", customTxn)
 										statusCode = 200

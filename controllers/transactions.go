@@ -211,6 +211,9 @@ func (c *TransactionsController) GetAll() {
 				return
 			}
 			k, v := kv[0], kv[1]
+			logs.Info("Query key: ", k)
+			logs.Info("Query value: ", v)
+
 			query[k] = v
 		}
 	}
