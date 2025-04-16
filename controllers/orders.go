@@ -204,6 +204,21 @@ func (c *OrdersController) Post() {
 							item.Quantity = finalQuantity
 							item.LastOrderDate = orderDate
 
+							if itemPrice, err := models.GetItem_pricesById(item.ItemPrice.ItemPriceId); err == nil {
+								logs.Info("Update item amount paid ", float32(item.ItemPrice.ItemPrice)*float32(r.Quantity))
+								itemPrice.AmountPaid = float32(item.ItemPrice.ItemPrice) * float32(r.Quantity)
+								if itemPrice.AmountPaid >= itemPrice.ItemPrice {
+									itemPrice.AmountPaid = itemPrice.ItemPrice
+								}
+
+								if err := models.UpdateItem_pricesById(itemPrice); err != nil {
+									logs.Error("Error updating item::: ", err.Error())
+									message = "Error updating the item price"
+								}
+							} else {
+								logs.Error("Error adding order item. Could not find quantity::: ", err.Error())
+							}
+
 							if err := models.UpdateItemsById(item); err != nil {
 								logs.Error("Error updating item::: ", err.Error())
 								message = "Error updating the item quantity"

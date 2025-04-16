@@ -16,6 +16,7 @@ type Item_prices struct {
 	AltItemPrice float32
 	ShowAltPrice bool
 	Currency     *Currencies `orm:"rel(fk)"`
+	AmountPaid   float32
 	Active       int
 	DateCreated  time.Time `orm:"type(datetime)"`
 	DateModified time.Time `orm:"type(datetime)"`

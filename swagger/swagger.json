@@ -965,6 +965,10 @@
                     "type": "number",
                     "format": "float"
                 },
+                "AmountPaid": {
+                    "type": "number",
+                    "format": "float"
+                },
                 "CreatedBy": {
                     "type": "integer",
                     "format": "int64"
