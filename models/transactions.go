@@ -46,8 +46,10 @@ func GetTransactionsById(id int64) (v *Transactions, err error) {
 	qs := o.QueryTable(new(Transactions))
 
 	v = &Transactions{TransactionId: id}
+	logs.Info("About to get transaction details...")
 	if err = qs.Filter("TransactionId", id).RelatedSel().One(v); err == nil {
 		// q := Transactions{TransactionId: id}
+		logs.Info("Load related for payments")
 		_, err := o.LoadRelated(v, "Payments")
 
 		if err == nil {

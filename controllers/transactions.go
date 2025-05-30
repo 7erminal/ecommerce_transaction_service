@@ -138,11 +138,11 @@ func (c *TransactionsController) GetUserTransactions() {
 func (c *TransactionsController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
+	logs.Info("Getting transaction by ID ", id)
 	v, err := models.GetTransactionsById(id)
 	message := "An error occurred adding this audit request"
 	statusCode := 308
 
-	logs.Info("Getting transaction by ID ", id)
 	if err != nil {
 		c.Data["json"] = err.Error()
 		message = "Error fetching Transactions."
@@ -153,6 +153,10 @@ func (c *TransactionsController) GetOne() {
 		message = "Transaction fetched successfully"
 		statusCode = 200
 		fmt.Printf("Returning Order: %+v\n", v.Order)
+		fmt.Printf("Payments: %+v\n", v.Payments)
+		logs.Info("Payment reference number is ", v.Payments)
+		logs.Info("Status of the transaction si ", v.Status.Status)
+		logs.Info("Branch is ", v.Branch.Branch)
 		resp := responses.TransactionResponseDTO{StatusCode: statusCode, Transaction: v, StatusDesc: message}
 		c.Data["json"] = resp
 	}

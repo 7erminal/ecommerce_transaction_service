@@ -1265,6 +1265,9 @@
                 "Reciever": {
                     "$ref": "#/definitions/models.Users"
                 },
+                "ReferenceNumber": {
+                    "type": "string"
+                },
                 "Sender": {
                     "$ref": "#/definitions/models.Customers"
                 },

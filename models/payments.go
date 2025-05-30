@@ -11,21 +11,22 @@ import (
 )
 
 type Payments struct {
-	PaymentId      int64 `orm:"auto"`
-	InitiatedBy    int64
-	Transaction    *Transactions `orm:"rel(fk)"`
-	Sender         *Customers    `orm:"rel(fk);column(sender)"`
-	Reciever       *Users        `orm:"rel(fk);column(reciever)"`
-	Amount         float64
-	PaymentMethod  *Payment_methods `orm:"rel(fk);column(payment_method)"`
-	PaymentProof   string           `orm:"null"`
-	Status         int64
-	PaymentAccount int
-	DateCreated    time.Time `orm:"type(datetime)"`
-	DateModified   time.Time `orm:"type(datetime)"`
-	CreatedBy      int64
-	ModifiedBy     int64
-	Active         int
+	PaymentId       int64 `orm:"auto"`
+	InitiatedBy     int64
+	Transaction     *Transactions `orm:"rel(fk)"`
+	Sender          *Customers    `orm:"rel(fk);column(sender)"`
+	Reciever        *Users        `orm:"rel(fk);column(reciever)"`
+	Amount          float64
+	PaymentMethod   *Payment_methods `orm:"rel(fk);column(payment_method)"`
+	PaymentProof    string           `orm:"null"`
+	Status          int64
+	PaymentAccount  int
+	DateCreated     time.Time `orm:"type(datetime)"`
+	DateModified    time.Time `orm:"type(datetime)"`
+	CreatedBy       int64
+	ModifiedBy      int64
+	Active          int
+	ReferenceNumber string
 }
 
 func init() {
