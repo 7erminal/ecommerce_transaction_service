@@ -380,7 +380,7 @@ func (c *OrdersController) ConfirmOrder() {
 			txn.Active = 1
 			if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
 				var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified, Customer: txn.Order.Customer, OrderDetails: txn.Order.OrderDetails}
-				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, Status: txn.Status.Status, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active}
+				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, Status: txn.Status.Status, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active, Branch: txn.Branch}
 
 				if order, err := models.GetOrdersById(txn.Order.OrderId); err == nil {
 					if order_items, err := models.GetOrder_itemsByOrder(*order); err == nil {
@@ -452,7 +452,7 @@ func (c *OrdersController) ReturnOrder() {
 			txn.Active = 1
 			if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
 				var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: txn.Order.OrderId, OrderNumber: txn.Order.OrderNumber, Quantity: txn.Order.Quantity, Cost: txn.Order.Cost, CurrencyId: txn.Order.Currency, OrderDate: txn.Order.OrderDate, DateCreated: txn.Order.DateCreated, DateModified: txn.Order.DateModified, Customer: txn.Order.Customer, OrderDetails: txn.Order.OrderDetails, ReturnedDate: txn.Order.ReturnedDate, OrderEndDate: txn.Order.OrderEndDate}
-				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, Status: txn.Status.Status, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active}
+				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: txn.TransactionId, Order: &customOrder, Amount: txn.Amount, TransactingCurrency: txn.TransactingCurrency, Status: txn.Status.Status, DateCreated: txn.DateCreated, DateModified: txn.DateModified, CreatedBy: txn.CreatedBy, ModifiedBy: txn.ModifiedBy, Active: txn.Active, Branch: txn.Branch}
 
 				if order, err := models.GetOrdersById(txn.Order.OrderId); err == nil {
 
