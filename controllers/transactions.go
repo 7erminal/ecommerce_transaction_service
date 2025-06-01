@@ -114,7 +114,19 @@ func (c *TransactionsController) GetUserTransactions() {
 
 		for _, r := range *transactions {
 			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, Quantity: r.Order.Quantity, Cost: r.Order.Cost, CurrencyId: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
-			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{TransactionId: r.TransactionId, Order: &customOrder, Amount: r.Amount, TransactingCurrency: r.TransactingCurrency, Status: r.Status.Status, DateCreated: r.DateCreated, DateModified: r.DateModified, CreatedBy: r.CreatedBy, ModifiedBy: r.ModifiedBy, Active: r.Active}
+			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{
+				TransactionId:       r.TransactionId,
+				Order:               &customOrder,
+				Amount:              r.Amount,
+				TransactingCurrency: r.TransactingCurrency,
+				Status:              r.Status.Status,
+				DateCreated:         r.DateCreated,
+				DateModified:        r.DateModified,
+				CreatedBy:           r.CreatedBy,
+				ModifiedBy:          r.ModifiedBy,
+				Active:              r.Active,
+				Branch:              r.Branch,
+			}
 
 			customTxns = append(customTxns, customTxn)
 		}

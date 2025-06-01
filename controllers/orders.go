@@ -300,6 +300,7 @@ func (c *OrdersController) Post() {
 											CreatedBy:           transaction_.CreatedBy,
 											ModifiedBy:          transaction_.ModifiedBy,
 											Active:              transaction_.Active,
+											Branch:              transaction_.Branch,
 										}
 
 										fmt.Printf("custom transaction of v: %+v\n", customTxn)

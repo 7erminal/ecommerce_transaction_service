@@ -40,4 +40,5 @@ type TransactionsCustom struct {
 	CreatedBy           int
 	ModifiedBy          int
 	Active              int
+	Branch              *models.Branches `orm:"rel(fk)"`
 }
