@@ -206,8 +206,8 @@ func (c *OrdersController) Post() {
 
 							if itemPrice, err := models.GetItem_pricesById(item.ItemPrice.ItemPriceId); err == nil {
 								logs.Info("Update item amount paid ", float32(item.ItemPrice.ItemPrice)*float32(r.Quantity))
-								itemPrice.AmountPaid = float32(item.ItemPrice.ItemPrice) * float32(r.Quantity)
-								if itemPrice.AmountPaid >= itemPrice.ItemPrice {
+								itemPrice.AmountPaid = itemPrice.AmountPaid + (float32(item.ItemPrice.ItemPrice) * float32(r.Quantity))
+								if itemPrice.AmountPaid >= itemPrice.AltItemPrice {
 									itemPrice.AmountPaid = itemPrice.ItemPrice
 								}
 
