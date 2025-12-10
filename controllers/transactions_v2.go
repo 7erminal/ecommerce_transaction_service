@@ -40,7 +40,8 @@ func (c *TransactionsV2Controller) Post() {
 	// Validate the request
 
 	// authorization := ctx.Input.Header("Authorization")
-	phoneNumber := c.Ctx.Input.Header("PhoneNumber")
+	// phoneNumber := c.Ctx.Input.Header("PhoneNumber")
+	phoneNumber := req.PhoneNumber
 	sourceSystem := c.Ctx.Input.Header("SourceSystem")
 
 	responseCode := 400
