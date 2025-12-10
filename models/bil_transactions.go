@@ -27,9 +27,9 @@ type Bil_transactions struct {
 	Commission              float64
 	ExternalReferenceNumber string        `orm:"size(255)"`
 	Status                  *Status_codes `orm:"rel(fk)"`
-	ExtraDetails1           string        `orm:"size(255)"`
-	ExtraDetails2           string        `orm:"size(255)"`
-	ExtraDetails3           string        `orm:"size(255)"`
+	ExtraDetails1           string        `orm:"size(255); column(extra_details_1)"`
+	ExtraDetails2           string        `orm:"size(255); column(extra_details_2)"`
+	ExtraDetails3           string        `orm:"size(255); column(extra_details_3)"`
 	DateCreated             time.Time     `orm:"type(datetime)"`
 	DateModified            time.Time     `orm:"type(datetime)"`
 	CreatedBy               int
