@@ -40,6 +40,11 @@ func init() {
 				&controllers.TransactionsV2Controller{},
 			),
 		),
+		beego.NSNamespace("/callback",
+			beego.NSInclude(
+				&controllers.CallbackController{},
+			),
+		),
 	)
 
 	beego.AddNamespace(ns2)
