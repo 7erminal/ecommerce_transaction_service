@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 )
 
 type Customers struct {
@@ -52,12 +53,79 @@ func GetCustomerById(id int64) (v *Customers, err error) {
 	return nil, err
 }
 
+func GetCustomerByPhoneNumber(phoneNumber string) (v *Customers, err error) {
+	o := orm.NewOrm()
+	v = &Customers{PhoneNumber: phoneNumber}
+	qs := o.QueryTable(new(Customers))
+	if err = qs.Filter("PhoneNumber", phoneNumber).RelatedSel().One(v); err == nil {
+		return v, nil
+	}
+	return nil, err
+}
+
+// GetItemsById retrieves Items by Id. Returns error if
+// Id doesn't exist
+func GetCustomerCount(query map[string]string, search map[string]string) (c int64, err error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Customers))
+
+	if len(search) > 0 {
+		cond := orm.NewCondition()
+		for k, v := range search {
+			// rewrite dot-notation to Object__Attribute
+			k = strings.Replace(k, ".", "__", -1)
+			if strings.Contains(k, "isnull") {
+				qs = qs.Filter(k, (v == "true" || v == "1"))
+			} else {
+				logs.Info("Adding or statement")
+				cond = cond.Or(k+"__icontains", v)
+
+				// qs = qs.Filter(k+"__icontains", v)
+
+			}
+		}
+		logs.Info("Condition set ", qs)
+		qs = qs.SetCond(cond)
+	}
+
+	logs.Info("Query is ", query)
+	for k, v := range query {
+		// rewrite dot-notation to Object__Attribute
+		k = strings.Replace(k, ".", "__", -1)
+		qs = qs.Filter(k, v)
+	}
+	if c, err = qs.RelatedSel().Count(); err == nil {
+		return c, nil
+	}
+	return 0, err
+}
+
 // GetAllCustomers retrieves all Customers matches certain condition. Returns empty list if
 // no records exist
 func GetAllCustomers(query map[string]string, fields []string, sortby []string, order []string,
-	offset int64, limit int64) (ml []interface{}, err error) {
+	offset int64, limit int64, search map[string]string) (ml []interface{}, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Customers))
+
+	if len(search) > 0 {
+		cond := orm.NewCondition()
+		for k, v := range search {
+			// rewrite dot-notation to Object__Attribute
+			k = strings.Replace(k, ".", "__", -1)
+			if strings.Contains(k, "isnull") {
+				qs = qs.Filter(k, (v == "true" || v == "1"))
+			} else {
+				logs.Info("Adding or statement")
+				cond = cond.Or(k+"__icontains", v)
+
+				// qs = qs.Filter(k+"__icontains", v)
+
+			}
+		}
+		logs.Info("Condition set ", qs)
+		qs = qs.SetCond(cond)
+	}
+
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -110,11 +178,41 @@ func GetAllCustomers(query map[string]string, fields []string, sortby []string, 
 	if _, err = qs.All(&l, fields...); err == nil {
 		if len(fields) == 0 {
 			for _, v := range l {
+				_, err = o.LoadRelated(&v, "EmergencyContacts")
+				if err != nil {
+					logs.Error("Error loading related EmergencyContacts: ", err)
+				} else {
+					logs.Info("EmergencyContacts loaded successfully")
+					// fmt.Printf("Emergency contacts of customers: %T\n", v)
+					// fmt.Printf("Emergency contacts of customers: %v\n", v.EmergencyContacts)
+					// for _, ec := range v.EmergencyContacts {
+					// 	fmt.Printf("Emergency contact: %v\n", ec)
+					// }
+				}
+				_, err = o.LoadRelated(&v, "Guarantors")
+				if err != nil {
+					logs.Error("Error loading related Guarantors: ", err)
+				}
 				ml = append(ml, v)
 			}
 		} else {
 			// trim unused fields
 			for _, v := range l {
+				_, err = o.LoadRelated(&v, "EmergencyContacts")
+				if err != nil {
+					logs.Error("Error loading related EmergencyContacts: ", err)
+				} else {
+					logs.Info("EmergencyContacts loaded successfully")
+					// fmt.Printf("Emergency contacts of customers: %T\n", v)
+					// fmt.Printf("Emergency contacts of customers: %v\n", v.EmergencyContacts)
+					// for _, ec := range v.EmergencyContacts {
+					// 	fmt.Printf("Emergency contact: %v\n", ec)
+					// }
+				}
+				_, err = o.LoadRelated(&v, "Guarantors")
+				if err != nil {
+					logs.Error("Error loading related Guarantors: ", err)
+				}
 				m := make(map[string]interface{})
 				val := reflect.ValueOf(v)
 				for _, fname := range fields {

@@ -10,65 +10,60 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 )
 
-type Services struct {
-	ServiceId          int64     `orm:"auto"`
-	ServiceName        string    `orm:"size(100)"`
-	ServiceCode        string    `orm:"size(100)"`
-	ServiceDescription string    `orm:"size(300)"`
-	DateCreated        time.Time `orm:"type(datetime)"`
-	DateModified       time.Time `orm:"type(datetime)"`
-	CreatedBy          int
-	ModifiedBy         int
-	Active             int
+type Billers struct {
+	BillerId          int64     `orm:"auto"`
+	BillerName        string    `orm:"size(80)"`
+	BillerCode        string    `orm:"size(80)"`
+	BillerReferenceId string    `orm:"size(250)"`
+	Description       string    `orm:"size(255)"`
+	Operator          *Operator `orm:"rel(fk);column(operator_id)"`
+	DateCreated       time.Time `orm:"type(datetime)"`
+	DateModified      time.Time `orm:"type(datetime)"`
+	CreatedBy         int
+	ModifiedBy        int
+	Active            int
 }
 
 func init() {
-	orm.RegisterModel(new(Services))
+	orm.RegisterModel(new(Billers))
 }
 
-// AddServices insert a new Services into database and returns
+// AddBillers insert a new Billers into database and returns
 // last inserted Id on success.
-func AddServices(m *Services) (id int64, err error) {
+func AddBillers(m *Billers) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
-// GetServicesById retrieves Services by Id. Returns error if
+// GetBillersById retrieves Billers by Id. Returns error if
 // Id doesn't exist
-func GetServicesById(id int64) (v *Services, err error) {
+func GetBillersById(id int64) (v *Billers, err error) {
 	o := orm.NewOrm()
-	v = &Services{ServiceId: id}
-	if err = o.QueryTable(new(Services)).Filter("ServiceId", id).RelatedSel().One(v); err == nil {
+	v = &Billers{BillerId: id}
+	if err = o.QueryTable(new(Billers)).Filter("BillerId", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-func GetServicesByName(name string) (v *Services, err error) {
+// GetBillersById retrieves Billers by Id. Returns error if
+// Id doesn't exist
+func GetBillerByCode(code string) (v *Billers, err error) {
 	o := orm.NewOrm()
-	v = &Services{ServiceName: name}
-	if err = o.QueryTable(new(Services)).Filter("ServiceName", name).RelatedSel().One(v); err == nil {
+	v = &Billers{BillerCode: code}
+	if err = o.QueryTable(new(Billers)).Filter("BillerCode", code).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-func GetServicesByCode(code string) (v *Services, err error) {
-	o := orm.NewOrm()
-	v = &Services{ServiceCode: code}
-	if err = o.QueryTable(new(Services)).Filter("ServiceCode", code).RelatedSel().One(v); err == nil {
-		return v, nil
-	}
-	return nil, err
-}
-
-// GetAllServices retrieves all Services matches certain condition. Returns empty list if
+// GetAllBillers retrieves all Billers matches certain condition. Returns empty list if
 // no records exist
-func GetAllServices(query map[string]string, fields []string, sortby []string, order []string,
+func GetAllBillers(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Services))
+	qs := o.QueryTable(new(Billers))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -114,7 +109,7 @@ func GetAllServices(query map[string]string, fields []string, sortby []string, o
 		}
 	}
 
-	var l []Services
+	var l []Billers
 	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
@@ -137,11 +132,11 @@ func GetAllServices(query map[string]string, fields []string, sortby []string, o
 	return nil, err
 }
 
-// UpdateServices updates Services by Id and returns error if
+// UpdateBillers updates Billers by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateServicesById(m *Services) (err error) {
+func UpdateBillersById(m *Billers) (err error) {
 	o := orm.NewOrm()
-	v := Services{ServiceId: m.ServiceId}
+	v := Billers{BillerId: m.BillerId}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -152,15 +147,15 @@ func UpdateServicesById(m *Services) (err error) {
 	return
 }
 
-// DeleteServices deletes Services by Id and returns error if
+// DeleteBillers deletes Billers by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteServices(id int64) (err error) {
+func DeleteBillers(id int64) (err error) {
 	o := orm.NewOrm()
-	v := Services{ServiceId: id}
+	v := Billers{BillerId: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Services{ServiceId: id}); err == nil {
+		if num, err = o.Delete(&Billers{BillerId: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}

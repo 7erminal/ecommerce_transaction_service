@@ -10,65 +10,75 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 )
 
-type Services struct {
-	ServiceId          int64     `orm:"auto"`
-	ServiceName        string    `orm:"size(100)"`
-	ServiceCode        string    `orm:"size(100)"`
-	ServiceDescription string    `orm:"size(300)"`
-	DateCreated        time.Time `orm:"type(datetime)"`
-	DateModified       time.Time `orm:"type(datetime)"`
-	CreatedBy          int
-	ModifiedBy         int
-	Active             int
+type Bil_transactions struct {
+	TransactionId           int64      `orm:"auto"`
+	TransactionRefNumber    string     `orm:"size(255);unique"`
+	Service                 *Services  `orm:"rel(fk)"`
+	BillerCode              string     `orm:"size(255)"`
+	Request                 *Request   `orm:"rel(fk)"`
+	TransactionBy           *Customers `orm:"rel(fk);column(transaction_by)"`
+	Amount                  float64
+	TransactingCurrency     string `orm:"size(255)"`
+	SourceChannel           string `orm:"size(255)"`
+	Source                  string `orm:"size(255)"`
+	Destination             string `orm:"size(255)"`
+	Package                 string `orm:"size(255)"`
+	Charge                  float64
+	Commission              float64
+	ExternalReferenceNumber string        `orm:"size(255)"`
+	Status                  *Status_codes `orm:"rel(fk)"`
+	ExtraDetails1           string        `orm:"size(255)"`
+	ExtraDetails2           string        `orm:"size(255)"`
+	ExtraDetails3           string        `orm:"size(255)"`
+	DateCreated             time.Time     `orm:"type(datetime)"`
+	DateModified            time.Time     `orm:"type(datetime)"`
+	CreatedBy               int
+	ModifiedBy              int
+	Active                  int
+}
+
+func (t *Bil_transactions) TableName() string {
+	return "bil_transactions"
 }
 
 func init() {
-	orm.RegisterModel(new(Services))
+	orm.RegisterModel(new(Bil_transactions))
 }
 
-// AddServices insert a new Services into database and returns
+// AddBil_transactions insert a new Bil_transactions into database and returns
 // last inserted Id on success.
-func AddServices(m *Services) (id int64, err error) {
+func AddBil_transactions(m *Bil_transactions) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
-// GetServicesById retrieves Services by Id. Returns error if
+// GetBil_transactionsById retrieves Bil_transactions by Id. Returns error if
 // Id doesn't exist
-func GetServicesById(id int64) (v *Services, err error) {
+func GetBil_transactionsById(id int64) (v *Bil_transactions, err error) {
 	o := orm.NewOrm()
-	v = &Services{ServiceId: id}
-	if err = o.QueryTable(new(Services)).Filter("ServiceId", id).RelatedSel().One(v); err == nil {
+	v = &Bil_transactions{TransactionId: id}
+	if err = o.QueryTable(new(Bil_transactions)).Filter("TransactionId", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-func GetServicesByName(name string) (v *Services, err error) {
+func GetBil_transactionsByTransactionRefNum(id string) (v *Bil_transactions, err error) {
 	o := orm.NewOrm()
-	v = &Services{ServiceName: name}
-	if err = o.QueryTable(new(Services)).Filter("ServiceName", name).RelatedSel().One(v); err == nil {
+	v = &Bil_transactions{TransactionRefNumber: id}
+	if err = o.QueryTable(new(Bil_transactions)).Filter("TransactionRefNumber", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-func GetServicesByCode(code string) (v *Services, err error) {
-	o := orm.NewOrm()
-	v = &Services{ServiceCode: code}
-	if err = o.QueryTable(new(Services)).Filter("ServiceCode", code).RelatedSel().One(v); err == nil {
-		return v, nil
-	}
-	return nil, err
-}
-
-// GetAllServices retrieves all Services matches certain condition. Returns empty list if
+// GetAllBil_transactions retrieves all Bil_transactions matches certain condition. Returns empty list if
 // no records exist
-func GetAllServices(query map[string]string, fields []string, sortby []string, order []string,
+func GetAllBil_transactions(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Services))
+	qs := o.QueryTable(new(Bil_transactions))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -114,7 +124,7 @@ func GetAllServices(query map[string]string, fields []string, sortby []string, o
 		}
 	}
 
-	var l []Services
+	var l []Bil_transactions
 	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
@@ -137,11 +147,11 @@ func GetAllServices(query map[string]string, fields []string, sortby []string, o
 	return nil, err
 }
 
-// UpdateServices updates Services by Id and returns error if
+// UpdateBil_transactions updates Bil_transactions by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateServicesById(m *Services) (err error) {
+func UpdateBil_transactionsById(m *Bil_transactions) (err error) {
 	o := orm.NewOrm()
-	v := Services{ServiceId: m.ServiceId}
+	v := Bil_transactions{TransactionId: m.TransactionId}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -152,15 +162,15 @@ func UpdateServicesById(m *Services) (err error) {
 	return
 }
 
-// DeleteServices deletes Services by Id and returns error if
+// DeleteBil_transactions deletes Bil_transactions by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteServices(id int64) (err error) {
+func DeleteBil_transactions(id int64) (err error) {
 	o := orm.NewOrm()
-	v := Services{ServiceId: id}
+	v := Bil_transactions{TransactionId: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Services{ServiceId: id}); err == nil {
+		if num, err = o.Delete(&Bil_transactions{TransactionId: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}

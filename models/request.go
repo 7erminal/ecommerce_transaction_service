@@ -10,65 +10,54 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 )
 
-type Services struct {
-	ServiceId          int64     `orm:"auto"`
-	ServiceName        string    `orm:"size(100)"`
-	ServiceCode        string    `orm:"size(100)"`
-	ServiceDescription string    `orm:"size(300)"`
-	DateCreated        time.Time `orm:"type(datetime)"`
-	DateModified       time.Time `orm:"type(datetime)"`
-	CreatedBy          int
-	ModifiedBy         int
-	Active             int
+type Request struct {
+	RequestId        int64      `orm:"auto"`
+	ApiRequestId     int64      `orm:"column(api_request_id)"`
+	CustId           *Customers `orm:"rel(fk);column(cust_id)"`
+	Request          string     `orm:"size(1000)"`
+	RequestType      string     `orm:"size(100)"`
+	RequestStatus    string     `orm:"size(255)"`
+	RequestAmount    float64
+	RequestResponse  string    `orm:"size(1000)"`
+	CallbackResponse string    `orm:"size(1000)"`
+	RequestDate      time.Time `orm:"type(datetime)"`
+	DateCreated      time.Time `orm:"type(datetime);column(created_at)"`
+	DateModified     time.Time `orm:"type(datetime);column(updated_at)"`
+}
+
+func (t *Request) TableName() string {
+	return "requests"
 }
 
 func init() {
-	orm.RegisterModel(new(Services))
+	orm.RegisterModel(new(Request))
 }
 
-// AddServices insert a new Services into database and returns
+// AddRequest insert a new Request into database and returns
 // last inserted Id on success.
-func AddServices(m *Services) (id int64, err error) {
+func AddRequest(m *Request) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
-// GetServicesById retrieves Services by Id. Returns error if
+// GetRequestById retrieves Request by Id. Returns error if
 // Id doesn't exist
-func GetServicesById(id int64) (v *Services, err error) {
+func GetRequestById(id int64) (v *Request, err error) {
 	o := orm.NewOrm()
-	v = &Services{ServiceId: id}
-	if err = o.QueryTable(new(Services)).Filter("ServiceId", id).RelatedSel().One(v); err == nil {
+	v = &Request{RequestId: id}
+	if err = o.QueryTable(new(Request)).Filter("RequestId", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-func GetServicesByName(name string) (v *Services, err error) {
-	o := orm.NewOrm()
-	v = &Services{ServiceName: name}
-	if err = o.QueryTable(new(Services)).Filter("ServiceName", name).RelatedSel().One(v); err == nil {
-		return v, nil
-	}
-	return nil, err
-}
-
-func GetServicesByCode(code string) (v *Services, err error) {
-	o := orm.NewOrm()
-	v = &Services{ServiceCode: code}
-	if err = o.QueryTable(new(Services)).Filter("ServiceCode", code).RelatedSel().One(v); err == nil {
-		return v, nil
-	}
-	return nil, err
-}
-
-// GetAllServices retrieves all Services matches certain condition. Returns empty list if
+// GetAllRequest retrieves all Request matches certain condition. Returns empty list if
 // no records exist
-func GetAllServices(query map[string]string, fields []string, sortby []string, order []string,
+func GetAllRequest(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Services))
+	qs := o.QueryTable(new(Request))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -114,7 +103,7 @@ func GetAllServices(query map[string]string, fields []string, sortby []string, o
 		}
 	}
 
-	var l []Services
+	var l []Request
 	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
@@ -137,11 +126,11 @@ func GetAllServices(query map[string]string, fields []string, sortby []string, o
 	return nil, err
 }
 
-// UpdateServices updates Services by Id and returns error if
+// UpdateRequest updates Request by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateServicesById(m *Services) (err error) {
+func UpdateRequestById(m *Request) (err error) {
 	o := orm.NewOrm()
-	v := Services{ServiceId: m.ServiceId}
+	v := Request{RequestId: m.RequestId}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -152,15 +141,15 @@ func UpdateServicesById(m *Services) (err error) {
 	return
 }
 
-// DeleteServices deletes Services by Id and returns error if
+// DeleteRequest deletes Request by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteServices(id int64) (err error) {
+func DeleteRequest(id int64) (err error) {
 	o := orm.NewOrm()
-	v := Services{ServiceId: id}
+	v := Request{RequestId: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Services{ServiceId: id}); err == nil {
+		if num, err = o.Delete(&Request{RequestId: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}

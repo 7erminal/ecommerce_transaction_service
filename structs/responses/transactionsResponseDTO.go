@@ -42,3 +42,15 @@ type TransactionsCustom struct {
 	Active              int
 	Branch              *models.Branches `orm:"rel(fk)"`
 }
+
+type BilTransactionResponseDTO struct {
+	StatusCode     int
+	BilTransaction *models.Bil_transactions
+	StatusDesc     string
+}
+
+type BilTransactionsResponseDTO struct {
+	StatusCode      int
+	BilTransactions *[]interface{}
+	StatusDesc      string
+}

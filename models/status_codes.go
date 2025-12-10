@@ -10,65 +10,56 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 )
 
-type Services struct {
-	ServiceId          int64     `orm:"auto"`
-	ServiceName        string    `orm:"size(100)"`
-	ServiceCode        string    `orm:"size(100)"`
-	ServiceDescription string    `orm:"size(300)"`
-	DateCreated        time.Time `orm:"type(datetime)"`
-	DateModified       time.Time `orm:"type(datetime)"`
-	CreatedBy          int
-	ModifiedBy         int
-	Active             int
+type Status_codes struct {
+	StatusId          int64  `orm:"auto"`
+	Status            string `orm:"size(128)"`
+	StatusCode        string `orm:"size(50)"`
+	StatusDescription string `orm:"size(255)"`
+	Active            int
+	DateCreated       time.Time `orm:"type(datetime)"`
+	DateModified      time.Time `orm:"type(datetime)"`
+	CreatedBy         int
+	ModifiedBy        int
 }
 
 func init() {
-	orm.RegisterModel(new(Services))
+	orm.RegisterModel(new(Status_codes))
 }
 
-// AddServices insert a new Services into database and returns
+// AddStatus_codes insert a new Status_codes into database and returns
 // last inserted Id on success.
-func AddServices(m *Services) (id int64, err error) {
+func AddStatus_codes(m *Status_codes) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
-// GetServicesById retrieves Services by Id. Returns error if
+// GetStatus_codesById retrieves Status_codes by Id. Returns error if
 // Id doesn't exist
-func GetServicesById(id int64) (v *Services, err error) {
+func GetStatus_codesById(id int64) (v *Status_codes, err error) {
 	o := orm.NewOrm()
-	v = &Services{ServiceId: id}
-	if err = o.QueryTable(new(Services)).Filter("ServiceId", id).RelatedSel().One(v); err == nil {
+	v = &Status_codes{StatusId: id}
+	if err = o.QueryTable(new(Status_codes)).Filter("StatusId", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-func GetServicesByName(name string) (v *Services, err error) {
+func GetStatus_codesByCode(code string) (v *Status_codes, err error) {
 	o := orm.NewOrm()
-	v = &Services{ServiceName: name}
-	if err = o.QueryTable(new(Services)).Filter("ServiceName", name).RelatedSel().One(v); err == nil {
+	v = &Status_codes{StatusCode: code}
+	if err = o.QueryTable(new(Status_codes)).Filter("StatusCode", code).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-func GetServicesByCode(code string) (v *Services, err error) {
-	o := orm.NewOrm()
-	v = &Services{ServiceCode: code}
-	if err = o.QueryTable(new(Services)).Filter("ServiceCode", code).RelatedSel().One(v); err == nil {
-		return v, nil
-	}
-	return nil, err
-}
-
-// GetAllServices retrieves all Services matches certain condition. Returns empty list if
+// GetAllStatus_codes retrieves all Status_codes matches certain condition. Returns empty list if
 // no records exist
-func GetAllServices(query map[string]string, fields []string, sortby []string, order []string,
+func GetAllStatus_codes(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Services))
+	qs := o.QueryTable(new(Status_codes))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -114,7 +105,7 @@ func GetAllServices(query map[string]string, fields []string, sortby []string, o
 		}
 	}
 
-	var l []Services
+	var l []Status_codes
 	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
@@ -137,11 +128,11 @@ func GetAllServices(query map[string]string, fields []string, sortby []string, o
 	return nil, err
 }
 
-// UpdateServices updates Services by Id and returns error if
+// UpdateStatus_codes updates Status_codes by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateServicesById(m *Services) (err error) {
+func UpdateStatus_codesById(m *Status_codes) (err error) {
 	o := orm.NewOrm()
-	v := Services{ServiceId: m.ServiceId}
+	v := Status_codes{StatusId: m.StatusId}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -152,15 +143,15 @@ func UpdateServicesById(m *Services) (err error) {
 	return
 }
 
-// DeleteServices deletes Services by Id and returns error if
+// DeleteStatus_codes deletes Status_codes by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteServices(id int64) (err error) {
+func DeleteStatus_codes(id int64) (err error) {
 	o := orm.NewOrm()
-	v := Services{ServiceId: id}
+	v := Status_codes{StatusId: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Services{ServiceId: id}); err == nil {
+		if num, err = o.Delete(&Status_codes{StatusId: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}
