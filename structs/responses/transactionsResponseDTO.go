@@ -87,4 +87,5 @@ type Bil_transactionCustom struct {
 	ExtraDetails3           string
 	DateProcessed           time.Time
 	Active                  int
+	InsTxns                 []*Bil_ins_transactionCustom
 }

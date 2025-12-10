@@ -125,7 +125,7 @@ func (c *CallbackController) Post() {
 					}
 				}
 
-				var insResponses []responses.Bil_ins_transactionCustom
+				var insResponses []*responses.Bil_ins_transactionCustom
 
 				insTxns, err := models.GetAllBil_ins_transactions(query, fields, sortby, order, offset, limit)
 				if err == nil {
@@ -153,7 +153,7 @@ func (c *CallbackController) Post() {
 							Response:               insTxnObj.Response,
 							Active:                 insTxnObj.Active,
 						}
-						insResponses = append(insResponses, bilTxnResp)
+						insResponses = append(insResponses, &bilTxnResp)
 					}
 
 				} else {
@@ -210,6 +210,7 @@ func (c *CallbackController) Post() {
 					ExtraDetails3:           resp.ExtraDetails3,
 					DateProcessed:           resp.DateModified,
 					Active:                  resp.Active,
+					InsTxns:                 insResponses,
 				}
 
 				c.Ctx.Output.SetStatus(200)
