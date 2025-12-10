@@ -10,11 +10,10 @@ type BilTransactionRequestDTO struct {
 	Source          string
 	PhoneNumber     string
 	Amount          float64
-	Network         string
 	Destination     string
 	ClientReference string
 	Package         string
-	ServiceId       string
+	ServiceCode     string
 	RequestId       string
 	ExtraData       ExtraData
 	BillerCode      string

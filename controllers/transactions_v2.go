@@ -61,7 +61,7 @@ func (c *TransactionsV2Controller) Post() {
 		status, err := models.GetStatus_codesByCode(statusCode)
 		if err == nil {
 			// Restructure the request to match the model
-			serviceCode := "BILL_PAYMENT"
+			serviceCode := req.ServiceCode
 			if service, err := models.GetServicesByCode(serviceCode); err == nil {
 				requestIdStr := req.RequestId
 				requestId, _ := strconv.ParseInt(requestIdStr, 10, 64)
@@ -130,9 +130,9 @@ func (c *TransactionsV2Controller) Post() {
 	}
 
 	response := responses.BilTransactionResponseDTO{
-		StatusCode:     responseCode,
-		StatusDesc:     responseMessage,
-		BilTransaction: &bilTxn,
+		StatusCode: responseCode,
+		StatusDesc: responseMessage,
+		Result:     &bilTxn,
 	}
 
 	c.Data["json"] = response

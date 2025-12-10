@@ -44,13 +44,13 @@ type TransactionsCustom struct {
 }
 
 type BilTransactionResponseDTO struct {
-	StatusCode     int
-	BilTransaction *models.Bil_transactions
-	StatusDesc     string
+	StatusCode int
+	Result     *models.Bil_transactions
+	StatusDesc string
 }
 
 type BilTransactionsResponseDTO struct {
-	StatusCode      int
-	BilTransactions *[]interface{}
-	StatusDesc      string
+	StatusCode int
+	Result     *[]interface{}
+	StatusDesc string
 }
