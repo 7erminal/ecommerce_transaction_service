@@ -150,12 +150,26 @@ func (c *TransactionsV2Controller) Post() {
 func (c *TransactionsV2Controller) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
+
+	statusCode := 400
+	responseMessage := "Request not processed"
+	bilTxn := models.Bil_transactions{}
 	v, err := models.GetBil_transactionsById(id)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		responseMessage = "Transaction not found: " + err.Error()
+		c.Ctx.Output.SetStatus(200)
 	} else {
-		c.Data["json"] = v
+		bilTxn = *v
+		statusCode = 200
+		responseMessage = "Transaction retrieved successfully"
 	}
+
+	response := responses.BilTransactionResponseDTO{
+		StatusCode: statusCode,
+		StatusDesc: responseMessage,
+		Result:     &bilTxn,
+	}
+	c.Data["json"] = response
 	c.ServeJSON()
 }
 
