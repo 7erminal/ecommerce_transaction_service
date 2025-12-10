@@ -54,3 +54,37 @@ type BilTransactionsResponseDTO struct {
 	Result     *[]interface{}
 	StatusDesc string
 }
+
+type Bil_ins_transactionCustom struct {
+	BilInsTransactionId    int64
+	Amount                 string
+	Biller                 string
+	SenderAccountNumber    string
+	RecipientAccountNumber string
+	Network                string
+	Request                string
+	Response               string
+	Active                 int
+}
+
+type Bil_transactionCustom struct {
+	TransactionId           string
+	TransactionRefNumber    string
+	Service                 string
+	BillerCode              string
+	Amount                  string
+	TransactingCurrency     string
+	SourceChannel           string
+	Source                  string
+	Destination             string
+	Package                 string
+	Charge                  string
+	Commission              string
+	ExternalReferenceNumber string
+	Status                  string
+	ExtraDetails1           string
+	ExtraDetails2           string
+	ExtraDetails3           string
+	DateProcessed           time.Time
+	Active                  int
+}
