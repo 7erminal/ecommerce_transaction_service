@@ -12,22 +12,23 @@ import (
 )
 
 type Customers struct {
-	CustomerId           int64     `orm:"auto"`
-	FullName             string    `orm:"column(full_name);size(255)"`
-	ImagePath            string    `orm:"column(image_path);size(255)"`
-	Email                string    `orm:"column(email);size(255);null"`
-	PhoneNumber          string    `orm:"column(phone_number);size(255);null"`
-	Location             string    `orm:"column(location);size(255);null"`
-	IdentificationNumber string    `orm:"column(identification_number);size(255);null"`
-	Nickname             string    `orm:"size(100);omitempty;null"`
-	Dob                  time.Time `orm:"column(dob);type(datetime)"`
-	DateCreated          time.Time `orm:"type(datetime)"`
-	DateModified         time.Time `orm:"type(datetime)"`
-	LastTxnDate          time.Time `orm:"type(datetime);null;column(last_txn_date);"`
+	CustomerId           int64                 `orm:"auto"`
+	FullName             string                `orm:"column(full_name);size(255)"`
+	ImagePath            string                `orm:"column(image_path);size(255)"`
+	Email                string                `orm:"column(email);size(255);null"`
+	PhoneNumber          string                `orm:"column(phone_number);size(255);null"`
+	Location             string                `orm:"column(location);size(255);null"`
+	IdentificationType   *Identification_types `orm:"rel(fk);column(identification_type_id);omitempty;null"`
+	IdentificationNumber string                `orm:"column(identification_number);size(255);null"`
+	CustomerCategory     *Customer_categories  `orm:"rel(fk);omitempty;null"`
+	Nickname             string                `orm:"size(100);omitempty;null"`
+	Dob                  time.Time             `orm:"column(dob);type(datetime)"`
+	DateCreated          time.Time             `orm:"type(datetime)"`
+	DateModified         time.Time             `orm:"type(datetime)"`
 	CreatedBy            int
 	ModifiedBy           int
 	Active               int
-	User                 *Users `orm:"rel(fk);omitempty;null"`
+	LastTxnDate          time.Time `orm:"type(datetime)"`
 }
 
 func init() {
