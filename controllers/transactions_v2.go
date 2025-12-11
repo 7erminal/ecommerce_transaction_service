@@ -25,6 +25,7 @@ func (c *TransactionsV2Controller) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("GetOneTransactionWithTxnRef", c.GetOneTransactionWithTxnRef)
 }
 
 // Post ...
@@ -156,6 +157,39 @@ func (c *TransactionsV2Controller) GetOne() {
 	responseMessage := "Request not processed"
 	bilTxn := models.Bil_transactions{}
 	v, err := models.GetBil_transactionsById(id)
+	if err != nil {
+		responseMessage = "Transaction not found: " + err.Error()
+		c.Ctx.Output.SetStatus(200)
+	} else {
+		bilTxn = *v
+		statusCode = 200
+		responseMessage = "Transaction retrieved successfully"
+	}
+
+	response := responses.BilTransactionResponseDTO{
+		StatusCode: statusCode,
+		StatusDesc: responseMessage,
+		Result:     &bilTxn,
+	}
+	c.Data["json"] = response
+	c.ServeJSON()
+}
+
+// GetOneTransactionWithTxnRef ...
+// @Title Get One Transaction With Txn Ref
+// @Description get Transactions by Txn Ref
+// @Param	ref		path 	string	true		"The key for staticblock"
+// @Success 200 {object} models.Transactions
+// @Failure 403 :ref is empty
+// @router /ref/:ref [get]
+func (c *TransactionsV2Controller) GetOneTransactionWithTxnRef() {
+	idStr := c.Ctx.Input.Param(":ref")
+	// id, _ := strconv.ParseInt(idStr, 0, 64)
+
+	statusCode := 400
+	responseMessage := "Request not processed"
+	bilTxn := models.Bil_transactions{}
+	v, err := models.GetBil_transactionsByTransactionRefNum(idStr)
 	if err != nil {
 		responseMessage = "Transaction not found: " + err.Error()
 		c.Ctx.Output.SetStatus(200)
