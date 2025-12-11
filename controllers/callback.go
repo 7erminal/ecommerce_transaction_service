@@ -46,28 +46,28 @@ func (c *CallbackController) Post() {
 	transaction := responses.Bil_transactionCustom{}
 
 	// Handle successful callback
-	transactionId := ""
+	transactionRef := ""
 	if v.ClientReference != nil {
 		logs.Info("Transaction ID found in request: ", *v.ClientReference)
-		transactionId = *v.ClientReference
+		transactionRef = *v.ClientReference
 	}
-	logs.Info("About to get transaction by ID: ", transactionId)
-	id, err := strconv.ParseInt(transactionId, 10, 64)
-	if err != nil {
-		logs.Error("Invalid transaction ID: %v", err)
-		responseCode = false
-		responseMessage = "Invalid transaction ID"
-		resp := responses.CallbackResponse{
-			StatusCode:    responseCode,
-			StatusMessage: responseMessage,
-			Result:        nil,
-		}
-		c.Data["json"] = resp
-		c.Ctx.Output.SetStatus(400)
-		c.ServeJSON()
-		return
-	}
-	if resp, err := models.GetBil_transactionsById(id); err == nil {
+	logs.Info("About to get transaction by ID: ", transactionRef)
+	// id, err := strconv.ParseInt(transactionId, 10, 64)
+	// if err != nil {
+	// 	logs.Error("Invalid transaction ID: %v", err)
+	// 	responseCode = false
+	// 	responseMessage = "Invalid transaction ID"
+	// 	resp := responses.CallbackResponse{
+	// 		StatusCode:    responseCode,
+	// 		StatusMessage: responseMessage,
+	// 		Result:        nil,
+	// 	}
+	// 	c.Data["json"] = resp
+	// 	c.Ctx.Output.SetStatus(400)
+	// 	c.ServeJSON()
+	// 	return
+	// }
+	if resp, err := models.GetBil_transactionsByTransactionRefNum(transactionRef); err == nil {
 		logs.Info("Request ID: ", resp.TransactionId, " found for callback processing")
 		if resp != nil {
 			// Update the transaction status
@@ -216,7 +216,7 @@ func (c *CallbackController) Post() {
 				c.Ctx.Output.SetStatus(200)
 			}
 		} else {
-			logs.Info("Transaction not found for ID: %s", transactionId)
+			logs.Info("Transaction not found for ID: %s", transactionRef)
 			responseCode = false
 			responseMessage = "Transaction not found"
 			// c.Data["json"] = map[string]string{"error": "Transaction not found"}
