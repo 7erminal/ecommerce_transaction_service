@@ -49,7 +49,7 @@ func (c *CallbackController) Post() {
 	logs.Info("Transaction callback Request data: ", string(vBytes))
 
 	// Handle successful callback
-	transactionRef := v.ClientReference
+	transactionRef := v.TransactionId
 
 	logs.Info("About to get transaction by ID: ", transactionRef)
 	// id, err := strconv.ParseInt(transactionId, 10, 64)
