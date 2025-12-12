@@ -181,6 +181,7 @@ func (c *CallbackController) Post() {
 						SenderAccountNumber:    resp.Source,
 						RecipientAccountNumber: resp.Destination,
 						Network:                resp.BillerCode,
+						Status:                 status,
 						Request:                string(resText),
 						Response:               string(resText),
 						DateCreated:            time.Now(),
