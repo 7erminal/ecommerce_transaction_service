@@ -19,7 +19,7 @@ type Bil_ins_transactions struct {
 	SenderAccountNumber    string        `orm:"size(255)"`
 	RecipientAccountNumber string        `orm:"size(255)"`
 	Network                string        `orm:"size(150)"`
-	Status                 *Status_codes `orm:"rel(fk)"`
+	Status                 *Status_codes `orm:"rel(fk);column(status)"`
 	Request                string        `orm:"size(255)"`
 	Response               string        `orm:"size(255)"`
 	DateCreated            time.Time     `orm:"type(datetime)"`
