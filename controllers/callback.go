@@ -45,6 +45,9 @@ func (c *CallbackController) Post() {
 	responseMessage := "Invalid request"
 	transaction := responses.Bil_transactionCustom{}
 
+	vBytes, _ := json.Marshal(v)
+	logs.Info("Transaction callback Request data: ", string(vBytes))
+
 	// Handle successful callback
 	transactionRef := ""
 	if v.ClientReference != nil {
