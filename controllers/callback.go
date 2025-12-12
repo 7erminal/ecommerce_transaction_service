@@ -49,11 +49,8 @@ func (c *CallbackController) Post() {
 	logs.Info("Transaction callback Request data: ", string(vBytes))
 
 	// Handle successful callback
-	transactionRef := ""
-	if v.ClientReference != nil {
-		logs.Info("Transaction ID found in request: ", *v.ClientReference)
-		transactionRef = *v.ClientReference
-	}
+	transactionRef := v.ClientReference
+
 	logs.Info("About to get transaction by ID: ", transactionRef)
 	// id, err := strconv.ParseInt(transactionId, 10, 64)
 	// if err != nil {
@@ -81,9 +78,7 @@ func (c *CallbackController) Post() {
 			if err == nil {
 				resp.Status = status
 				resp.DateModified = time.Now()
-				if v.ExternalTransactionId != nil {
-					resp.ExternalReferenceNumber = *v.ExternalTransactionId
-				}
+				resp.ExternalReferenceNumber = v.ExternalTransactionId
 				resp.DateModified = time.Now()
 				resp.Charge = v.Charges
 			} else {
