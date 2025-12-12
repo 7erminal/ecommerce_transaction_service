@@ -25,8 +25,8 @@ type CallbackRequest struct {
 	ExternalTransactionId string
 	Amount                float64
 	Charges               float64
-	AmountAfterCharges    float64
-	PaymentDate           string
-	OrderId               string
 	Status                string
+	Commission            string
+	ClientResponseCode    string
+	ClientResponseMessage string
 }

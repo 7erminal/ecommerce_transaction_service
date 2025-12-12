@@ -41,7 +41,7 @@ func (c *CallbackController) Post() {
 		return
 	}
 
-	responseCode := false
+	responseCode := 506
 	responseMessage := "Invalid request"
 	transaction := responses.Bil_transactionCustom{}
 
@@ -79,6 +79,12 @@ func (c *CallbackController) Post() {
 				resp.Status = status
 				resp.DateModified = time.Now()
 				resp.ExternalReferenceNumber = v.ExternalTransactionId
+				resp.Commission, _ = strconv.ParseFloat(v.Commission, 64)
+				resp.ClientResponseCode = v.ClientResponseCode
+				// Update charge if needed
+				if v.Charges > 0 {
+					resp.Charge = v.Charges
+				}
 				resp.DateModified = time.Now()
 				resp.Charge = v.Charges
 			} else {
@@ -88,7 +94,7 @@ func (c *CallbackController) Post() {
 
 			if err := models.UpdateBil_transactionsById(resp); err != nil {
 				logs.Info("Failed to update transaction status: %v", err)
-				responseCode = false
+				responseCode = 505
 				responseMessage = "Failed to update transaction status"
 				resp := responses.CallbackResponse{
 					StatusCode:    responseCode,
@@ -167,6 +173,28 @@ func (c *CallbackController) Post() {
 					// return
 				}
 
+				if biller, err := models.GetBillerByCode(resp.BillerCode); err == nil {
+					insTransaction := models.Bil_ins_transactions{
+						BilTransactionId:       resp,
+						Amount:                 v.Amount,
+						Biller:                 biller,
+						SenderAccountNumber:    resp.Source,
+						RecipientAccountNumber: resp.Destination,
+						Network:                resp.BillerCode,
+						Request:                string(resText),
+						Response:               string(resText),
+						DateCreated:            time.Now(),
+						DateModified:           time.Now(),
+						CreatedBy:              1,
+						ModifiedBy:             1,
+						Active:                 1,
+					}
+
+					if _, err := models.AddBil_ins_transactions(&insTransaction); err != nil {
+						logs.Error("Failed to create ins transaction: %v", err)
+					}
+				}
+
 				logs.Info("Callback response text: %s", string(resText))
 				logs.Info("Updating request", resp.Request.RequestId, " with callback response")
 				if request, err := models.GetRequestById(resp.Request.RequestId); err == nil {
@@ -186,7 +214,7 @@ func (c *CallbackController) Post() {
 					logs.Error("Failed to retrieve request by ID: %v", err)
 				}
 
-				responseCode = true
+				responseCode = 200
 				responseMessage = "Transaction updated successfully"
 
 				transaction = responses.Bil_transactionCustom{
@@ -215,7 +243,7 @@ func (c *CallbackController) Post() {
 			}
 		} else {
 			logs.Info("Transaction not found for ID: %s", transactionRef)
-			responseCode = false
+			responseCode = 507
 			responseMessage = "Transaction not found"
 			// c.Data["json"] = map[string]string{"error": "Transaction not found"}
 			c.Ctx.Output.SetStatus(200)
@@ -223,7 +251,7 @@ func (c *CallbackController) Post() {
 	} else {
 		c.Data["json"] = map[string]string{"error": "Failed to retrieve transaction"}
 		logs.Info("Failed to retrieve transaction: %s", err.Error())
-		responseCode = false
+		responseCode = 508
 		responseMessage = "Failed to retrieve transaction"
 		// c.Data["json"] = map[string]string{"error": "Transaction not found"}
 		c.Ctx.Output.SetStatus(200)

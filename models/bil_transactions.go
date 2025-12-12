@@ -30,6 +30,7 @@ type Bil_transactions struct {
 	ExtraDetails1           string        `orm:"size(255); column(extra_details_1)"`
 	ExtraDetails2           string        `orm:"size(255); column(extra_details_2)"`
 	ExtraDetails3           string        `orm:"size(255); column(extra_details_3)"`
+	ClientResponseCode      string        `orm:"size(255); column(client_response_code)"`
 	DateCreated             time.Time     `orm:"type(datetime)"`
 	DateModified            time.Time     `orm:"type(datetime)"`
 	CreatedBy               int

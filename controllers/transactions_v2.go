@@ -106,7 +106,7 @@ func (c *TransactionsV2Controller) Post() {
 							Active:               1, // Assuming active status
 						}
 						if _, err := models.AddBil_transactions(&transaction); err == nil {
-							responseCode = 201
+							responseCode = 200
 							responseMessage = "Transaction created successfully"
 							bilTxn = transaction
 						} else {

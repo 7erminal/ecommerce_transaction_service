@@ -1,7 +1,7 @@
 package responses
 
 type CallbackResponse struct {
-	StatusCode    bool
+	StatusCode    int
 	StatusMessage string
 	Result        *Bil_transactionCustom
 }
