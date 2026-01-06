@@ -10,6 +10,7 @@ import (
 	"transaction_service/structs/requests"
 	"transaction_service/structs/responses"
 
+	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -82,6 +83,7 @@ func (c *TransactionsV2Controller) Post() {
 				}
 				if _, err := models.AddRequest(&v); err == nil {
 					if biller, err := models.GetBillerByCode(req.BillerCode); err == nil {
+						logs.Info("Extra data received are ", req.ExtraData.ExtraData1, req.ExtraData.ExtraData2, req.ExtraData.ExtraData3)
 						// Create a transaction record
 						transaction := models.Bil_transactions{
 							TransactionRefNumber: "TRX-" + strconv.FormatInt(time.Now().Unix(), 10) + strconv.FormatInt(v.RequestId, 10),
