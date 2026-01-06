@@ -94,6 +94,7 @@ func (c *TransactionsV2Controller) Post() {
 							SourceChannel:        sourceSystem,
 							Source:               req.Source,
 							Destination:          req.Destination,
+							Package:              req.Package,
 							Charge:               0.0,    // Assuming no charge for simplicity
 							Status:               status, // Assuming 1 means successful
 							ExtraDetails1:        req.ExtraData.ExtraData1,
