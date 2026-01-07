@@ -32,7 +32,7 @@ jobs:
           set -e  # Exit on any error
           cd /usr/app/mobile-application/ecommerce_transaction_service
           git stash
-          git pull origin main  # Use branch explicitly
+          git pull origin msysmobilizer  # Use branch explicitly
           go build -o transaction-service
           pm2 restart transaction-service || pm2 start transaction-service --name transaction-service
         EOF
