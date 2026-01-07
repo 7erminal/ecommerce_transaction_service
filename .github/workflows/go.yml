@@ -1,0 +1,41 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "msysmobilizer" ]
+  pull_request:
+    branches: [ "msysmobilizer" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    environment: msysmobilizer
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Build
+      env:
+              GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+              GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+              SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+      run: |
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
+          set -e  # Exit on any error
+          cd /usr/app/mobile-application/ecommerce_transaction_service
+          git stash
+          git pull origin main  # Use branch explicitly
+          go build -o transaction-service
+          pm2 restart transaction-service || pm2 start transaction-service --name transaction-service
+        EOF
+
+    # - name: Test
+    #   run: go test -v ./...
