@@ -16,7 +16,7 @@ type Client struct {
 func (c *Client) SendRequest() (*http.Response, error) {
 	// TODO: BaseURLとPathのvalidation
 	fullURL := c.Request.BaseURL + c.Request.Path
-	logs.Info("Full third party URL: ", fullURL)
+	logs.Info("Third party URL: ", fullURL)
 	beegoRequest := httplib.NewBeegoRequest(
 		fullURL,
 		c.Request.Method.String())
