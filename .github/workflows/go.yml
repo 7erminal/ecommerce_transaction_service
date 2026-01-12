@@ -5,15 +5,15 @@ name: Go
 
 on:
   push:
-    branches: [ "msysmobilizer" ]
+    branches: [ "makufoods" ]
   pull_request:
-    branches: [ "msysmobilizer" ]
+    branches: [ "makufoods" ]
 
 jobs:
 
   build:
     runs-on: ubuntu-latest
-    environment: msysmobilizer
+    environment: makufoods
     steps:
     - uses: actions/checkout@v4
 
@@ -28,7 +28,7 @@ jobs:
               GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
               SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
       run: |
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@184.174.33.200 << 'EOF'
           set -e  # Exit on any error
           cd /usr/app/mobile-application/ecommerce_transaction_service
           git stash
