@@ -30,9 +30,9 @@ jobs:
       run: |
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@184.174.33.200 << 'EOF'
           set -e  # Exit on any error
-          cd /usr/app/mobile-application/ecommerce_transaction_service
+          cd /usr/app/maku_foods_transaction_service
           git stash
-          git pull origin msysmobilizer  # Use branch explicitly
-          go build -o transaction-service
-          pm2 restart transaction-service || pm2 start transaction-service --name transaction-service
-        EOF
+          git pull origin makufoods  # Use branch explicitly
+          go build -o maku-foods-transaction-service
+          pm2 restart maku-foods-transaction-service || pm2 start maku-foods-transaction-service --name maku-foods-transaction-service
+        EOF 
