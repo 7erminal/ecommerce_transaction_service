@@ -26,7 +26,7 @@ func (c *CallbackController) URLMapping() {
 
 // Post ...
 // @Title Create
-// @Description create Callback
+// @Description create Callback request
 // @Param	body		body 	requests.CallbackRequest	true		"body for Callback content"
 // @Success 201 {object} responses.CallbackResponse
 // @Failure 403 body is empty
