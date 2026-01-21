@@ -34,7 +34,7 @@ jobs:
 
         ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
           set -e
-          cd /usr/app/mobile-application/ecommerce_transaction_service
+          cd /usr/app/mobile-application/transaction-service
           git stash
           git pull origin msysmobilizer
           go build -o transaction-service
