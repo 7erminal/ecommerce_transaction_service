@@ -39,5 +39,5 @@ jobs:
           git pull origin msysmobilizer
           go build -o transaction-service
           pm2 restart transaction-service || \
-          pm2 start transaction-service --name transaction-service
+          pm2 start transaction-service --name transaction-service 
         EOF
