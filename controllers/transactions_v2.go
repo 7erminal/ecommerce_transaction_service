@@ -99,6 +99,7 @@ func (c *TransactionsV2Controller) Post() {
 							Package:              req.Package,
 							Charge:               0.0,    // Assuming no charge for simplicity
 							Status:               status, // Assuming 1 means successful
+							CorpId:               req.CorpId,
 							ExtraDetails1:        req.ExtraData.ExtraData1,
 							ExtraDetails2:        req.ExtraData.ExtraData2,
 							ExtraDetails3:        req.ExtraData.ExtraData3,

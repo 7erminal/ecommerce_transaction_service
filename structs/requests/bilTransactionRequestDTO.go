@@ -17,4 +17,5 @@ type BilTransactionRequestDTO struct {
 	RequestId       string
 	ExtraData       ExtraData
 	BillerCode      string
+	CorpId          string
 }
