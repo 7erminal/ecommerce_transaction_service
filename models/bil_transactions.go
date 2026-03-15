@@ -35,8 +35,8 @@ type Bil_transactions struct {
 	ClientResponseCode      string        `orm:"size(255); column(client_response_code)"`
 	DateCreated             time.Time     `orm:"type(datetime)"`
 	DateModified            time.Time     `orm:"type(datetime)"`
-	CreatedBy               int
-	ModifiedBy              int
+	CreatedBy               *Users
+	ModifiedBy              *Users
 	Active                  int
 }
 

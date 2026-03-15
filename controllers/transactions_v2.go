@@ -59,6 +59,12 @@ func (c *TransactionsV2Controller) Post() {
 		return
 	}
 
+	userid := req.CreatedBy
+	useridInt, err := strconv.ParseInt(userid, 10, 64)
+	if err != nil {
+		useridInt = 1
+	}
+
 	// Get customer by ID
 	if cust, err := models.GetCustomerByPhoneNumber(phoneNumber); err == nil {
 		status, err := models.GetStatus_codesByCode(statusCode)
@@ -84,37 +90,45 @@ func (c *TransactionsV2Controller) Post() {
 				if _, err := models.AddRequest(&v); err == nil {
 					if biller, err := models.GetBillerByCode(req.BillerCode); err == nil {
 						logs.Info("Extra data received are ", req.ExtraData.ExtraData1, req.ExtraData.ExtraData2, req.ExtraData.ExtraData3)
-						// Create a transaction record
-						transaction := models.Bil_transactions{
-							TransactionRefNumber: "TRX-" + strconv.FormatInt(time.Now().Unix(), 10) + strconv.FormatInt(v.RequestId, 10),
-							Service:              service, // Assuming service ID is 1 for airtime
-							BillerCode:           biller.BillerCode,
-							Request:              &v,
-							TransactionBy:        cust,
-							Amount:               req.Amount,
-							TransactingCurrency:  "GHC", // Assuming USD for simplicity
-							SourceChannel:        sourceSystem,
-							Source:               req.Source,
-							Destination:          req.Destination,
-							Package:              req.Package,
-							Charge:               0.0,    // Assuming no charge for simplicity
-							Status:               status, // Assuming 1 means successful
-							CorpId:               req.CorpId,
-							ExtraDetails1:        req.ExtraData.ExtraData1,
-							ExtraDetails2:        req.ExtraData.ExtraData2,
-							ExtraDetails3:        req.ExtraData.ExtraData3,
-							DateCreated:          time.Now(),
-							DateModified:         time.Now(),
-							CreatedBy:            1,
-							ModifiedBy:           1,
-							Active:               1, // Assuming active status
-						}
-						if _, err := models.AddBil_transactions(&transaction); err == nil {
-							responseCode = 200
-							responseMessage = "Transaction created successfully"
-							bilTxn = transaction
+
+						// If user does not exist, create a system user with the userid 1
+						if user, err := models.GetUsersById(useridInt); err == nil {
+
+							// Create a transaction record
+							transaction := models.Bil_transactions{
+								TransactionRefNumber: "TRX-" + strconv.FormatInt(time.Now().Unix(), 10) + strconv.FormatInt(v.RequestId, 10),
+								Service:              service, // Assuming service ID is 1 for airtime
+								BillerCode:           biller.BillerCode,
+								Request:              &v,
+								TransactionBy:        cust,
+								Amount:               req.Amount,
+								TransactingCurrency:  "GHC", // Assuming USD for simplicity
+								SourceChannel:        sourceSystem,
+								Source:               req.Source,
+								Destination:          req.Destination,
+								Package:              req.Package,
+								Charge:               0.0,    // Assuming no charge for simplicity
+								Status:               status, // Assuming 1 means successful
+								CorpId:               req.CorpId,
+								ExtraDetails1:        req.ExtraData.ExtraData1,
+								ExtraDetails2:        req.ExtraData.ExtraData2,
+								ExtraDetails3:        req.ExtraData.ExtraData3,
+								DateCreated:          time.Now(),
+								DateModified:         time.Now(),
+								CreatedBy:            user,
+								ModifiedBy:           user,
+								Active:               1, // Assuming active status
+							}
+							if _, err := models.AddBil_transactions(&transaction); err == nil {
+								responseCode = 200
+								responseMessage = "Transaction created successfully"
+								bilTxn = transaction
+							} else {
+								responseMessage = "Failed to create transaction: " + err.Error()
+								responseCode = 500
+							}
 						} else {
-							responseMessage = "Failed to create transaction: " + err.Error()
+							responseMessage = "Failed to fetch user: " + err.Error()
 							responseCode = 500
 						}
 					} else {
