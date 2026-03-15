@@ -15,6 +15,37 @@
     },
     "basePath": "/v1",
     "paths": {
+        "/callback/process": {
+            "post": {
+                "tags": [
+                    "callback"
+                ],
+                "description": "create Callback request\n\u003cbr\u003e",
+                "operationId": "CallbackController.Create",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Callback content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CallbackRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/responses.CallbackResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/order-items/": {
             "get": {
                 "tags": [
@@ -537,18 +568,12 @@
                     "transactions"
                 ],
                 "description": "get Transactions\n\u003cbr\u003e",
-                "operationId": "TransactionsController.Get All",
+                "operationId": "TransactionsV2Controller.Get All",
                 "parameters": [
                     {
                         "in": "query",
                         "name": "query",
                         "description": "Filter. e.g. col1:v1,col2:v2 ...",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "search",
-                        "description": "Filter. e.g. camera ...",
                         "type": "string"
                     },
                     {
@@ -591,6 +616,32 @@
                     },
                     "403": {
                         "description": ""
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "transactions"
+                ],
+                "description": "create Transactions\n\u003cbr\u003e",
+                "operationId": "TransactionsV2Controller.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Transactions content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Transactions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.Transactions"
+                    },
+                    "403": {
+                        "description": "body is empty"
                     }
                 }
             }
@@ -685,13 +736,42 @@
                 }
             }
         },
+        "/transactions/ref/{ref}": {
+            "get": {
+                "tags": [
+                    "transactions"
+                ],
+                "description": "get Transactions by Txn Ref\n\u003cbr\u003e",
+                "operationId": "TransactionsV2Controller.Get One Transaction With Txn Ref",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "ref",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transactions"
+                        }
+                    },
+                    "403": {
+                        "description": ":ref is empty"
+                    }
+                }
+            }
+        },
         "/transactions/{id}": {
             "get": {
                 "tags": [
                     "transactions"
                 ],
                 "description": "get Transactions by id\n\u003cbr\u003e",
-                "operationId": "TransactionsController.Get One",
+                "operationId": "TransactionsV2Controller.Get One",
                 "parameters": [
                     {
                         "in": "path",
@@ -718,7 +798,7 @@
                     "transactions"
                 ],
                 "description": "update the Transactions\n\u003cbr\u003e",
-                "operationId": "TransactionsController.Put",
+                "operationId": "TransactionsV2Controller.Put",
                 "parameters": [
                     {
                         "in": "path",
@@ -733,7 +813,7 @@
                         "description": "body for Transactions content",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.UpdateTransactionRequestDTO"
+                            "$ref": "#/definitions/models.Transactions"
                         }
                     }
                 ],
@@ -754,7 +834,7 @@
                     "transactions"
                 ],
                 "description": "delete the Transactions\n\u003cbr\u003e",
-                "operationId": "TransactionsController.Delete",
+                "operationId": "TransactionsV2Controller.Delete",
                 "parameters": [
                     {
                         "in": "path",
@@ -891,6 +971,42 @@
                 }
             }
         },
+        "models.Customer_categories": {
+            "title": "Customer_categories",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Category": {
+                    "type": "string"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CustomerCategoryId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
         "models.Customers": {
             "title": "Customers",
             "type": "object",
@@ -902,6 +1018,9 @@
                 "CreatedBy": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "CustomerCategory": {
+                    "$ref": "#/definitions/models.Customer_categories"
                 },
                 "CustomerId": {
                     "type": "integer",
@@ -928,6 +1047,9 @@
                 "IdentificationNumber": {
                     "type": "string"
                 },
+                "IdentificationType": {
+                    "$ref": "#/definitions/models.Identification_types"
+                },
                 "ImagePath": {
                     "type": "string"
                 },
@@ -947,9 +1069,42 @@
                 },
                 "PhoneNumber": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Identification_types": {
+            "title": "Identification_types",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
                 },
-                "User": {
-                    "$ref": "#/definitions/models.Users"
+                "Code": {
+                    "type": "string"
+                },
+                "CreatedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DateModified": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "IdentificationTypeId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ModifiedBy": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Name": {
+                    "type": "string"
                 }
             }
         },
@@ -1304,6 +1459,9 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "ServiceCode": {
+                    "type": "string"
+                },
                 "ServiceDescription": {
                     "type": "string"
                 },
@@ -1588,6 +1746,48 @@
                 }
             }
         },
+        "requests.CallbackRequest": {
+            "title": "CallbackRequest",
+            "type": "object",
+            "properties": {
+                "Amount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "AmountCharged": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "Charges": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "ClientReference": {
+                    "type": "string"
+                },
+                "ClientResponseCode": {
+                    "type": "string"
+                },
+                "ClientResponseMessage": {
+                    "type": "string"
+                },
+                "Commission": {
+                    "type": "string"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ExternalTransactionId": {
+                    "type": "string"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "TransactionId": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.ConfirmOrderDTO": {
             "title": "ConfirmOrderDTO",
             "type": "object",
@@ -1657,6 +1857,128 @@
                     "type": "string"
                 },
                 "SenderAccountNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.Bil_ins_transactionCustom": {
+            "title": "Bil_ins_transactionCustom",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Amount": {
+                    "type": "string"
+                },
+                "BilInsTransactionId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Biller": {
+                    "type": "string"
+                },
+                "Network": {
+                    "type": "string"
+                },
+                "RecipientAccountNumber": {
+                    "type": "string"
+                },
+                "Request": {
+                    "type": "string"
+                },
+                "Response": {
+                    "type": "string"
+                },
+                "SenderAccountNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.Bil_transactionCustom": {
+            "title": "Bil_transactionCustom",
+            "type": "object",
+            "properties": {
+                "Active": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Amount": {
+                    "type": "string"
+                },
+                "BillerCode": {
+                    "type": "string"
+                },
+                "Charge": {
+                    "type": "string"
+                },
+                "Commission": {
+                    "type": "string"
+                },
+                "DateProcessed": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Destination": {
+                    "type": "string"
+                },
+                "ExternalReferenceNumber": {
+                    "type": "string"
+                },
+                "ExtraDetails1": {
+                    "type": "string"
+                },
+                "ExtraDetails2": {
+                    "type": "string"
+                },
+                "ExtraDetails3": {
+                    "type": "string"
+                },
+                "InsTxns": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responses.Bil_ins_transactionCustom"
+                    }
+                },
+                "Package": {
+                    "type": "string"
+                },
+                "Service": {
+                    "type": "string"
+                },
+                "Source": {
+                    "type": "string"
+                },
+                "SourceChannel": {
+                    "type": "string"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "TransactingCurrency": {
+                    "type": "string"
+                },
+                "TransactionId": {
+                    "type": "string"
+                },
+                "TransactionRefNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.CallbackResponse": {
+            "title": "CallbackResponse",
+            "type": "object",
+            "properties": {
+                "Result": {
+                    "$ref": "#/definitions/responses.Bil_transactionCustom"
+                },
+                "StatusCode": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "StatusMessage": {
                     "type": "string"
                 }
             }
@@ -1774,6 +2096,14 @@
         {
             "name": "order-items",
             "description": "Order_itemsController operations for Order_items\n"
+        },
+        {
+            "name": "transactions",
+            "description": "TransactionsController operations for Transactions\n"
+        },
+        {
+            "name": "callback",
+            "description": "CallbackController operations for Callback\n"
         }
     ]
 }
