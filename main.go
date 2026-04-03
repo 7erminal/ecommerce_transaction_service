@@ -16,7 +16,7 @@ func main() {
 		logs.Error("%s", err)
 	}
 	orm.RegisterDataBase("default", "mysql", sqlConn)
-	logs.SetLogger(logs.AdapterFile, `{"filename":"../logs/ecommerce_transaction_service.log"}`)
+	logs.SetLogger(logs.AdapterFile, `{"filename":"../logs/transaction_service.log"}`)
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:8000", "http://13.40.60.131", "http://13.40.60.131:8001", "http://167.86.115.44:8002", "makufoodsltd.com", "makufoodsltd.net", "https://makufoodsltd.net", "https://www.makufoodsltd.net", "https://www.makufoodsltd.com", "https://makufoodsltd.com", "https://admin.bridgeafrica.group"},
