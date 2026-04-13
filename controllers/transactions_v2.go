@@ -213,6 +213,12 @@ func (c *TransactionsV2Controller) GetOneTransactionWithTxnRef() {
 		c.Ctx.Output.SetStatus(200)
 	} else {
 		bilTxn = *v
+		if vJSON, marshalErr := json.Marshal(v); marshalErr != nil {
+			logs.Error("failed to marshal transaction v to json: %v", marshalErr)
+		} else {
+			logs.Info("transaction v: %s", string(vJSON))
+		}
+
 		statusCode = 200
 		responseMessage = "Transaction retrieved successfully"
 	}
