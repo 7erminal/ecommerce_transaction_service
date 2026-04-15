@@ -152,6 +152,10 @@ func (c *TransactionsV2Controller) Post() {
 					responseMessage = "Biller not found: " + err.Error()
 					responseCode = 502
 				}
+			} else {
+				logs.Error("Failed to create request record: ", err)
+				responseMessage = "Failed to create request record: " + err.Error()
+				responseCode = 500
 			}
 		} else {
 			logs.Error("Service not found: ", err)
