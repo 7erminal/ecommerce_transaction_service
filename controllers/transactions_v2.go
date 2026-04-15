@@ -54,10 +54,13 @@ func (c *TransactionsV2Controller) Post() {
 
 	reqText, err := json.Marshal(req)
 	if err != nil {
+		logs.Error("Invalid request format")
 		c.Data["json"] = "Invalid request format"
 		c.ServeJSON()
 		return
 	}
+
+	logs.Info("Full request: %s", string(reqText))
 
 	userid := req.CreatedBy
 	useridInt, err := strconv.ParseInt(userid, 10, 64)
@@ -124,27 +127,33 @@ func (c *TransactionsV2Controller) Post() {
 								responseMessage = "Transaction created successfully"
 								bilTxn = transaction
 							} else {
+								logs.Error("Failed to create transaction: ", err)
 								responseMessage = "Failed to create transaction: " + err.Error()
 								responseCode = 500
 							}
 						} else {
+							logs.Error("User not found: ", err)
 							responseMessage = "Failed to fetch user: " + err.Error()
 							responseCode = 500
 						}
 					} else {
+						logs.Error("Biller not found: ", err)
 						responseMessage = "Biller not found: " + err.Error()
 						responseCode = 502
 					}
 				}
 			} else {
+				logs.Error("Service not found: ", err)
 				responseMessage = "Service not found: " + err.Error()
 				responseCode = 501
 			}
 		} else {
+			logs.Error("Status not found: ", err)
 			responseMessage = "Status not found: " + err.Error()
 			responseCode = 503
 		}
 	} else {
+		logs.Error("Customer not found: ", err)
 		responseMessage = "Customer not found: " + err.Error()
 		responseCode = 504
 	}
