@@ -76,10 +76,14 @@ func (c *TransactionsV2Controller) Post() {
 		responseMessage = "Customer not found: " + err.Error()
 		responseCode = 504
 	}
+	logs.Info("Customer details: ", cust)
+
+	logs.Info("Fetching status for code: %s", statusCode)
 	status, err := models.GetStatus_codesByCode(statusCode)
 	if err == nil {
 		// Restructure the request to match the model
 		serviceCode := req.ServiceCode
+		logs.Info("Fetching service for code: %s", serviceCode)
 		if service, err := models.GetServicesByCode(serviceCode); err == nil {
 			requestIdStr := req.RequestId
 			requestId, _ := strconv.ParseInt(requestIdStr, 10, 64)
