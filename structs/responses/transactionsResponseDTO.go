@@ -49,6 +49,12 @@ type BilTransactionResponseDTO struct {
 	StatusDesc string
 }
 
+type UserTransactionResponseDTO struct {
+	StatusCode int
+	Result     *models.UserTransactions
+	StatusDesc string
+}
+
 type BilTransactionsResponseDTO struct {
 	StatusCode int
 	Result     *[]interface{}

@@ -22,6 +22,7 @@ type TransactionsV2Controller struct {
 // URLMapping ...
 func (c *TransactionsV2Controller) URLMapping() {
 	c.Mapping("Post", c.Post)
+	c.Mapping("UserPost", c.UserPost)
 	c.Mapping("GetOne", c.GetOne)
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
@@ -70,8 +71,7 @@ func (c *TransactionsV2Controller) Post() {
 
 	// Get customer by ID
 	cust := &models.Customers{}
-	if cust, err = models.GetCustomerByPhoneNumber(phoneNumber); err == nil {
-	} else {
+	if cust, err = models.GetCustomerByPhoneNumber(phoneNumber); err != nil {
 		logs.Error("Customer not found: ", err)
 		responseMessage = "Customer not found: " + err.Error()
 		responseCode = 504
@@ -169,6 +169,181 @@ func (c *TransactionsV2Controller) Post() {
 	}
 
 	response := responses.BilTransactionResponseDTO{
+		StatusCode: responseCode,
+		StatusDesc: responseMessage,
+		Result:     &bilTxn,
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
+// UserPost ...
+// @Title UserPost
+// @Description create Transactions for a user
+// @Param	body		body 	models.Transactions	true		"body for Transactions content"
+// @Success 201 {int} models.Transactions
+// @Failure 403 body is empty
+// @router /user [post]
+func (c *TransactionsV2Controller) UserPost() {
+	var req requests.BilTransactionRequestDTO
+	json.Unmarshal(c.Ctx.Input.RequestBody, &req)
+	// Validate the request
+
+	// authorization := ctx.Input.Header("Authorization")
+	// phoneNumber := c.Ctx.Input.Header("PhoneNumber")
+	phoneNumber := req.PhoneNumber
+	sourceSystem := c.Ctx.Input.Header("SourceSystem")
+
+	responseCode := 400
+	responseMessage := "Request not processed"
+	bilTxn := models.UserTransactions{}
+
+	statusCode := "PENDING" // Assuming 5002 is the status code for "Request Pending"
+
+	reqText, err := json.Marshal(req)
+	if err != nil {
+		logs.Error("Invalid request format")
+		c.Data["json"] = "Invalid request format"
+		c.ServeJSON()
+		return
+	}
+
+	logs.Info("Full request: %s", string(reqText))
+
+	userid := req.CreatedBy
+	useridInt, err := strconv.ParseInt(userid, 10, 64)
+	if err != nil {
+		useridInt = 1
+	}
+
+	// Get customer by ID
+	user := &models.Users{}
+	if user, err = models.GetUsersByUsername(phoneNumber); err != nil {
+		logs.Error("User not found: ", err)
+		responseMessage = "User not found: " + err.Error()
+		responseCode = 504
+	}
+	logs.Info("User details: ", user)
+
+	logs.Info("Fetching status for code: %s", statusCode)
+	status, err := models.GetStatus_codesByCode(statusCode)
+	if err == nil {
+		// Restructure the request to match the model
+		serviceCode := req.ServiceCode
+		logs.Info("Fetching service for code: %s", serviceCode)
+		if service, err := models.GetServicesByCode(serviceCode); err == nil {
+			requestIdStr := req.RequestId
+			requestId, _ := strconv.ParseInt(requestIdStr, 10, 64)
+			// Create a request record
+			v := models.UserRequest{
+				ApiRequestId:    requestId,
+				UserId:          user,
+				Request:         string(reqText),
+				RequestType:     service.ServiceName,
+				RequestStatus:   status.StatusDescription,
+				RequestAmount:   req.Amount,
+				RequestResponse: "",
+				RequestDate:     time.Now(),
+				DateCreated:     time.Now(),
+				DateModified:    time.Now(),
+			}
+			if _, err := models.AddUserRequest(&v); err == nil {
+				logs.Info("Extra data received are ", req.ExtraData.ExtraData1, req.ExtraData.ExtraData2, req.ExtraData.ExtraData3)
+
+				// Get customer by ID
+				cust := &models.Customers{}
+				if cust, err = models.GetCustomerByPhoneNumber(phoneNumber); err != nil {
+					logs.Error("Customer not found: ", err)
+					responseMessage = "Customer not found: " + err.Error()
+					responseCode = 504
+				}
+				logs.Info("Customer details: ", cust)
+				// If user does not exist, create a system user with the userid 1
+				if user, err := models.GetUsersById(useridInt); err == nil {
+
+					// Create a transaction record
+					transaction := models.UserTransactions{
+						TransactionId:                "TRX-" + strconv.FormatInt(time.Now().Unix(), 10) + strconv.FormatInt(v.RequestId, 10),
+						Service:                      service, // Assuming service ID is 1 for airtime
+						Request:                      &v,
+						TransactionCustomerReference: cust,
+						Amount:                       req.Amount,
+						TransactingCurrency:          "GHC", // Assuming USD for simplicity
+						SourceChannel:                sourceSystem,
+						Source:                       req.Source,
+						Destination:                  req.Destination,
+						Package:                      req.Package,
+						Charge:                       0.0,    // Assuming no charge for simplicity
+						Status:                       status, // Assuming 1 means successful
+						CorpId:                       req.CorpId,
+						ExtraDetails1:                req.ExtraData.ExtraData1,
+						ExtraDetails2:                req.ExtraData.ExtraData2,
+						ExtraDetails3:                req.ExtraData.ExtraData3,
+						DateCreated:                  time.Now(),
+						DateModified:                 time.Now(),
+						CreatedBy:                    user,
+						ModifiedBy:                   user,
+						Active:                       1, // Assuming active status
+					}
+					if _, err := models.AddUserTransactions(&transaction); err == nil {
+						logs.Info("Transaction created successfully: ", transaction)
+						// Save in user_ins_transactions table to add details in the steps
+						userInsTransaction := models.UserInsTransactions{
+							UserTransactionId:      &transaction,
+							Amount:                 req.Amount,
+							Data:                   string(reqText),
+							SenderAccountNumber:    req.Source,
+							RecipientAccountNumber: req.Destination,
+							Service:                service,
+							Status:                 status,
+							Request:                string(reqText),
+							Response:               "",
+							DateCreated:            time.Now(),
+							DateModified:           time.Now(),
+							CreatedBy:              int(user.UserId),
+							ModifiedBy:             int(user.UserId),
+							Active:                 1,
+						}
+						if _, err := models.AddUserInsTransactions(&userInsTransaction); err == nil {
+							logs.Info("UserInsTransaction created successfully: ", userInsTransaction)
+
+							responseCode = 200
+							responseMessage = "Transaction created successfully"
+							bilTxn = transaction
+						} else {
+							logs.Error("Failed to create transaction: ", err)
+							responseMessage = "Failed to create transaction: " + err.Error()
+							responseCode = 500
+						}
+					} else {
+						logs.Error("Failed to add user transaction: ", err)
+						responseMessage = "Failed to add user transaction: " + err.Error()
+						responseCode = 500
+					}
+				} else {
+					logs.Error("User not found: ", err)
+					responseMessage = "Failed to fetch user: " + err.Error()
+					responseCode = 500
+				}
+			} else {
+				logs.Error("Failed to create request record: ", err)
+				responseMessage = "Failed to create request record: " + err.Error()
+				responseCode = 500
+			}
+		} else {
+			logs.Error("Service not found: ", err)
+			responseMessage = "Service not found: " + err.Error()
+			responseCode = 501
+		}
+	} else {
+		logs.Error("Status not found: ", err)
+		responseMessage = "Status not found: " + err.Error()
+		responseCode = 503
+	}
+
+	response := responses.UserTransactionResponseDTO{
 		StatusCode: responseCode,
 		StatusDesc: responseMessage,
 		Result:     &bilTxn,
