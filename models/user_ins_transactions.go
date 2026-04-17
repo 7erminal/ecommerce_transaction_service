@@ -15,13 +15,13 @@ type UserInsTransactions struct {
 	UserInsTransactionId   string            `orm:"size(255);unique;column(ins_transaction_id)"`
 	UserTransactionId      *UserTransactions `orm:"rel(fk);column(user_transaction_id)"`
 	Amount                 float64
-	Data                   string        `orm:"size(255)"`
+	Data                   string        `orm:"size(255);null"`
 	SenderAccountNumber    string        `orm:"size(255)"`
 	RecipientAccountNumber string        `orm:"size(255)"`
 	Service                *Services     `orm:"rel(fk)"`
 	Status                 *Status_codes `orm:"rel(fk);column(status)"`
-	Request                string        `orm:"size(255)"`
-	Response               string        `orm:"size(255)"`
+	Request                string        `orm:"size(255);null"`
+	Response               string        `orm:"size(255);null"`
 	DateCreated            time.Time     `orm:"type(datetime)"`
 	DateModified           time.Time     `orm:"type(datetime)"`
 	CreatedBy              int
