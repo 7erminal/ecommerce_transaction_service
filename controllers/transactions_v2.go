@@ -293,7 +293,7 @@ func (c *TransactionsV2Controller) UserPost() {
 							UserInsTransactionId:   "TRX-INS-" + strconv.FormatInt(time.Now().Unix(), 10) + strconv.FormatInt(v.RequestId, 10),
 							UserTransactionId:      &transaction,
 							Amount:                 req.Amount,
-							Data:                   string(reqText),
+							Data:                   "",
 							SenderAccountNumber:    req.SourceAccountNumber,
 							RecipientAccountNumber: req.DestinationAccountNumber,
 							Service:                service,
