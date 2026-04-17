@@ -187,7 +187,7 @@ func (c *TransactionsV2Controller) Post() {
 // @Failure 403 body is empty
 // @router /user [post]
 func (c *TransactionsV2Controller) UserPost() {
-	var req requests.BilTransactionRequestDTO
+	var req requests.UserTransactionRequestDTO
 	json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 	// Validate the request
 
@@ -272,12 +272,11 @@ func (c *TransactionsV2Controller) UserPost() {
 						Amount:                       req.Amount,
 						TransactingCurrency:          "GHC", // Assuming USD for simplicity
 						SourceChannel:                sourceSystem,
-						Source:                       req.Source,
-						Destination:                  req.Destination,
+						Source:                       req.SourceAccountNumber,
+						Destination:                  req.DestinationAccountNumber,
 						Package:                      req.Package,
 						Charge:                       0.0,    // Assuming no charge for simplicity
 						Status:                       status, // Assuming 1 means successful
-						CorpId:                       req.CorpId,
 						ExtraDetails1:                req.ExtraData.ExtraData1,
 						ExtraDetails2:                req.ExtraData.ExtraData2,
 						ExtraDetails3:                req.ExtraData.ExtraData3,
@@ -294,8 +293,8 @@ func (c *TransactionsV2Controller) UserPost() {
 							UserTransactionId:      &transaction,
 							Amount:                 req.Amount,
 							Data:                   string(reqText),
-							SenderAccountNumber:    req.Source,
-							RecipientAccountNumber: req.Destination,
+							SenderAccountNumber:    req.SourceAccountNumber,
+							RecipientAccountNumber: req.DestinationAccountNumber,
 							Service:                service,
 							Status:                 status,
 							Request:                string(reqText),

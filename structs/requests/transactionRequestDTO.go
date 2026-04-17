@@ -25,3 +25,17 @@ type GetUserTransactionsRequest struct {
 	Id    int64
 	Limit int
 }
+
+type UserTransactionRequestDTO struct {
+	SourceChannel            string
+	SourceAccountNumber      string
+	PhoneNumber              string
+	Amount                   float64
+	DestinationAccountNumber string
+	ClientReference          string
+	Package                  string
+	ServiceCode              string
+	RequestId                string
+	ExtraData                ExtraData
+	CreatedBy                string
+}
