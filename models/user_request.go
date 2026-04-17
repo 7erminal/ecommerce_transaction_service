@@ -21,8 +21,8 @@ type UserRequest struct {
 	RequestResponse  string    `orm:"size(1000)"`
 	CallbackResponse string    `orm:"size(1000)"`
 	RequestDate      time.Time `orm:"type(datetime)"`
-	DateCreated      time.Time `orm:"type(datetime);column(created_at)"`
-	DateModified     time.Time `orm:"type(datetime);column(updated_at)"`
+	DateCreated      time.Time `orm:"type(datetime);column(date_created)"`
+	DateModified     time.Time `orm:"type(datetime);column(date_modified)"`
 }
 
 func (t *UserRequest) TableName() string {
