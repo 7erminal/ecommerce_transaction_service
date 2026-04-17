@@ -290,6 +290,7 @@ func (c *TransactionsV2Controller) UserPost() {
 						logs.Info("Transaction created successfully: ", transaction)
 						// Save in user_ins_transactions table to add details in the steps
 						userInsTransaction := models.UserInsTransactions{
+							UserInsTransactionId:   "TRX-INS-" + strconv.FormatInt(time.Now().Unix(), 10) + strconv.FormatInt(v.RequestId, 10),
 							UserTransactionId:      &transaction,
 							Amount:                 req.Amount,
 							Data:                   string(reqText),
