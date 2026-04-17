@@ -306,6 +306,11 @@ func (c *TransactionsV2Controller) UserPost() {
 							ModifiedBy:             int(user.UserId),
 							Active:                 1,
 						}
+						if userInsTransactionJSON, marshalErr := json.Marshal(userInsTransaction); marshalErr != nil {
+							logs.Error("failed to marshal userInsTransaction to json: %v", marshalErr)
+						} else {
+							logs.Info("userInsTransaction: %s", string(userInsTransactionJSON))
+						}
 						if _, err := models.AddUserInsTransactions(&userInsTransaction); err == nil {
 							logs.Info("UserInsTransaction created successfully: ", userInsTransaction)
 
