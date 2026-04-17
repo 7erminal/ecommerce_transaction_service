@@ -304,4 +304,13 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["transaction_service/controllers:TransactionsV2Controller"] = append(beego.GlobalControllerRouter["transaction_service/controllers:TransactionsV2Controller"],
+        beego.ControllerComments{
+            Method: "UserPost",
+            Router: `/user`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
 }
