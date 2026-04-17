@@ -291,7 +291,7 @@ func (c *TransactionsV2Controller) UserPost() {
 						// Save in user_ins_transactions table to add details in the steps
 						userInsTransaction := models.UserInsTransactions{
 							UserInsTransactionId:   "TRX-INS-" + strconv.FormatInt(time.Now().Unix(), 10) + strconv.FormatInt(v.RequestId, 10),
-							UserTransactionId:      &models.UserTransactions{TransactionId: transaction.TransactionId},
+							UserTransactionId:      transaction.TransactionId,
 							Amount:                 req.Amount,
 							Data:                   "",
 							SenderAccountNumber:    req.SourceAccountNumber,

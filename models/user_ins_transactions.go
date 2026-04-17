@@ -12,8 +12,8 @@ import (
 )
 
 type UserInsTransactions struct {
-	UserInsTransactionId   string            `orm:"size(255);unique;column(ins_transaction_id)"`
-	UserTransactionId      *UserTransactions `orm:"rel(fk);column(user_transaction_id)"`
+	UserInsTransactionId   string `orm:"size(255);unique;column(ins_transaction_id)"`
+	UserTransactionId      string `orm:"size(255);column(user_transaction_id)"`
 	Amount                 float64
 	Data                   string        `orm:"size(255);null"`
 	SenderAccountNumber    string        `orm:"size(255)"`
@@ -125,13 +125,7 @@ func GetAllUserInsTransactions(query map[string]string, fields []string, sortby 
 			for _, v := range l {
 				// Load related fields as needed
 				o.LoadRelated(&v, "UserTransactionId")
-				if v.UserTransactionId != nil {
-					o.LoadRelated(v.UserTransactionId, "TransactionBy")
-					o.LoadRelated(v.UserTransactionId, "Service")
-					o.LoadRelated(v.UserTransactionId, "Request")
-					o.LoadRelated(v.UserTransactionId, "Status")
-				}
-				o.LoadRelated(&v, "Biller")
+
 				ml = append(ml, v)
 			}
 		} else {
@@ -139,13 +133,7 @@ func GetAllUserInsTransactions(query map[string]string, fields []string, sortby 
 			for _, v := range l {
 				// Load related fields as needed
 				o.LoadRelated(&v, "UserTransactionId")
-				if v.UserTransactionId != nil {
-					o.LoadRelated(v.UserTransactionId, "TransactionBy")
-					o.LoadRelated(v.UserTransactionId, "Service")
-					o.LoadRelated(v.UserTransactionId, "Request")
-					o.LoadRelated(v.UserTransactionId, "Status")
-				}
-				o.LoadRelated(&v, "Biller")
+
 				m := make(map[string]interface{})
 				val := reflect.ValueOf(v)
 				for _, fname := range fields {
