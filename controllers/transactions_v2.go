@@ -200,7 +200,7 @@ func (c *TransactionsV2Controller) UserPost() {
 	responseMessage := "Request not processed"
 	bilTxn := models.UserTransactions{}
 
-	statusCode := "PENDING" // Assuming 5002 is the status code for "Request Pending"
+	statusCode := req.Status
 
 	reqText, err := json.Marshal(req)
 	if err != nil {

@@ -14,7 +14,7 @@ type UserTransactions struct {
 	TransactionId                string       `orm:"size(255);unique"`
 	Service                      *Services    `orm:"rel(fk)"`
 	Request                      *UserRequest `orm:"rel(fk)"`
-	TransactionCustomerReference *Customers   `orm:"rel(fk);column(transaction_customer_reference)"`
+	TransactionCustomerReference *Customers   `orm:"rel(fk);column(transaction_customer_reference);null"`
 	Amount                       float64
 	TransactingCurrency          string `orm:"size(255)"`
 	SourceChannel                string `orm:"size(255)"`

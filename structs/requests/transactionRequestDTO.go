@@ -38,4 +38,5 @@ type UserTransactionRequestDTO struct {
 	RequestId                string
 	ExtraData                ExtraData
 	CreatedBy                string
+	Status                   string
 }
