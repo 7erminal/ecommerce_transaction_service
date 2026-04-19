@@ -198,7 +198,7 @@ func (c *TransactionsV2Controller) UserPost() {
 
 	responseCode := 400
 	responseMessage := "Request not processed"
-	bilTxn := models.UserTransactions{}
+	txnData := responses.UserTransactions{}
 
 	statusCode := req.Status
 
@@ -306,6 +306,31 @@ func (c *TransactionsV2Controller) UserPost() {
 							ModifiedBy:             int(user.UserId),
 							Active:                 1,
 						}
+
+						txnData = responses.UserTransactions{
+							TransactionId:                transaction.TransactionId,
+							Service:                      service.ServiceName,
+							TransactionCustomerReference: cust.FullName,
+							Amount:                       transaction.Amount,
+							TransactingCurrency:          transaction.TransactingCurrency,
+							SourceChannel:                transaction.SourceChannel,
+							Source:                       transaction.Source,
+							Destination:                  transaction.Destination,
+							Package:                      transaction.Package,
+							Charge:                       transaction.Charge,
+							Commission:                   transaction.Commission,
+							ExternalReferenceNumber:      transaction.ExternalReferenceNumber,
+							Status:                       status.StatusDescription,
+							ExtraDetails1:                transaction.ExtraDetails1,
+							ExtraDetails2:                transaction.ExtraDetails2,
+							ExtraDetails3:                transaction.ExtraDetails3,
+							ClientResponseCode:           transaction.ClientResponseCode,
+							DateCreated:                  transaction.DateCreated,
+							DateModified:                 transaction.DateModified,
+							CreatedBy:                    user.Username,
+							ModifiedBy:                   user.Username,
+							Active:                       transaction.Active,
+						}
 						if userInsTransactionJSON, marshalErr := json.Marshal(userInsTransaction); marshalErr != nil {
 							logs.Error("failed to marshal userInsTransaction to json: %v", marshalErr)
 						} else {
@@ -316,7 +341,6 @@ func (c *TransactionsV2Controller) UserPost() {
 
 							responseCode = 200
 							responseMessage = "Transaction created successfully"
-							bilTxn = transaction
 						} else {
 							logs.Error("Failed to create transaction: ", err)
 							responseMessage = "Failed to create transaction: " + err.Error()
@@ -351,7 +375,7 @@ func (c *TransactionsV2Controller) UserPost() {
 	response := responses.UserTransactionResponseDTO{
 		StatusCode: responseCode,
 		StatusDesc: responseMessage,
-		Result:     &bilTxn,
+		Result:     &txnData,
 	}
 
 	c.Data["json"] = response
@@ -445,6 +469,7 @@ func (c *TransactionsV2Controller) GetUserTransactionWithTxnRef() {
 	statusCode := 400
 	responseMessage := "Request not processed"
 	bilTxn := models.UserTransactions{}
+	txnData := responses.UserTransactions{}
 	v, err := models.GetUserTransactionsById(idStr)
 	if err != nil {
 		responseMessage = "Transaction not found: " + err.Error()
@@ -459,12 +484,37 @@ func (c *TransactionsV2Controller) GetUserTransactionWithTxnRef() {
 
 		statusCode = 200
 		responseMessage = "Transaction retrieved successfully"
+
+		txnData = responses.UserTransactions{
+			TransactionId:                bilTxn.TransactionId,
+			Service:                      bilTxn.Service.ServiceName,
+			TransactionCustomerReference: bilTxn.TransactionCustomerReference.FullName,
+			Amount:                       bilTxn.Amount,
+			TransactingCurrency:          bilTxn.TransactingCurrency,
+			SourceChannel:                bilTxn.SourceChannel,
+			Source:                       bilTxn.Source,
+			Destination:                  bilTxn.Destination,
+			Package:                      bilTxn.Package,
+			Charge:                       bilTxn.Charge,
+			Commission:                   bilTxn.Commission,
+			ExternalReferenceNumber:      bilTxn.ExternalReferenceNumber,
+			Status:                       bilTxn.Status.StatusCode,
+			ExtraDetails1:                bilTxn.ExtraDetails1,
+			ExtraDetails2:                bilTxn.ExtraDetails2,
+			ExtraDetails3:                bilTxn.ExtraDetails3,
+			ClientResponseCode:           bilTxn.ClientResponseCode,
+			DateCreated:                  bilTxn.DateCreated,
+			DateModified:                 bilTxn.DateModified,
+			CreatedBy:                    bilTxn.CreatedBy.FullName,
+			ModifiedBy:                   bilTxn.ModifiedBy.FullName,
+			Active:                       bilTxn.Active,
+		}
 	}
 
 	response := responses.UserTransactionResponseDTO{
 		StatusCode: statusCode,
 		StatusDesc: responseMessage,
-		Result:     &bilTxn,
+		Result:     &txnData,
 	}
 	c.Data["json"] = response
 	c.ServeJSON()

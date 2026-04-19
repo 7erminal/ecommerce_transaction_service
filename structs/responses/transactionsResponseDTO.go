@@ -51,7 +51,7 @@ type BilTransactionResponseDTO struct {
 
 type UserTransactionResponseDTO struct {
 	StatusCode int
-	Result     *models.UserTransactions
+	Result     *UserTransactions
 	StatusDesc string
 }
 
@@ -94,4 +94,29 @@ type Bil_transactionCustom struct {
 	DateProcessed           time.Time
 	Active                  int
 	InsTxns                 []*Bil_ins_transactionCustom
+}
+
+type UserTransactions struct {
+	TransactionId                string
+	Service                      string
+	TransactionCustomerReference string
+	Amount                       float64
+	TransactingCurrency          string
+	SourceChannel                string
+	Source                       string
+	Destination                  string
+	Package                      string
+	Charge                       float64
+	Commission                   float64
+	ExternalReferenceNumber      string
+	Status                       string
+	ExtraDetails1                string
+	ExtraDetails2                string
+	ExtraDetails3                string
+	ClientResponseCode           string
+	DateCreated                  time.Time
+	DateModified                 time.Time
+	CreatedBy                    string
+	ModifiedBy                   string
+	Active                       int
 }
