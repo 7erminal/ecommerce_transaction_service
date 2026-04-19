@@ -96,6 +96,19 @@ type Bil_transactionCustom struct {
 	InsTxns                 []*Bil_ins_transactionCustom
 }
 
+type UserInsTransactions struct {
+	UserInsTransactionId   string
+	UserTransactionId      string
+	Amount                 float64
+	Data                   string
+	SenderAccountNumber    string
+	RecipientAccountNumber string
+	Service                string
+	Status                 string
+	Request                string
+	Response               string
+}
+
 type UserTransactions struct {
 	TransactionId                string
 	Service                      string
@@ -119,4 +132,5 @@ type UserTransactions struct {
 	CreatedBy                    string
 	ModifiedBy                   string
 	Active                       int
+	TransactionDetails           *[]UserInsTransactions
 }

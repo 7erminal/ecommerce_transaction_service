@@ -16,6 +16,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["transaction_service/controllers:CallbackController"] = append(beego.GlobalControllerRouter["transaction_service/controllers:CallbackController"],
+        beego.ControllerComments{
+            Method: "UserTransactionCallback",
+            Router: `/tx/process`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["transaction_service/controllers:Order_itemsController"] = append(beego.GlobalControllerRouter["transaction_service/controllers:Order_itemsController"],
         beego.ControllerComments{
             Method: "Post",
