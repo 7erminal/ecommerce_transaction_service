@@ -11,7 +11,7 @@ import (
 )
 
 type UserRequest struct {
-	RequestId        int64  `orm:"auto"`
+	RequestId        int64  `orm:"auto;column(user_request_id)"`
 	ApiRequestId     int64  `orm:"column(api_request_id)"`
 	UserId           *Users `orm:"rel(fk);column(user_id)"`
 	Request          string `orm:"size(1000)"`
