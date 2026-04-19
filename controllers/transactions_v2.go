@@ -431,6 +431,45 @@ func (c *TransactionsV2Controller) GetOneTransactionWithTxnRef() {
 	c.ServeJSON()
 }
 
+// GetUserTransactionWithTxnRef ...
+// @Title Get User Transaction With Txn Ref
+// @Description get Transactions by Txn Ref
+// @Param	ref		path 	string	true		"The key for staticblock"
+// @Success 200 {object} models.Transactions
+// @Failure 403 :ref is empty
+// @router /user/ref/:ref [get]
+func (c *TransactionsV2Controller) GetUserTransactionWithTxnRef() {
+	idStr := c.Ctx.Input.Param(":ref")
+	// id, _ := strconv.ParseInt(idStr, 0, 64)
+
+	statusCode := 400
+	responseMessage := "Request not processed"
+	bilTxn := models.UserTransactions{}
+	v, err := models.GetUserTransactionsById(idStr)
+	if err != nil {
+		responseMessage = "Transaction not found: " + err.Error()
+		c.Ctx.Output.SetStatus(200)
+	} else {
+		bilTxn = *v
+		if vJSON, marshalErr := json.Marshal(v); marshalErr != nil {
+			logs.Error("failed to marshal transaction v to json: %v", marshalErr)
+		} else {
+			logs.Info("transaction v: %s", string(vJSON))
+		}
+
+		statusCode = 200
+		responseMessage = "Transaction retrieved successfully"
+	}
+
+	response := responses.UserTransactionResponseDTO{
+		StatusCode: statusCode,
+		StatusDesc: responseMessage,
+		Result:     &bilTxn,
+	}
+	c.Data["json"] = response
+	c.ServeJSON()
+}
+
 // GetAll ...
 // @Title Get All
 // @Description get Transactions
