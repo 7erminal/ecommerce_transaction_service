@@ -324,6 +324,15 @@ func init() {
 
     beego.GlobalControllerRouter["transaction_service/controllers:TransactionsV2Controller"] = append(beego.GlobalControllerRouter["transaction_service/controllers:TransactionsV2Controller"],
         beego.ControllerComments{
+            Method: "GetAllUserTransactions",
+            Router: `/user-transactions`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["transaction_service/controllers:TransactionsV2Controller"] = append(beego.GlobalControllerRouter["transaction_service/controllers:TransactionsV2Controller"],
+        beego.ControllerComments{
             Method: "GetUserTransactionWithTxnRef",
             Router: `/user/ref/:ref`,
             AllowHTTPMethods: []string{"get"},
