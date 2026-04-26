@@ -55,6 +55,12 @@ type UserTransactionResponseDTO struct {
 	StatusDesc string
 }
 
+type UserTransactionsResponseDTO struct {
+	StatusCode int
+	Result     *[]UserTransactions
+	StatusDesc string
+}
+
 type BilTransactionsResponseDTO struct {
 	StatusCode int
 	Result     *[]interface{}
