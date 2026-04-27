@@ -23,6 +23,7 @@ type UserTransactions struct {
 	Package                      string `orm:"size(255)"`
 	Charge                       float64
 	Commission                   float64
+	Reference                    string `orm:"size(255);null"`
 	ExternalReferenceNumber      string `orm:"size(255)"`
 	IsAsync                      bool
 	Status                       *Status_codes `orm:"rel(fk)"`
