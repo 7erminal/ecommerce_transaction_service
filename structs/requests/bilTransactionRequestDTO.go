@@ -11,6 +11,7 @@ type BilTransactionRequestDTO struct {
 	PhoneNumber     string
 	Amount          float64
 	Destination     string
+	Reference       string
 	ClientReference string
 	Package         string
 	ServiceCode     string

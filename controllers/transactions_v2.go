@@ -28,6 +28,8 @@ func (c *TransactionsV2Controller) URLMapping() {
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
 	c.Mapping("GetOneTransactionWithTxnRef", c.GetOneTransactionWithTxnRef)
+	c.Mapping("GetAllUserTransactions", c.GetAllUserTransactions)
+	c.Mapping("PutUserTransaction", c.PutUserTransaction)
 }
 
 // Post ...
@@ -270,7 +272,8 @@ func (c *TransactionsV2Controller) UserPost() {
 						Request:                      &v,
 						TransactionCustomerReference: cust,
 						Amount:                       req.Amount,
-						TransactingCurrency:          "GHC", // Assuming USD for simplicity
+						TransactingCurrency:          "GHC",
+						Reference:                    req.Reference,
 						SourceChannel:                sourceSystem,
 						Source:                       req.SourceAccountNumber,
 						Destination:                  req.DestinationAccountNumber,
@@ -684,6 +687,84 @@ func (c *TransactionsV2Controller) GetAllUserTransactions() {
 	response := responses.UserTransactionsResponseDTO{
 		StatusCode: responseCode,
 		StatusDesc: responseMessage,
+		Result:     &txnData,
+	}
+
+	c.Data["json"] = response
+
+	c.ServeJSON()
+}
+
+// Put User Transactions ...
+// @Title Put User Transactions
+// @Description update the Transactions
+// @Param	id		path 	string	true		"The id you want to update"
+// @Param	body		body 	models.Transactions	true		"body for Transactions content"
+// @Success 200 {object} models.Transactions
+// @Failure 403 :id is not int
+// @router /user-transaction/:id [put]
+func (c *TransactionsV2Controller) PutUserTransaction() {
+	idStr := c.Ctx.Input.Param(":id")
+	req := requests.UpdateUserTransactionRequest{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &req)
+
+	statusCode := 400
+	statusMessage := "Something went wrong"
+	txnData := responses.UserTransactions{}
+
+	status := req.Status
+
+	if transaction, err := models.GetUserTransactionsById(idStr); err == nil {
+		status, err := models.GetStatus_codesByCode(status)
+		if err == nil {
+			transaction.Status = status
+			transaction.ExternalReferenceNumber = req.ClientReference
+			if err := models.UpdateUserTransactionsById(transaction); err == nil {
+				statusCode = 200
+				statusMessage = "Transaction updated successfully"
+
+				customerRef := ""
+				if transaction.TransactionCustomerReference != nil {
+					customerRef = transaction.TransactionCustomerReference.FullName
+				}
+
+				txnData = responses.UserTransactions{
+					TransactionId:                transaction.TransactionId,
+					TransactionCustomerReference: customerRef,
+					Amount:                       transaction.Amount,
+					TransactingCurrency:          transaction.TransactingCurrency,
+					SourceChannel:                transaction.SourceChannel,
+					Source:                       transaction.Source,
+					Destination:                  transaction.Destination,
+					Package:                      transaction.Package,
+					Charge:                       transaction.Charge,
+					Commission:                   transaction.Commission,
+					ExternalReferenceNumber:      transaction.ExternalReferenceNumber,
+					Status:                       transaction.Status.StatusDescription,
+					ExtraDetails1:                transaction.ExtraDetails1,
+					ExtraDetails2:                transaction.ExtraDetails2,
+					ExtraDetails3:                transaction.ExtraDetails3,
+					ClientResponseCode:           transaction.ClientResponseCode,
+					DateCreated:                  transaction.DateCreated,
+					DateModified:                 transaction.DateModified,
+					CreatedBy:                    transaction.CreatedBy.FullName,
+					ModifiedBy:                   transaction.ModifiedBy.FullName,
+					Active:                       transaction.Active,
+				}
+			} else {
+				c.Data["json"] = err.Error()
+				logs.Error("Error updating user transaction:: ", err.Error())
+				statusMessage = "Failed to update transaction: " + err.Error()
+				statusCode = 500
+			}
+		} else {
+			statusMessage = "Invalid status provided"
+		}
+	}
+
+	response := responses.UserTransactionResponseDTO{
+		StatusCode: statusCode,
+		StatusDesc: statusMessage,
 		Result:     &txnData,
 	}
 
