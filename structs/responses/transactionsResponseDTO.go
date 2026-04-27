@@ -134,6 +134,7 @@ type UserTransactions struct {
 	ExtraDetails2                string
 	ExtraDetails3                string
 	ClientResponseCode           string
+	ClientReferenceId            string
 	DateCreated                  time.Time
 	DateModified                 time.Time
 	CreatedBy                    string
