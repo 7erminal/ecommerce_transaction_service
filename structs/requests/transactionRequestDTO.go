@@ -43,6 +43,7 @@ type UserTransactionRequestDTO struct {
 }
 
 type UpdateUserTransactionRequest struct {
-	ClientReference string
-	Status          string
+	ClientReference    string
+	Status             string
+	ClientResponseCode string
 }

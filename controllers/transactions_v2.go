@@ -326,7 +326,7 @@ func (c *TransactionsV2Controller) UserPost() {
 							Reference:                    transaction.Reference,
 							ExternalReferenceNumber:      transaction.ExternalReferenceNumber,
 							Status:                       status.StatusDescription,
-							ClienReferenceId:             transaction.CorpId,
+							ClientReferenceId:            transaction.CorpId,
 							ExtraDetails1:                transaction.ExtraDetails1,
 							ExtraDetails2:                transaction.ExtraDetails2,
 							ExtraDetails3:                transaction.ExtraDetails3,
@@ -713,6 +713,16 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 	req := requests.UpdateUserTransactionRequest{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &req)
 
+	reqText, err := json.Marshal(req)
+	if err != nil {
+		logs.Error("Invalid request format")
+		c.Data["json"] = "Invalid request format"
+		c.ServeJSON()
+		return
+	}
+
+	logs.Info("Full request: %s", string(reqText))
+
 	statusCode := 400
 	statusMessage := "Something went wrong"
 	txnData := responses.UserTransactions{}
@@ -724,6 +734,7 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 		if err == nil {
 			transaction.Status = status
 			transaction.ExternalReferenceNumber = req.ClientReference
+			transaction.ClientResponseCode = req.ClientResponseCode
 			if err := models.UpdateUserTransactionsById(transaction); err == nil {
 				statusCode = 200
 				statusMessage = "Transaction updated successfully"
@@ -756,6 +767,30 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 					CreatedBy:                    transaction.CreatedBy.FullName,
 					ModifiedBy:                   transaction.ModifiedBy.FullName,
 					Active:                       transaction.Active,
+				}
+
+				var fields []string
+				var sortby []string
+				var order []string
+				var query = make(map[string]string)
+				var limit int64 = 10
+				var offset int64
+
+				query["user_transaction_id"] = idStr
+
+				if txnInsTransaction, err := models.GetAllUserInsTransactions(query, fields, sortby, order, offset, limit); err == nil {
+					for _, v := range txnInsTransaction {
+						m := v.(models.UserInsTransactions)
+						m.Status = status
+						m.Response = string(reqText)
+						if err := models.UpdateUserInsTransactionsById(&m); err != nil {
+							logs.Error("Failed to update userInsTransaction: ", err)
+						} else {
+							logs.Info("userInsTransaction updated successfully: ", txnInsTransaction)
+						}
+					}
+				} else {
+					logs.Error("Failed to fetch userInsTransaction: ", err)
 				}
 			} else {
 				c.Data["json"] = err.Error()
