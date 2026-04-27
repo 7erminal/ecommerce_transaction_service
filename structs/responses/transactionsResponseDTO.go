@@ -127,6 +127,7 @@ type UserTransactions struct {
 	Package                      string
 	Charge                       float64
 	Commission                   float64
+	Reference                    string
 	ExternalReferenceNumber      string
 	Status                       string
 	ExtraDetails1                string
