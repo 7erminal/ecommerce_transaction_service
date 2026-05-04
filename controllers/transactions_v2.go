@@ -732,6 +732,19 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 	status := req.Status
 
 	if transaction, err := models.GetUserTransactionsById(idStr); err == nil {
+		if transaction == nil {
+			statusMessage = "Transaction not found"
+			response := responses.UserTransactionResponseDTO{
+				StatusCode: statusCode,
+				StatusDesc: statusMessage,
+				Result:     &txnData,
+			}
+
+			c.Data["json"] = response
+			c.ServeJSON()
+			return
+		}
+
 		status, err := models.GetStatus_codesByCode(status)
 		if err == nil {
 			transaction.Status = status
@@ -749,6 +762,21 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 					customerRef = transaction.TransactionCustomerReference.FullName
 				}
 
+				statusDescription := ""
+				if transaction.Status != nil {
+					statusDescription = transaction.Status.StatusDescription
+				}
+
+				createdBy := ""
+				if transaction.CreatedBy != nil {
+					createdBy = transaction.CreatedBy.FullName
+				}
+
+				modifiedBy := ""
+				if transaction.ModifiedBy != nil {
+					modifiedBy = transaction.ModifiedBy.FullName
+				}
+
 				txnData = responses.UserTransactions{
 					TransactionId:                transaction.TransactionId,
 					TransactionCustomerReference: customerRef,
@@ -762,15 +790,15 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 					Commission:                   transaction.Commission,
 					Reference:                    transaction.Reference,
 					ExternalReferenceNumber:      transaction.ExternalReferenceNumber,
-					Status:                       transaction.Status.StatusDescription,
+					Status:                       statusDescription,
 					ExtraDetails1:                transaction.ExtraDetails1,
 					ExtraDetails2:                transaction.ExtraDetails2,
 					ExtraDetails3:                transaction.ExtraDetails3,
 					ClientResponseCode:           transaction.ClientResponseCode,
 					DateCreated:                  transaction.DateCreated,
 					DateModified:                 transaction.DateModified,
-					CreatedBy:                    transaction.CreatedBy.FullName,
-					ModifiedBy:                   transaction.ModifiedBy.FullName,
+					CreatedBy:                    createdBy,
+					ModifiedBy:                   modifiedBy,
 					Active:                       transaction.Active,
 				}
 
