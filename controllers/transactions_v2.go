@@ -737,6 +737,9 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 			transaction.Status = status
 			transaction.ExternalReferenceNumber = req.ClientReference
 			transaction.ClientResponseCode = req.ClientResponseCode
+			logs.Info("Transaction status is going to be updated to ", transaction.Status)
+			logs.Info("Transaction external reference number is going to be updated to ", transaction.ExternalReferenceNumber)
+			logs.Info("Transaction client response code is going to be updated to ", transaction.ClientResponseCode)
 			if err := models.UpdateUserTransactionsById(transaction); err == nil {
 				statusCode = 200
 				statusMessage = "Transaction updated successfully"
