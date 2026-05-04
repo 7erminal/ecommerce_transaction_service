@@ -123,17 +123,11 @@ func GetAllUserInsTransactions(query map[string]string, fields []string, sortby 
 		logs.Info("ORM Records: ", l)
 		if len(fields) == 0 {
 			for _, v := range l {
-				// Load related fields as needed
-				o.LoadRelated(&v, "UserTransactionId")
-
 				ml = append(ml, v)
 			}
 		} else {
 			// trim unused fields
 			for _, v := range l {
-				// Load related fields as needed
-				o.LoadRelated(&v, "UserTransactionId")
-
 				m := make(map[string]interface{})
 				val := reflect.ValueOf(v)
 				for _, fname := range fields {

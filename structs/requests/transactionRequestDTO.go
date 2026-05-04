@@ -46,4 +46,5 @@ type UpdateUserTransactionRequest struct {
 	ClientReference    string
 	Status             string
 	ClientResponseCode string
+	Charge             string
 }
