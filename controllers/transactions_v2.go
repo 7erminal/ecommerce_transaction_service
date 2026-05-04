@@ -825,6 +825,7 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 					for _, v := range txnInsTransaction {
 						m := v.(models.UserInsTransactions)
 						m.Status = status
+						m.UserTransactionId = transaction.TransactionId
 						m.Response = string(reqText)
 						logs.Info("Updating userInsTransaction with ID ", m.UserInsTransactionId, " to status ", m.Status, " and response ", m.Response)
 						if err := models.UpdateUserInsTransactionsById(&m); err != nil {
