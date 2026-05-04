@@ -164,8 +164,9 @@ func UpdateUserTransactionStatusAndResponse(transactionId string, status *Status
 
 	o := orm.NewOrm()
 	res, err := o.Raw(
-		"UPDATE user_transactions SET status_id = ?, external_reference_number = ?, client_response_code = ?, date_modified = ? WHERE transaction_id = ?",
+		"UPDATE user_transactions SET status_id = ?, charge = ?, external_reference_number = ?, client_response_code = ?, date_modified = ? WHERE transaction_id = ?",
 		status.StatusId,
+		charge,
 		externalReferenceNumber,
 		clientResponseCode,
 		time.Now(),
