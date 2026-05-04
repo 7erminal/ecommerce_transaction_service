@@ -722,6 +722,8 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 	}
 
 	logs.Info("Full request: %s", string(reqText))
+	logs.Info("Status to update: %s", req.Status)
+	logs.Info("Transaction ID to update: %s", idStr)
 
 	statusCode := 400
 	statusMessage := "Something went wrong"
