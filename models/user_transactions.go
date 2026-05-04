@@ -163,18 +163,23 @@ func UpdateUserTransactionStatusAndResponse(transactionId string, status *Status
 	}
 
 	o := orm.NewOrm()
-	v := UserTransactions{TransactionId: transactionId}
-	if err = o.Read(&v, "TransactionId"); err != nil {
+	res, err := o.Raw(
+		"UPDATE user_transactions SET status_id = ?, external_reference_number = ?, client_response_code = ?, date_modified = ? WHERE transaction_id = ?",
+		status.StatusId,
+		externalReferenceNumber,
+		clientResponseCode,
+		time.Now(),
+		transactionId,
+	).Exec()
+	if err != nil {
 		return err
 	}
 
-	v.Status = status
-	v.ExternalReferenceNumber = externalReferenceNumber
-	v.ClientResponseCode = clientResponseCode
-	v.DateModified = time.Now()
+	if rows, rowsErr := res.RowsAffected(); rowsErr == nil && rows == 0 {
+		return orm.ErrNoRows
+	}
 
-	_, err = o.Update(&v, "Status", "ExternalReferenceNumber", "ClientResponseCode", "DateModified")
-	return err
+	return nil
 }
 
 // DeleteUserTransactions deletes UserTransactions by Id and returns error if
