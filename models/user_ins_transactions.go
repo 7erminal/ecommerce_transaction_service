@@ -156,6 +156,32 @@ func UpdateUserInsTransactionsById(m *UserInsTransactions) (err error) {
 	return
 }
 
+// UpdateUserInsTransactionStatusAndResponse updates only callback-related fields.
+// This avoids full-struct updates that may panic when unrelated relation pointers are nil.
+func UpdateUserInsTransactionStatusAndResponse(userInsTransactionId string, status *Status_codes, response string) (err error) {
+	if status == nil {
+		return errors.New("status cannot be nil")
+	}
+
+	o := orm.NewOrm()
+	res, err := o.Raw(
+		"UPDATE user_ins_transactions SET status = ?, response = ?, date_modified = ? WHERE ins_transaction_id = ?",
+		status.StatusId,
+		response,
+		time.Now(),
+		userInsTransactionId,
+	).Exec()
+	if err != nil {
+		return err
+	}
+
+	if rows, rowsErr := res.RowsAffected(); rowsErr == nil && rows == 0 {
+		return orm.ErrNoRows
+	}
+
+	return nil
+}
+
 // DeleteUserInsTransactions deletes UserInsTransactions by Id and returns error if
 // the record to be deleted doesn't exist
 func DeleteUserInsTransactions(id string) (err error) {

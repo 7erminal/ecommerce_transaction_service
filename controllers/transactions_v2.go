@@ -829,7 +829,7 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 						// m.Service = m.Service
 						m.Response = string(reqText)
 						logs.Info("Updating userInsTransaction with ID ", m.UserInsTransactionId, " to status ", m.Status, " and Service ", m.Service, " and response ", m.Response)
-						if err := models.UpdateUserInsTransactionsById(&m); err != nil {
+						if err := models.UpdateUserInsTransactionStatusAndResponse(m.UserInsTransactionId, status, m.Response); err != nil {
 							logs.Error("Failed to update userInsTransaction: ", err)
 						} else {
 							logs.Info("userInsTransaction updated successfully: ", txnInsTransaction)
