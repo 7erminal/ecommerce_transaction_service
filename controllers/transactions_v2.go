@@ -607,7 +607,7 @@ func (c *TransactionsV2Controller) GetAllUserTransactions() {
 	var sortby []string
 	var order []string
 	var query = make(map[string]string)
-	var limit int64 = 10
+	var limit int64 = 1000
 	var offset int64
 
 	responseCode := 400
