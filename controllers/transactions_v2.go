@@ -825,6 +825,7 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 						m := v.(models.UserInsTransactions)
 						m.Status = status
 						m.Response = string(reqText)
+						logs.Info("Updating userInsTransaction with ID ", m.UserInsTransactionId, " to status ", m.Status, " and response ", m.Response)
 						if err := models.UpdateUserInsTransactionsById(&m); err != nil {
 							logs.Error("Failed to update userInsTransaction: ", err)
 						} else {
