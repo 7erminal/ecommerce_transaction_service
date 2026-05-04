@@ -821,6 +821,7 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 				query["user_transaction_id"] = idStr
 
 				if txnInsTransaction, err := models.GetAllUserInsTransactions(query, fields, sortby, order, offset, limit); err == nil {
+					logs.Info("Fetched userInsTransaction: ", txnInsTransaction)
 					for _, v := range txnInsTransaction {
 						m := v.(models.UserInsTransactions)
 						m.Status = status
