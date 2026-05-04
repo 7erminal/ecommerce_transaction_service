@@ -729,7 +729,7 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 	statusMessage := "Something went wrong"
 	txnData := responses.UserTransactions{}
 
-	status := req.Status
+	requestedStatus := req.Status
 
 	if transaction, err := models.GetUserTransactionsById(idStr); err == nil {
 		if transaction == nil {
@@ -745,7 +745,7 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 			return
 		}
 
-		status, err := models.GetStatus_codesByCode(status)
+		status, err := models.GetStatus_codesByCode(requestedStatus)
 		if err == nil {
 			transaction.Status = status
 			transaction.ExternalReferenceNumber = req.ClientReference
@@ -753,9 +753,10 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 			logs.Info("Transaction status is going to be updated to ", transaction.Status)
 			logs.Info("Transaction external reference number is going to be updated to ", transaction.ExternalReferenceNumber)
 			logs.Info("Transaction client response code is going to be updated to ", transaction.ClientResponseCode)
-			if err := models.UpdateUserTransactionsById(transaction); err == nil {
+			if err := models.UpdateUserTransactionStatusAndResponse(transaction.TransactionId, status, req.ClientReference, req.ClientResponseCode); err == nil {
 				statusCode = 200
 				statusMessage = "Transaction updated successfully"
+				transaction.DateModified = time.Now()
 
 				customerRef := ""
 				if transaction.TransactionCustomerReference != nil {

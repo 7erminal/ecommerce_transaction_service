@@ -155,6 +155,28 @@ func UpdateUserTransactionsById(m *UserTransactions) (err error) {
 	return
 }
 
+// UpdateUserTransactionStatusAndResponse updates only callback-related fields.
+// This avoids full-struct updates that may panic when unrelated relation pointers are nil.
+func UpdateUserTransactionStatusAndResponse(transactionId string, status *Status_codes, externalReferenceNumber string, clientResponseCode string) (err error) {
+	if status == nil {
+		return errors.New("status cannot be nil")
+	}
+
+	o := orm.NewOrm()
+	v := UserTransactions{TransactionId: transactionId}
+	if err = o.Read(&v, "TransactionId"); err != nil {
+		return err
+	}
+
+	v.Status = status
+	v.ExternalReferenceNumber = externalReferenceNumber
+	v.ClientResponseCode = clientResponseCode
+	v.DateModified = time.Now()
+
+	_, err = o.Update(&v, "Status", "ExternalReferenceNumber", "ClientResponseCode", "DateModified")
+	return err
+}
+
 // DeleteUserTransactions deletes UserTransactions by Id and returns error if
 // the record to be deleted doesn't exist
 func DeleteUserTransactions(id string) (err error) {
