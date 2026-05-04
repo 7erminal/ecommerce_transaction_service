@@ -157,7 +157,7 @@ func UpdateUserTransactionsById(m *UserTransactions) (err error) {
 
 // UpdateUserTransactionStatusAndResponse updates only callback-related fields.
 // This avoids full-struct updates that may panic when unrelated relation pointers are nil.
-func UpdateUserTransactionStatusAndResponse(transactionId string, status *Status_codes, externalReferenceNumber string, clientResponseCode string) (err error) {
+func UpdateUserTransactionStatusAndResponse(transactionId string, status *Status_codes, externalReferenceNumber string, clientResponseCode string, charge float64) (err error) {
 	if status == nil {
 		return errors.New("status cannot be nil")
 	}

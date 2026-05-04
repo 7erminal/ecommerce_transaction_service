@@ -761,7 +761,7 @@ func (c *TransactionsV2Controller) PutUserTransaction() {
 				transaction.Charge = chargeFloat
 				logs.Info("Transaction charge is going to be updated to ", transaction.Charge)
 			}
-			if err := models.UpdateUserTransactionStatusAndResponse(transaction.TransactionId, status, req.ClientReference, req.ClientResponseCode); err == nil {
+			if err := models.UpdateUserTransactionStatusAndResponse(transaction.TransactionId, status, req.ClientReference, req.ClientResponseCode, transaction.Charge); err == nil {
 				statusCode = 200
 				statusMessage = "Transaction updated successfully"
 				transaction.DateModified = time.Now()
