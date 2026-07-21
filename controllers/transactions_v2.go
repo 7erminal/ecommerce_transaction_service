@@ -668,10 +668,16 @@ func (c *TransactionsV2Controller) GetAllUserTransactions() {
 		for _, v := range l {
 			m := v.(models.UserTransactions)
 
+			customerReference := ""
+
+			if m.TransactionCustomerReference != nil && m.TransactionCustomerReference.FullName != "" {
+				customerReference = m.TransactionCustomerReference.FullName
+			}
+
 			txnData = append(txnData, responses.UserTransactions{
 				TransactionId:                m.TransactionId,
 				Service:                      m.Service.ServiceName,
-				TransactionCustomerReference: m.TransactionCustomerReference.FullName,
+				TransactionCustomerReference: customerReference,
 				Amount:                       m.Amount,
 				TransactingCurrency:          m.TransactingCurrency,
 				SourceChannel:                m.SourceChannel,
