@@ -254,12 +254,15 @@ func (c *TransactionsV2Controller) UserPost() {
 			if _, err := models.AddUserRequest(&v); err == nil {
 				logs.Info("Extra data received are ", req.ExtraData.ExtraData1, req.ExtraData.ExtraData2, req.ExtraData.ExtraData3)
 
+				customerName := req.ExtraData.ExtraData1
 				// Get customer by ID
 				cust := &models.Customers{}
 				if cust, err = models.GetCustomerByPhoneNumber(phoneNumber); err != nil {
 					logs.Error("Customer not found: ", err)
 					responseMessage = "Customer not found: " + err.Error()
 					responseCode = 504
+				} else {
+					customerName = cust.FullName
 				}
 				logs.Info("Customer details: ", cust)
 				// If user does not exist, create a system user with the userid 1
@@ -314,7 +317,7 @@ func (c *TransactionsV2Controller) UserPost() {
 						txnData = responses.UserTransactions{
 							TransactionId:                transaction.TransactionId,
 							Service:                      service.ServiceName,
-							TransactionCustomerReference: cust.FullName,
+							TransactionCustomerReference: customerName,
 							Amount:                       transaction.Amount,
 							TransactingCurrency:          transaction.TransactingCurrency,
 							SourceChannel:                transaction.SourceChannel,
