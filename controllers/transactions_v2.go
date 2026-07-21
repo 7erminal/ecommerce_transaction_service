@@ -494,10 +494,16 @@ func (c *TransactionsV2Controller) GetUserTransactionWithTxnRef() {
 		statusCode = 200
 		responseMessage = "Transaction retrieved successfully"
 
+		customerReference := ""
+
+		if bilTxn.TransactionCustomerReference != nil && bilTxn.TransactionCustomerReference.FullName != "" {
+			customerReference = bilTxn.TransactionCustomerReference.FullName
+		}
+
 		txnData = responses.UserTransactions{
 			TransactionId:                bilTxn.TransactionId,
 			Service:                      bilTxn.Service.ServiceName,
-			TransactionCustomerReference: bilTxn.TransactionCustomerReference.FullName,
+			TransactionCustomerReference: customerReference,
 			Amount:                       bilTxn.Amount,
 			TransactingCurrency:          bilTxn.TransactingCurrency,
 			SourceChannel:                bilTxn.SourceChannel,
