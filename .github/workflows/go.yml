@@ -5,15 +5,15 @@ name: Go
 
 on:
   push:
-    branches: [ "msysmobilizer" ]
+    branches: [ "ecommerce" ]
   pull_request:
-    branches: [ "msysmobilizer" ]
+    branches: [ "ecommerce" ]
 
 jobs:
 
   build:
     runs-on: ubuntu-latest
-    environment: msysmobilizer
+    environment: ecommerce
     steps:
     - uses: actions/checkout@v4
 
@@ -34,9 +34,9 @@ jobs:
 
         ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
           set -e
-          cd /usr/app/mobile-application/transaction-service
+          cd /usr/app/ecommerce/ecommerce_main/transaction-service
           git stash
-          git pull origin msysmobilizer
+          git pull origin ecommerce
           go build -o transaction-service
           pm2 restart transaction-service || \
           pm2 start transaction-service --name transaction-service
