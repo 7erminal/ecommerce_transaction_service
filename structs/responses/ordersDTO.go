@@ -28,7 +28,7 @@ type OrderResponseDTO struct {
 
 type OrdersResponseDTO struct {
 	StatusCode int
-	Orders     *[]models.Orders
+	Orders     *[]OrdersCustom
 	StatusDesc string
 }
 

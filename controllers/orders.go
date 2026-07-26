@@ -608,7 +608,29 @@ func (c *OrdersController) GetUserOrders() {
 
 	if orders, err := models.GetOrdersByUser(v.Id); err == nil {
 		logs.Debug("Item ID to get quantity is ", orders)
-		var resp = responses.OrdersResponseDTO{StatusCode: 200, Orders: orders, StatusDesc: "Order details fetched successfully"}
+		ordersResponse := []responses.OrdersCustom{}
+		for _, order := range *orders {
+			customerData := responses.CustomersAlt{
+				CustomerId:    order.CustomerId,
+				CustomerName:  order.CustomerName,
+				CustomerEmail: order.CustomerEmail,
+				CustomerPhone: order.CustomerPhone}
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{
+				OrderId:      order.OrderId,
+				OrderNumber:  order.OrderNumber,
+				Quantity:     order.Quantity,
+				Cost:         order.Cost,
+				Currency:     order.Currency,
+				OrderDate:    order.OrderDate,
+				DateCreated:  order.DateCreated,
+				DateModified: order.DateModified,
+				OrderEndDate: order.OrderEndDate,
+				Customer:     &customerData,
+				OrderDetails: order.OrderDetails,
+				ReturnedDate: order.ReturnedDate}
+			ordersResponse = append(ordersResponse, customOrder)
+		}
+		var resp = responses.OrdersResponseDTO{StatusCode: 200, Orders: &ordersResponse, StatusDesc: "Order details fetched successfully"}
 		c.Ctx.Output.SetStatus(200)
 		c.Data["json"] = resp
 	} else {
@@ -632,9 +654,35 @@ func (c *OrdersController) GetOne() {
 	id, _ := strconv.ParseInt(idStr, 0, 64)
 	v, err := models.GetOrdersById(id)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		logs.Error("Error fetching order by ID::: ", err.Error())
+		var resp = responses.OrderResponseDTO{StatusCode: 608, Order: nil, StatusDesc: "Failed to fetch order details"}
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = resp
 	} else {
-		c.Data["json"] = v
+		var customerData = responses.CustomersAlt{
+			CustomerId:    v.CustomerId,
+			CustomerName:  v.CustomerName,
+			CustomerEmail: v.CustomerEmail,
+			CustomerPhone: v.CustomerPhone}
+
+		var orderData = responses.OrdersCustom{
+			OrderId:      v.OrderId,
+			OrderNumber:  v.OrderNumber,
+			Quantity:     v.Quantity,
+			Cost:         v.Cost,
+			Currency:     v.Currency,
+			OrderDate:    v.OrderDate,
+			DateCreated:  v.DateCreated,
+			DateModified: v.DateModified,
+			OrderEndDate: v.OrderEndDate,
+			Customer:     &customerData,
+			OrderDetails: v.OrderDetails,
+			ReturnedDate: v.ReturnedDate,
+		}
+		v.OrderDetails = nil
+		var resp = responses.OrderResponseDTO{StatusCode: 200, Order: &orderData, StatusDesc: "Order details fetched successfully"}
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = resp
 	}
 	c.ServeJSON()
 }
@@ -695,9 +743,39 @@ func (c *OrdersController) GetAll() {
 
 	l, err := models.GetAllOrders(query, fields, sortby, order, offset, limit)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		logs.Error("Error fetching all orders::: ", err.Error())
+		var resp = responses.OrdersResponseDTO{StatusCode: 608, Orders: nil, StatusDesc: "Failed to fetch order details"}
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = resp
 	} else {
-		c.Data["json"] = l
+		ordersResponse := []responses.OrdersCustom{}
+		for _, order := range l {
+			m := order.(models.Orders)
+			var customerData = responses.CustomersAlt{
+				CustomerId:    m.CustomerId,
+				CustomerName:  m.CustomerName,
+				CustomerEmail: m.CustomerEmail,
+				CustomerPhone: m.CustomerPhone}
+
+			var orderData = responses.OrdersCustom{
+				OrderId:      m.OrderId,
+				OrderNumber:  m.OrderNumber,
+				Quantity:     m.Quantity,
+				Cost:         m.Cost,
+				Currency:     m.Currency,
+				OrderDate:    m.OrderDate,
+				DateCreated:  m.DateCreated,
+				DateModified: m.DateModified,
+				OrderEndDate: m.OrderEndDate,
+				Customer:     &customerData,
+				OrderDetails: m.OrderDetails,
+				ReturnedDate: m.ReturnedDate,
+			}
+			ordersResponse = append(ordersResponse, orderData)
+		}
+		var resp = responses.OrdersResponseDTO{StatusCode: 200, Orders: &ordersResponse, StatusDesc: "Order details fetched successfully"}
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = resp
 	}
 	c.ServeJSON()
 }
