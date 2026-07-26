@@ -8,12 +8,13 @@ import (
 	"time"
 
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/google/uuid"
 )
 
 type UserRequest struct {
-	RequestId        int64  `orm:"auto;column(user_request_id)"`
-	ApiRequestId     int64  `orm:"column(api_request_id)"`
-	UserId           *Users `orm:"rel(fk);column(user_id)"`
+	RequestId        string `orm:"column(user_request_id)"`
+	ApiRequestId     string `orm:"column(api_request_id)"`
+	UserId           string `orm:"column(user_id)"`
 	Request          string `orm:"size(1000)"`
 	RequestType      string `orm:"size(100)"`
 	RequestStatus    string `orm:"size(255)"`
@@ -36,14 +37,28 @@ func init() {
 // AddRequest insert a new UserRequest into database and returns
 // last inserted Id on success.
 func AddUserRequest(m *UserRequest) (id int64, err error) {
+	if m.RequestId == "" {
+		m.RequestId = generateUserRequestID()
+	}
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
+func generateUserRequestID() string {
+	now := time.Now()
+	// Format: YYMMDD.shortuuid.HHMMSS (e.g. 260725.27839f2.130525)
+	datePart := now.Format("060102")
+	timePart := now.Format("150405")
+	uid := strings.ReplaceAll(uuid.NewString(), "-", "")
+	shortUID := uid[:7]
+
+	return fmt.Sprintf("%s.%s.%s", datePart, shortUID, timePart)
+}
+
 // GetRequestById retrieves UserRequest by Id. Returns error if
 // Id doesn't exist
-func GetUserRequestById(id int64) (v *UserRequest, err error) {
+func GetUserRequestById(id string) (v *UserRequest, err error) {
 	o := orm.NewOrm()
 	v = &UserRequest{RequestId: id}
 	if err = o.QueryTable(new(UserRequest)).Filter("RequestId", id).RelatedSel().One(v); err == nil {
@@ -143,7 +158,7 @@ func UpdateUserRequestById(m *UserRequest) (err error) {
 
 // DeleteRequest deletes UserRequest by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteUserRequest(id int64) (err error) {
+func DeleteUserRequest(id string) (err error) {
 	o := orm.NewOrm()
 	v := UserRequest{RequestId: id}
 	// ascertain id exists in the database

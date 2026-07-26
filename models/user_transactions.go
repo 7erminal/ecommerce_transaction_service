@@ -12,9 +12,10 @@ import (
 
 type UserTransactions struct {
 	TransactionId                string       `orm:"size(255);unique"`
-	Service                      *Services    `orm:"rel(fk)"`
+	ServiceId                    string       `orm:"size(255)"`
+	ServiceName                  string       `orm:"size(255)"`
 	Request                      *UserRequest `orm:"rel(fk)"`
-	TransactionCustomerReference *Customers   `orm:"rel(fk);column(transaction_customer_reference);null"`
+	TransactionCustomerReference string       `orm:"column(transaction_customer_reference);null"`
 	Amount                       float64
 	TransactingCurrency          string `orm:"size(255)"`
 	SourceChannel                string `orm:"size(255)"`
@@ -34,8 +35,8 @@ type UserTransactions struct {
 	ClientResponseCode           string        `orm:"size(255); column(client_response_code)"`
 	DateCreated                  time.Time     `orm:"type(datetime)"`
 	DateModified                 time.Time     `orm:"type(datetime)"`
-	CreatedBy                    *Users        `orm:"rel(fk);column(created_by)"`
-	ModifiedBy                   *Users        `orm:"rel(fk);column(modified_by)"`
+	CreatedBy                    string        `orm:"column(created_by)"`
+	ModifiedBy                   string        `orm:"column(modified_by)"`
 	Active                       int
 }
 

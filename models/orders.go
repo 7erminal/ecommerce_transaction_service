@@ -11,23 +11,25 @@ import (
 )
 
 type Orders struct {
-	OrderId       int64      `orm:"auto"`
-	Customer      *Customers `orm:"rel(fk);null"`
-	OrderNumber   string
+	OrderId       int64  `orm:"auto"`
+	CustomerId    string `orm:"size(200);null"`
+	CustomerName  string `orm:"size(255);null"`
+	CustomerEmail string `orm:"size(255);null"`
+	CustomerPhone string `orm:"size(255);null"`
+	OrderNumber   string `orm:"size(100)"`
 	Quantity      int
 	Cost          float32
-	OrderDesc     string `orm:"column(order_desc)"`
-	OrderLocation string `orm:"column(order_location)"`
-	// Currency     *Currencies `orm:"rel(fk)"`
-	Currency     int64
-	OrderDate    time.Time `orm:"type(datetime)"`
-	OrderEndDate time.Time `orm:"type(datetime)"`
-	ReturnedDate time.Time `orm:"type(datetime)"`
-	DateCreated  time.Time `orm:"type(datetime)"`
-	DateModified time.Time `orm:"type(datetime)"`
-	CreatedBy    *Users    `orm:"column(created_by);rel(fk);"`
-	ModifiedBy   int64
-	OrderDetails []*Order_items `orm:"reverse(many);null;"`
+	OrderDesc     string    `orm:"size(500);column(order_desc)"`
+	OrderLocation string    `orm:"size(255);column(order_location)"`
+	Currency      string    `orm:"size(100);column(currency)"`
+	OrderDate     time.Time `orm:"type(datetime)"`
+	OrderEndDate  time.Time `orm:"type(datetime)"`
+	ReturnedDate  time.Time `orm:"type(datetime)"`
+	DateCreated   time.Time `orm:"type(datetime)"`
+	DateModified  time.Time `orm:"type(datetime)"`
+	CreatedBy     int64     `orm:"column(created_by);rel(fk);"`
+	ModifiedBy    int64
+	OrderDetails  []*Order_items `orm:"reverse(many);null;"`
 }
 
 func init() {

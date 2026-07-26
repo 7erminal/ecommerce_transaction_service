@@ -8,15 +8,16 @@ import (
 	"time"
 
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/google/uuid"
 )
 
 type Request struct {
-	RequestId        int64      `orm:"auto"`
-	ApiRequestId     int64      `orm:"column(api_request_id)"`
-	CustId           *Customers `orm:"rel(fk);column(cust_id)"`
-	Request          string     `orm:"size(1000)"`
-	RequestType      string     `orm:"size(100)"`
-	RequestStatus    string     `orm:"size(255)"`
+	RequestId        string `orm:"pk;size(36);column(request_id)"`
+	ApiRequestId     string `orm:"column(api_request_id)"`
+	CustId           string `orm:"column(cust_id)"`
+	Request          string `orm:"size(1000)"`
+	RequestType      string `orm:"size(100)"`
+	RequestStatus    string `orm:"size(255)"`
 	RequestAmount    float64
 	RequestResponse  string    `orm:"size(1000)"`
 	CallbackResponse string    `orm:"size(1000)"`
@@ -36,14 +37,28 @@ func init() {
 // AddRequest insert a new Request into database and returns
 // last inserted Id on success.
 func AddRequest(m *Request) (id int64, err error) {
+	if m.RequestId == "" {
+		m.RequestId = generateRequestID()
+	}
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
+func generateRequestID() string {
+	now := time.Now()
+	// Format: YYMMDD.shortuuid.HHMMSS (e.g. 260725.27839f2.130525)
+	datePart := now.Format("060102")
+	timePart := now.Format("150405")
+	uid := strings.ReplaceAll(uuid.NewString(), "-", "")
+	shortUID := uid[:7]
+
+	return fmt.Sprintf("%s.%s.%s", datePart, shortUID, timePart)
+}
+
 // GetRequestById retrieves Request by Id. Returns error if
 // Id doesn't exist
-func GetRequestById(id int64) (v *Request, err error) {
+func GetRequestById(id string) (v *Request, err error) {
 	o := orm.NewOrm()
 	v = &Request{RequestId: id}
 	if err = o.QueryTable(new(Request)).Filter("RequestId", id).RelatedSel().One(v); err == nil {
@@ -143,7 +158,7 @@ func UpdateRequestById(m *Request) (err error) {
 
 // DeleteRequest deletes Request by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteRequest(id int64) (err error) {
+func DeleteRequest(id string) (err error) {
 	o := orm.NewOrm()
 	v := Request{RequestId: id}
 	// ascertain id exists in the database

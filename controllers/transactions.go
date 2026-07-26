@@ -81,19 +81,27 @@ func (c *TransactionsController) GetUserTransactionsByDate() {
 		var customTxns []responses.TransactionsCustom = []responses.TransactionsCustom{}
 
 		for _, r := range *transactions {
-			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, OrderNumber: r.Order.OrderNumber, Quantity: r.Order.Quantity, Cost: r.Order.Cost, CurrencyId: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{
+				OrderId:      r.Order.OrderId,
+				OrderNumber:  r.Order.OrderNumber,
+				Quantity:     r.Order.Quantity,
+				Cost:         r.Order.Cost,
+				Currency:     r.Order.Currency,
+				OrderDate:    r.Order.OrderDate,
+				DateCreated:  r.Order.DateCreated,
+				DateModified: r.Order.DateModified}
 			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{
 				TransactionId:       r.TransactionId,
 				Order:               &customOrder,
 				Amount:              r.Amount,
-				TransactingCurrency: r.TransactingCurrency,
+				TransactingCurrency: r.CurrencySymbol,
 				Status:              r.Status.Status,
 				DateCreated:         r.DateCreated,
 				DateModified:        r.DateModified,
 				CreatedBy:           r.CreatedBy,
 				ModifiedBy:          r.ModifiedBy,
 				Active:              r.Active,
-				Branch:              r.Branch,
+				BranchName:          r.BranchName,
 			}
 
 			customTxns = append(customTxns, customTxn)
@@ -125,19 +133,19 @@ func (c *TransactionsController) GetUserTransactions() {
 		var customTxns []responses.TransactionsCustom = []responses.TransactionsCustom{}
 
 		for _, r := range *transactions {
-			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, Quantity: r.Order.Quantity, Cost: r.Order.Cost, CurrencyId: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, Quantity: r.Order.Quantity, Cost: r.Order.Cost, Currency: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
 			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{
 				TransactionId:       r.TransactionId,
 				Order:               &customOrder,
 				Amount:              r.Amount,
-				TransactingCurrency: r.TransactingCurrency,
+				TransactingCurrency: r.CurrencySymbol,
 				Status:              r.Status.Status,
 				DateCreated:         r.DateCreated,
 				DateModified:        r.DateModified,
 				CreatedBy:           r.CreatedBy,
 				ModifiedBy:          r.ModifiedBy,
 				Active:              r.Active,
-				Branch:              r.Branch,
+				BranchName:          r.BranchName,
 			}
 
 			customTxns = append(customTxns, customTxn)
@@ -163,7 +171,7 @@ func (c *TransactionsController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
 	logs.Info("Getting transaction by ID ", id)
-	v, err := models.GetTransactionsById(id)
+	v, err := models.GetTransactionsById(idStr)
 	message := "An error occurred adding this audit request"
 	statusCode := 308
 
@@ -177,10 +185,8 @@ func (c *TransactionsController) GetOne() {
 		message = "Transaction fetched successfully"
 		statusCode = 200
 		fmt.Printf("Returning Order: %+v\n", v.Order)
-		fmt.Printf("Payments: %+v\n", v.Payments)
-		logs.Info("Payment reference number is ", v.Payments)
 		logs.Info("Status of the transaction si ", v.Status.Status)
-		logs.Info("Branch is ", v.Branch.Branch)
+		logs.Info("Branch is ", v.BranchName)
 		resp := responses.TransactionResponseDTO{StatusCode: statusCode, Transaction: v, StatusDesc: message}
 		c.Data["json"] = resp
 	}
@@ -294,11 +300,11 @@ func (c *TransactionsController) GetAll() {
 // @router /:id [put]
 func (c *TransactionsController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 0, 64)
+	// id, _ := strconv.ParseInt(idStr, 0, 64)
 	var v requests.UpdateTransactionRequestDTO
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	if z, err := models.GetTransactionsById(id); err == nil {
+	if z, err := models.GetTransactionsById(idStr); err == nil {
 		if td, err := models.GetTransaction_detailsByTransaction(z); err == nil {
 			td.SenderAccountNumber = v.SenderAccountNumber
 			td.RecipientAccountNumber = v.RecipientAccountNumber
@@ -334,8 +340,8 @@ func (c *TransactionsController) Put() {
 // @router /:id [delete]
 func (c *TransactionsController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 0, 64)
-	if err := models.DeleteTransactions(id); err == nil {
+	// id, _ := strconv.ParseInt(idStr, 0, 64)
+	if err := models.DeleteTransactions(idStr); err == nil {
 		c.Data["json"] = "OK"
 	} else {
 		c.Data["json"] = err.Error()

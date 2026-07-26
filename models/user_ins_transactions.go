@@ -18,7 +18,8 @@ type UserInsTransactions struct {
 	Data                   string        `orm:"size(255);null"`
 	SenderAccountNumber    string        `orm:"size(255)"`
 	RecipientAccountNumber string        `orm:"size(255)"`
-	Service                *Services     `orm:"rel(fk)"`
+	ServiceId              string        `orm:"size(255)"`
+	ServiceName            string        `orm:"size(255)"`
 	Status                 *Status_codes `orm:"rel(fk);column(status)"`
 	Request                string        `orm:"size(255);null"`
 	Response               string        `orm:"size(255);null"`

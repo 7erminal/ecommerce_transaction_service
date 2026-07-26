@@ -52,15 +52,15 @@ func UpdateCustomer(c *beego.Controller, customerid string, transactionDate stri
 	return data
 }
 
-func CheckItemAfterOrder(itemId string) (resp responses.CustomerResponseDTO) {
+func CheckItemAfterOrder(itemId string) (resp responses.CustomerResponseAltDTO) {
 	host, _ := beego.AppConfig.String("itemsBaseUrl")
 
 	logs.Info("Sending item ID ", itemId)
 
-	var data responses.CustomerResponseDTO
+	var data responses.CustomerResponseAltDTO
 
 	data.StatusCode = 406
-	data.Customer = nil
+	data.Result = nil
 	data.StatusDesc = "Something went wrong"
 
 	request := api.NewRequest(

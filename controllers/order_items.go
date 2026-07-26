@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"transaction_service/controllers/functions"
 	"transaction_service/models"
 	"transaction_service/structs/requests"
 	"transaction_service/structs/responses"
@@ -153,20 +154,21 @@ func (c *Order_itemsController) Put() {
 			orderItem.ModifiedBy = v.ModifiedBy
 			if err := models.UpdateOrder_itemsById(orderItem); err == nil {
 				logs.Info("Order item updated successfully: ", orderItem)
-				if item, err := models.GetItemsById(orderItem.Item.ItemId); err != nil {
+				if item, err := functions.GetItem(&c.Controller, requests.GetItemRequest{ItemId: orderItem.Item}); err != nil {
 					logs.Error("An Error occurred while getting item: ", err.Error())
 				} else {
-					item.ItemStatus = status
-					if err := models.UpdateItemsById(item); err != nil {
-						logs.Error("An Error occurred while updating item: ", err.Error())
-					}
+					logs.Info("Item found: ", item)
+					// item.Item.Status = status
+					// if err := functions.UpdateItem(&c.Controller, requests.UpdateItemRequest{ItemId: item.Item.ItemId, Status: status}); err != nil {
+					// 	logs.Error("An Error occurred while updating item: ", err.Error())
+					// }
 				}
 				o := responses.OrdersCustom{
 					OrderId:      orderItem.Order.OrderId,
 					OrderNumber:  orderItem.Order.OrderNumber,
 					Quantity:     orderItem.Order.Quantity,
 					Cost:         orderItem.Order.Cost,
-					CurrencyId:   orderItem.Order.Currency,
+					Currency:     orderItem.Order.Currency,
 					OrderDate:    orderItem.Order.OrderDate,
 					DateCreated:  orderItem.Order.DateCreated,
 					DateModified: orderItem.Order.DateModified,
@@ -174,7 +176,7 @@ func (c *Order_itemsController) Put() {
 				oi := responses.OrderItemsCustom{
 					OrderItemId: orderItem.OrderItemId,
 					Order:       &o,
-					Item:        orderItem.Item,
+					Item:        orderItem.ItemName,
 					Quantity:    orderItem.Quantity,
 					Status:      orderItem.Status.Status,
 					OrderDate:   orderItem.OrderDate,

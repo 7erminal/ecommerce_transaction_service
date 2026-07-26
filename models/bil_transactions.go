@@ -11,12 +11,13 @@ import (
 )
 
 type Bil_transactions struct {
-	TransactionId           int64      `orm:"auto"`
-	TransactionRefNumber    string     `orm:"size(255);unique"`
-	Service                 *Services  `orm:"rel(fk)"`
-	BillerCode              string     `orm:"size(255)"`
-	Request                 *Request   `orm:"rel(fk)"`
-	TransactionBy           *Customers `orm:"rel(fk);column(transaction_by)"`
+	TransactionId           int64    `orm:"auto"`
+	TransactionRefNumber    string   `orm:"size(255);unique"`
+	ServiceId               string   `orm:"size(255)"`
+	ServiceName             string   `orm:"size(255)"`
+	BillerCode              string   `orm:"size(255)"`
+	Request                 *Request `orm:"rel(fk)"`
+	TransactionBy           string   `orm:"size(255);column(transaction_by)"`
 	Amount                  float64
 	TransactingCurrency     string `orm:"size(255)"`
 	SourceChannel           string `orm:"size(255)"`
@@ -35,8 +36,8 @@ type Bil_transactions struct {
 	ClientResponseCode      string        `orm:"size(255); column(client_response_code)"`
 	DateCreated             time.Time     `orm:"type(datetime)"`
 	DateModified            time.Time     `orm:"type(datetime)"`
-	CreatedBy               *Users        `orm:"rel(fk);column(created_by)"`
-	ModifiedBy              *Users        `orm:"rel(fk);column(modified_by)"`
+	CreatedBy               string        `orm:"size(255);column(created_by)"`
+	ModifiedBy              string        `orm:"size(255);column(modified_by)"`
 	Active                  int
 }
 

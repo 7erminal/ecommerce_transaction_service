@@ -15,7 +15,9 @@ type Bil_ins_transactions struct {
 	BilInsTransactionId    int64             `orm:"auto"`
 	BilTransactionId       *Bil_transactions `orm:"rel(fk);column(bil_transaction_id)"`
 	Amount                 float64
-	Biller                 *Billers      `orm:"rel(fk);column(biller_id)"`
+	BillerId               string        `orm:"size(255);column(biller_id)"`
+	BillerCode             string        `orm:"size(255);column(biller_code)"`
+	BillerName             string        `orm:"size(255);column(biller_name)"`
 	SenderAccountNumber    string        `orm:"size(255)"`
 	RecipientAccountNumber string        `orm:"size(255)"`
 	Network                string        `orm:"size(150)"`

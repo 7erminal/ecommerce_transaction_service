@@ -14,9 +14,12 @@ import (
 type Order_items struct {
 	OrderItemId  int64   `orm:"auto"`
 	Order        *Orders `orm:"rel(fk)"`
-	Item         *Items  `orm:"rel(fk);column(item_id)"`
-	Quantity     int64
+	Item         string  `orm:"column(item_id)"`
+	ItemName     string  `orm:"size(255);column(item_name)"`
+	UnitPrice    float32 `orm:"column(unit_price)"`
+	Quantity     int
 	Status       *Status   `orm:"rel(fk);column(item_status)"`
+	TotalPrice   float32   `orm:"column(total_price)"`
 	OrderDate    time.Time `orm:"type(datetime)"`
 	DateCreated  time.Time `orm:"type(datetime)"`
 	DateModified time.Time `orm:"type(datetime)"`

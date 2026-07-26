@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"transaction_service/controllers/functions"
 	"transaction_service/models"
 	"transaction_service/structs/requests"
 	"transaction_service/structs/responses"
@@ -149,7 +150,7 @@ func (c *CallbackController) Post() {
 						bilTxnResp := responses.Bil_ins_transactionCustom{
 							BilInsTransactionId:    insTxnObj.BilInsTransactionId,
 							Amount:                 strconv.FormatFloat(insTxnObj.Amount, 'f', 2, 64),
-							Biller:                 insTxnObj.Biller.BillerName,
+							Biller:                 insTxnObj.BillerName,
 							SenderAccountNumber:    insTxnObj.SenderAccountNumber,
 							RecipientAccountNumber: insTxnObj.RecipientAccountNumber,
 							Network:                insTxnObj.Network,
@@ -173,11 +174,14 @@ func (c *CallbackController) Post() {
 					// return
 				}
 
-				if biller, err := models.GetBillerByCode(resp.BillerCode); err == nil {
+				if biller, err := functions.GetBiller(&c.Controller, requests.GetBillerRequest{BillerId: resp.BillerCode}); err == nil {
+					billerIdStr := strconv.FormatInt(biller.Biller.BillerId, 10)
 					insTransaction := models.Bil_ins_transactions{
 						BilTransactionId:       resp,
 						Amount:                 v.Amount,
-						Biller:                 biller,
+						BillerName:             biller.Biller.BillerName,
+						BillerId:               billerIdStr,
+						BillerCode:             biller.Biller.BillerCode,
 						SenderAccountNumber:    resp.Source,
 						RecipientAccountNumber: resp.Destination,
 						Network:                resp.BillerCode,
@@ -221,7 +225,7 @@ func (c *CallbackController) Post() {
 				transaction = responses.Bil_transactionCustom{
 					TransactionId:           strconv.FormatInt(resp.TransactionId, 10),
 					TransactionRefNumber:    resp.TransactionRefNumber,
-					Service:                 resp.Service.ServiceName,
+					Service:                 resp.ServiceName,
 					BillerCode:              resp.BillerCode,
 					Amount:                  strconv.FormatFloat(resp.Amount, 'f', 2, 64),
 					TransactingCurrency:     resp.TransactingCurrency,
@@ -397,7 +401,7 @@ func (c *CallbackController) UserTransactionCallback() {
 							Data:                   insTxnObj.Data,
 							SenderAccountNumber:    insTxnObj.SenderAccountNumber,
 							RecipientAccountNumber: insTxnObj.RecipientAccountNumber,
-							Service:                insTxnObj.Service.ServiceName,
+							Service:                insTxnObj.ServiceName,
 							Status:                 insTxnObj.Status.StatusDescription,
 							Request:                insTxnObj.Request,
 							Response:               insTxnObj.Response,
@@ -442,8 +446,8 @@ func (c *CallbackController) UserTransactionCallback() {
 
 				transaction = responses.UserTransactions{
 					TransactionId:                resp.TransactionId,
-					Service:                      resp.Service.ServiceName,
-					TransactionCustomerReference: resp.TransactionCustomerReference.FullName,
+					Service:                      resp.ServiceName,
+					TransactionCustomerReference: resp.TransactionCustomerReference,
 					Amount:                       resp.Amount,
 					TransactingCurrency:          resp.TransactingCurrency,
 					SourceChannel:                resp.SourceChannel,
@@ -460,8 +464,8 @@ func (c *CallbackController) UserTransactionCallback() {
 					ClientResponseCode:           resp.ClientResponseCode,
 					DateCreated:                  resp.DateCreated,
 					DateModified:                 resp.DateModified,
-					CreatedBy:                    resp.CreatedBy.FullName,
-					ModifiedBy:                   resp.ModifiedBy.FullName,
+					CreatedBy:                    resp.CreatedBy,
+					ModifiedBy:                   resp.ModifiedBy,
 					Active:                       resp.Active,
 					TransactionDetails:           &insResponses,
 				}

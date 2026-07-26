@@ -30,17 +30,17 @@ type TransactionsCustomResponseDTO struct {
 }
 
 type TransactionsCustom struct {
-	TransactionId       int64         `orm:"auto"`
-	Order               *OrdersCustom `orm:"rel(fk)"`
+	TransactionId       string
+	Order               *OrdersCustom
 	Amount              float32
-	TransactingCurrency int64
+	TransactingCurrency string
 	Status              string
 	DateCreated         time.Time `orm:"type(datetime)"`
 	DateModified        time.Time `orm:"type(datetime)"`
 	CreatedBy           int
 	ModifiedBy          int
 	Active              int
-	Branch              *models.Branches `orm:"rel(fk)"`
+	BranchName          string
 }
 
 type BilTransactionResponseDTO struct {
@@ -141,4 +141,10 @@ type UserTransactions struct {
 	ModifiedBy                   string
 	Active                       int
 	TransactionDetails           *[]UserInsTransactions
+}
+
+type ItemQuantityResponseDTO struct {
+	StatusCode int
+	Quantity   *Item_quantity
+	StatusDesc string
 }

@@ -35,11 +35,6 @@ func init() {
 
 	ns2 := beego.NewNamespace("/v2",
 
-		beego.NSNamespace("/transactions",
-			beego.NSInclude(
-				&controllers.TransactionsV2Controller{},
-			),
-		),
 		beego.NSNamespace("/callback",
 			beego.NSInclude(
 				&controllers.CallbackController{},

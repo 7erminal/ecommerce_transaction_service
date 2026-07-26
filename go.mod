@@ -8,6 +8,7 @@ require github.com/smartystreets/goconvey v1.6.4
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 

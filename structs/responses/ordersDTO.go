@@ -6,13 +6,12 @@ import (
 )
 
 type OrdersCustom struct {
-	OrderId     int64 `orm:"auto"`
-	OrderNumber string
-	Quantity    int
-	Cost        float32
-	Customer    *models.Customers
-	// Currency     *Currencies `orm:"rel(fk)"`
-	CurrencyId   int64                 `orm:"column(currency)"`
+	OrderId      int64 `orm:"auto"`
+	OrderNumber  string
+	Quantity     int
+	Cost         float32
+	Customer     *CustomersAlt
+	Currency     string                `orm:"column(currency)"`
 	OrderDate    time.Time             `orm:"type(datetime)"`
 	OrderEndDate time.Time             `orm:"type(datetime)"`
 	ReturnedDate time.Time             `orm:"type(datetime)"`
@@ -36,8 +35,8 @@ type OrdersResponseDTO struct {
 type OrderItemsCustom struct {
 	OrderItemId int64
 	Order       *OrdersCustom
-	Item        *models.Items
-	Quantity    int64
+	Item        string
+	Quantity    int
 	Status      string
 	OrderDate   time.Time
 	Comment     string

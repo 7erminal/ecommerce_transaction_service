@@ -27,17 +27,20 @@ jobs:
               GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
               GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
               SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+              SSH_SERVER: ${{ vars.SSH_SERVER }}
+              SSH_USER: ${{ vars.SSH_USER }}
+              SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
 
-        ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
+        ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_SERVER << 'EOF'
           set -e
           cd /usr/app/ecommerce/ecommerce_main/transaction-service
           git stash
           git pull origin ecommerce
           go build -o transaction-service
           pm2 restart transaction-service || \
-          pm2 start transaction-service --name transaction-service
+          pm2 start transaction-service --name ecommerce-transaction-service
         EOF

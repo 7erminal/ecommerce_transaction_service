@@ -9,22 +9,25 @@ import (
 
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/google/uuid"
 )
 
 type Transactions struct {
-	TransactionId       int64     `orm:"auto"`
-	Order               *Orders   `orm:"rel(fk)"`
-	Branch              *Branches `orm:"rel(fk)"`
-	Amount              float32
-	TransactingCurrency int64
-	Status              *Status   `orm:"rel(fk);column(status_id)"`
-	DateCreated         time.Time `orm:"type(datetime)"`
-	DateModified        time.Time `orm:"type(datetime)"`
-	CreatedBy           int
-	ModifiedBy          int
-	Active              int
-	Services            *Services   `orm:"rel(fk);column(service_id)"`
-	Payments            []*Payments `orm:"reverse(many);null;"`
+	TransactionId  string  `orm:"pk;size(36);column(request_id)"`
+	Order          *Orders `orm:"rel(fk)"`
+	BranchId       string  `orm:"size(255)"`
+	BranchName     string  `orm:"size(255)"`
+	Amount         float32
+	CurrencyId     string    `orm:"size(255)"`
+	CurrencySymbol string    `orm:"size(255)"`
+	Status         *Status   `orm:"rel(fk);column(status_id)"`
+	DateCreated    time.Time `orm:"type(datetime)"`
+	DateModified   time.Time `orm:"type(datetime)"`
+	CreatedBy      int
+	ModifiedBy     int
+	Active         int
+	ServiceId      string `orm:"size(255);column(service_id)"`
+	ServiceName    string `orm:"size(255);column(service_name)"`
 }
 
 func init() {
@@ -34,14 +37,28 @@ func init() {
 // AddTransactions insert a new Transactions into database and returns
 // last inserted Id on success.
 func AddTransactions(m *Transactions) (id int64, err error) {
+	if m.TransactionId == "" {
+		m.TransactionId = generateTransactionID()
+	}
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
+func generateTransactionID() string {
+	now := time.Now()
+	// Format: YYMMDD.shortuuid.HHMMSS (e.g. 260725.27839f2.130525)
+	datePart := now.Format("060102")
+	timePart := now.Format("150405")
+	uid := strings.ReplaceAll(uuid.NewString(), "-", "")
+	shortUID := uid[:7]
+
+	return fmt.Sprintf("%s.%s.%s", datePart, shortUID, timePart)
+}
+
 // GetTransactionsById retrieves Transactions by Id. Returns error if
 // Id doesn't exist
-func GetTransactionsById(id int64) (v *Transactions, err error) {
+func GetTransactionsById(id string) (v *Transactions, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Transactions))
 
@@ -49,85 +66,14 @@ func GetTransactionsById(id int64) (v *Transactions, err error) {
 	logs.Info("About to get transaction details...")
 	if err = qs.Filter("TransactionId", id).RelatedSel().One(v); err == nil {
 		// q := Transactions{TransactionId: id}
-		logs.Info("Load related for payments")
-		_, err := o.LoadRelated(v, "Payments")
-
-		if err == nil {
-			logs.Info("Loaded payments ", v)
-			fmt.Printf("Payments loaded is: %+v\n", v.Payments)
-
-			for _, payment := range v.Payments {
-				// payment_ := Payments{PaymentId: payment.PaymentId}
-				// err = o.Read(payment)
-				// if err == nil {
-				_, err := o.LoadRelated(payment, "PaymentMethod")
-				if err == nil {
-					// payment.PaymentMethod = &paymentMethod
-					logs.Info("Payment method is ", payment.PaymentMethod)
-					fmt.Printf("Payment method loaded is: %+v\n", payment.PaymentMethod)
-				}
-				// }
-			}
-		}
 
 		_, err = o.LoadRelated(v.Order, "OrderDetails")
 		if err == nil {
 			logs.Info("No error. Continue to loop through orders ", v.Order)
-			fmt.Printf("Order loop: %+v\n", v.Order)
-			// orderitems := []Order_items{}
-			for _, orderD := range v.Order.OrderDetails {
-				logs.Info("Each order detail is ", orderD)
-				// orderitem := Order_items{OrderItemId: orderD.OrderItemId}
-				// err := o.Read(&orderitem)
-				// if err == nil {
-				_, err := o.LoadRelated(orderD, "Item")
-				logs.Info("No error getting item details")
-				// _, err := o.LoadRelated(&orderitem, "Item")
-				if err == nil {
-					// orderitems = append(orderitems, orderitem)
-					// item := Items{ItemId: orderD.Item.ItemId}
-					// err := o.Read(&item)
-					// if err == nil {
-					_, err := o.LoadRelated(orderD.Item, "Category")
-					if err != nil {
-						logs.Error("Failed loading category")
-					}
-					logs.Info("Item loaded is ", orderD.Item)
-					fmt.Printf("Category loaded is: %+v\n", orderD.Item.Category)
-
-					_, err = o.LoadRelated(orderD.Item, "ItemPrice")
-					if err != nil {
-						logs.Error("Failed loading item price")
-					}
-					logs.Info("Item price is ", orderD.Item.ItemPrice)
-
-					_, err = o.LoadRelated(orderD.Item, "Branch")
-					if err != nil {
-						logs.Error("Failed loading branch")
-					}
-					logs.Info("Item price is ", orderD.Item.Branch)
-					// }
-				} else {
-					logs.Error("Error loading related item ", err.Error())
-				}
-				// } else {
-				// 	logs.Error("An error occurred when reading order item ", err.Error())
-				// }
-			}
 		} else {
 			logs.Error("Error loading related..", err.Error())
 		}
 
-		logs.Info("About to load related for customer involved")
-		_, err = o.LoadRelated(v.Order, "Customer")
-		if err == nil {
-			logs.Info("No error. Continue to loop through orders ", v.Order)
-			fmt.Printf("Order loop: %+v\n", v.Order.Customer)
-			// orderitems := []Order_items{}
-
-		} else {
-			logs.Error("Error loading related..", err.Error())
-		}
 		// v.Order = &v.Order
 
 		fmt.Printf("Order details are: %+v\n", v.Order.OrderDetails)
@@ -272,74 +218,10 @@ func GetAllTransactions(query map[string]string, fields []string, sortby []strin
 				_, err = o.LoadRelated(v.Order, "OrderDetails")
 				if err == nil {
 					logs.Info("No error. Continue to loop through orders ", v.Order)
-					fmt.Printf("Order loop: %+v\n", v.Order)
-					// orderitems := []Order_items{}
-					for _, orderD := range v.Order.OrderDetails {
-						logs.Info("Each order detail is ", orderD)
-						// orderitem := Order_items{OrderItemId: orderD.OrderItemId}
-						// err := o.Read(&orderitem)
-						// if err == nil {
-						_, err := o.LoadRelated(orderD, "Item")
-						logs.Info("No error getting item details")
-						// _, err := o.LoadRelated(&orderitem, "Item")
-						if err == nil {
-							// orderitems = append(orderitems, orderitem)
-							// item := Items{ItemId: orderD.Item.ItemId}
-							// err := o.Read(&item)
-							// if err == nil {
-							_, err := o.LoadRelated(orderD.Item, "Category")
-							if err != nil {
-								logs.Error("Failed loading category")
-							}
-							logs.Info("Item loaded is ", orderD.Item)
-							fmt.Printf("Category loaded is: %+v\n", orderD.Item.Category)
-
-							_, err = o.LoadRelated(orderD.Item, "ItemPrice")
-							if err != nil {
-								logs.Error("Failed loading item price")
-							}
-							logs.Info("Item price is ", orderD.Item.ItemPrice)
-
-							_, err = o.LoadRelated(orderD.Item, "Branch")
-							if err != nil {
-								logs.Error("Failed loading branch")
-							}
-							logs.Info("Item price is ", orderD.Item.Branch)
-							// }
-						} else {
-							logs.Error("Error loading related item ", err.Error())
-						}
-						// } else {
-						// 	logs.Error("An error occurred when reading order item ", err.Error())
-						// }
-					}
 				} else {
 					logs.Error("Error loading related..", err.Error())
 				}
 
-				_, err = o.LoadRelated(v.Order, "Customer")
-				if err == nil {
-					fmt.Printf("Order loop: %+v\n", v.Order.Customer)
-				}
-
-				_, err = o.LoadRelated(&v, "Payments")
-				if err == nil {
-					logs.Info("Loaded payments ", v)
-					fmt.Printf("Payments loaded is: %+v\n", v.Payments)
-
-					for _, payment := range v.Payments {
-						// payment_ := Payments{PaymentId: payment.PaymentId}
-						// err = o.Read(payment)
-						// if err == nil {
-						_, err := o.LoadRelated(payment, "PaymentMethod")
-						if err == nil {
-							// payment.PaymentMethod = &paymentMethod
-							logs.Info("Payment method is ", payment.PaymentMethod)
-							fmt.Printf("Payment method loaded is: %+v\n", payment.PaymentMethod)
-						}
-						// }
-					}
-				}
 				ml = append(ml, v)
 			}
 		} else {
@@ -390,7 +272,7 @@ func UpdateTransactionsById(m *Transactions) (err error) {
 
 // DeleteTransactions deletes Transactions by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteTransactions(id int64) (err error) {
+func DeleteTransactions(id string) (err error) {
 	o := orm.NewOrm()
 	v := Transactions{TransactionId: id}
 	// ascertain id exists in the database
