@@ -23,8 +23,8 @@ type Transactions struct {
 	Status         *Status   `orm:"rel(fk);column(status_id)"`
 	DateCreated    time.Time `orm:"type(datetime)"`
 	DateModified   time.Time `orm:"type(datetime)"`
-	CreatedBy      int
-	ModifiedBy     int
+	CreatedBy      string    `orm:"size(255);column(created_by)"`
+	ModifiedBy     string    `orm:"size(255);column(modified_by)"`
 	Active         int
 	ServiceId      string `orm:"size(255);column(service_id)"`
 	ServiceName    string `orm:"size(255);column(service_name)"`

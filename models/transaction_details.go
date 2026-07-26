@@ -23,8 +23,8 @@ type Transaction_details struct {
 	TransactionType        string    `orm:"size(255)"`
 	DateCreated            time.Time `orm:"type(datetime)"`
 	DateModified           time.Time `orm:"type(datetime)"`
-	CreatedBy              int
-	ModifiedBy             int
+	CreatedBy              string    `orm:"size(255);column(created_by)"`
+	ModifiedBy             string    `orm:"size(255);column(modified_by)"`
 	Active                 int
 }
 

@@ -255,13 +255,12 @@ func (c *OrdersController) Post() {
 					}
 
 					if service_, err := functions.GetService(&c.Controller, requests.GetServiceRequest{ServiceId: serviceName}); err == nil {
-						service := *&service_.Service
+						service := service_.Service
 						status_ := "PENDING"
 						if status, err := models.GetStatusByName(status_); err == nil {
 							branchStr := strconv.FormatInt(branch.BranchId, 10)
 							currencyStr := strconv.FormatInt(cur.Result.CurrencyId, 10)
 							// convert created_by to int
-							created_by_int, _ := strconv.Atoi(created_by)
 							serviceIdStr := strconv.FormatInt(service.ServiceId, 10)
 							var transaction_ = models.Transactions{
 								Order:          &order_,
@@ -273,15 +272,15 @@ func (c *OrdersController) Post() {
 								Status:         status,
 								DateCreated:    time.Now(),
 								DateModified:   time.Now(),
-								CreatedBy:      created_by_int,
-								ModifiedBy:     created_by_int,
+								CreatedBy:      created_by,
+								ModifiedBy:     created_by,
 								ServiceId:      serviceIdStr,
 								ServiceName:    service.ServiceName}
 							logs.Info("About to add transaction")
 							if _, txn_err := models.AddTransactions(&transaction_); txn_err == nil {
 								logs.Info("NO error adding transaction")
 								status_code := "1022"
-								var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1}
+								var txn_details = models.Transaction_details{TransactionId: &transaction_, Amount: amount_, Comment: v.Comment, StatusCode: status_code, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: created_by, ModifiedBy: created_by}
 
 								if _, txn_d_err := models.AddTransaction_details((&txn_details)); txn_d_err == nil {
 									customerIdStr := strconv.FormatInt(customer.CustomerId, 10)
@@ -414,7 +413,7 @@ func (c *OrdersController) ConfirmOrder() {
 	if txn, txn_err := models.GetTransactionsById(v.TransactionId); txn_err == nil {
 		// status_ := "SUCCESS"
 		if status, err := models.GetStatusByName(v.Status); err == nil {
-			txn.CreatedBy, _ = strconv.Atoi(v.Confirmedby)
+			txn.CreatedBy = v.Confirmedby
 			txn.Status = status
 			txn.Active = 1
 			if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
@@ -538,7 +537,7 @@ func (c *OrdersController) ReturnOrder() {
 		logs.Info("Returned date is ", txn.Order.ReturnedDate)
 		// status_ := "SUCCESS"
 		if status, err := models.GetStatusByName(v.Status); err == nil {
-			txn.CreatedBy, _ = strconv.Atoi(v.Confirmedby)
+			txn.CreatedBy = v.Confirmedby
 			txn.Status = status
 			txn.Active = 1
 			if utxn_err := models.UpdateTransactionsById(txn); utxn_err == nil {
