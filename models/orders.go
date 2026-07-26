@@ -19,16 +19,16 @@ type Orders struct {
 	OrderNumber   string `orm:"size(100)"`
 	Quantity      int
 	Cost          float32
-	OrderDesc     string    `orm:"size(500);column(order_desc)"`
-	OrderLocation string    `orm:"size(255);column(order_location)"`
-	Currency      string    `orm:"size(100);column(currency)"`
-	OrderDate     time.Time `orm:"type(datetime)"`
-	OrderEndDate  time.Time `orm:"type(datetime)"`
-	ReturnedDate  time.Time `orm:"type(datetime)"`
-	DateCreated   time.Time `orm:"type(datetime)"`
-	DateModified  time.Time `orm:"type(datetime)"`
-	CreatedBy     int64     `orm:"column(created_by)"`
-	ModifiedBy    int64
+	OrderDesc     string         `orm:"size(500);column(order_desc)"`
+	OrderLocation string         `orm:"size(255);column(order_location)"`
+	Currency      string         `orm:"size(100);column(currency)"`
+	OrderDate     time.Time      `orm:"type(datetime)"`
+	OrderEndDate  time.Time      `orm:"type(datetime)"`
+	ReturnedDate  time.Time      `orm:"type(datetime)"`
+	DateCreated   time.Time      `orm:"type(datetime)"`
+	DateModified  time.Time      `orm:"type(datetime)"`
+	CreatedBy     string         `orm:"column(created_by)"`
+	ModifiedBy    string         `orm:"column(modified_by)"`
 	OrderDetails  []*Order_items `orm:"reverse(many);null;"`
 }
 

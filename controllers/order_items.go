@@ -140,7 +140,7 @@ func (c *Order_itemsController) GetAll() {
 func (c *Order_itemsController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := requests.UpdateOrderItemDTO{OrderItemId: id}
+	v := requests.UpdateOrderItemDTO{OrderItemId: idStr}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if orderItem, err := models.GetOrder_itemsById(id); err != nil {
 		logs.Info("Order item not found: ", err.Error())

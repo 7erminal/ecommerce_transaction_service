@@ -298,3 +298,21 @@ CREATE TABLE IF NOT EXISTS user_ins_transactions (
     INDEX idx_user_ins_transactions_status (status),
     INDEX idx_user_ins_transactions_user_transaction_id (user_transaction_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Incremental schema updates for model changes
+-- Convert created_by/modified_by from numeric types to string types.
+ALTER TABLE orders
+    MODIFY COLUMN created_by VARCHAR(255) NOT NULL,
+    MODIFY COLUMN modified_by VARCHAR(255) NOT NULL;
+
+ALTER TABLE transactions
+    MODIFY COLUMN created_by VARCHAR(255) NOT NULL,
+    MODIFY COLUMN modified_by VARCHAR(255) NOT NULL;
+
+ALTER TABLE order_items
+    MODIFY COLUMN created_by VARCHAR(255) NOT NULL,
+    MODIFY COLUMN modified_by VARCHAR(255) NOT NULL;
+
+ALTER TABLE transaction_details
+    MODIFY COLUMN created_by VARCHAR(255) NOT NULL,
+    MODIFY COLUMN modified_by VARCHAR(255) NOT NULL;

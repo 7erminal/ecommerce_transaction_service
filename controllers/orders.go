@@ -122,8 +122,21 @@ func (c *OrdersController) Post() {
 			}
 
 			customerIdStr := strconv.FormatInt(customer.CustomerId, 10)
+			userIdStr := strconv.FormatInt(user.User.UserId, 10)
 
-			var order_ = models.Orders{OrderDesc: v.RequestType, CustomerId: customerIdStr, OrderLocation: v.OrderLocation, Quantity: quantity_, Cost: float32(cost_), Currency: cur.Result.Symbol, OrderDate: orderDate, OrderEndDate: orderEndDate, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: user.User.UserId, ModifiedBy: user.User.UserId}
+			var order_ = models.Orders{
+				OrderDesc:     v.RequestType,
+				CustomerId:    customerIdStr,
+				OrderLocation: v.OrderLocation,
+				Quantity:      quantity_,
+				Cost:          float32(cost_),
+				Currency:      cur.Result.Symbol,
+				OrderDate:     orderDate,
+				OrderEndDate:  orderEndDate,
+				DateCreated:   time.Now(),
+				DateModified:  time.Now(),
+				CreatedBy:     userIdStr,
+				ModifiedBy:    userIdStr}
 
 			// Add order
 			if _, err := models.AddOrders(&order_); err == nil {
@@ -174,7 +187,15 @@ func (c *OrdersController) Post() {
 
 							if status, err := models.GetStatusByName("PENDING"); err == nil {
 								itemIdStr := strconv.FormatInt(item.Item.ItemId, 10)
-								var order_items = models.Order_items{Order: &order_, Item: itemIdStr, Quantity: each_quantity_, OrderDate: time.Now(), DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: user.User.UserId, Status: status}
+								var order_items = models.Order_items{
+									Order:        &order_,
+									Item:         itemIdStr,
+									Quantity:     each_quantity_,
+									OrderDate:    time.Now(),
+									DateCreated:  time.Now(),
+									DateModified: time.Now(),
+									CreatedBy:    userIdStr,
+									Status:       status}
 
 								logs.Info("About to add order items")
 								// Add order item

@@ -33,8 +33,8 @@ type ConfirmOrderDTO struct {
 }
 
 type UpdateOrderItemDTO struct {
-	OrderItemId int64
+	OrderItemId string
 	Status      string
 	Comment     string
-	ModifiedBy  int64
+	ModifiedBy  string
 }
