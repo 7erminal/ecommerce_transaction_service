@@ -27,7 +27,7 @@ type Orders struct {
 	ReturnedDate  time.Time `orm:"type(datetime)"`
 	DateCreated   time.Time `orm:"type(datetime)"`
 	DateModified  time.Time `orm:"type(datetime)"`
-	CreatedBy     int64     `orm:"column(created_by);rel(fk);"`
+	CreatedBy     int64     `orm:"column(created_by)"`
 	ModifiedBy    int64
 	OrderDetails  []*Order_items `orm:"reverse(many);null;"`
 }
