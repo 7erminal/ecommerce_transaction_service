@@ -16,6 +16,7 @@ type Order_items struct {
 	Order        *Orders `orm:"rel(fk)"`
 	Item         string  `orm:"column(item_id)"`
 	ItemName     string  `orm:"size(255);column(item_name)"`
+	Category     string  `orm:"size(255);column(item_category)"`
 	UnitPrice    float32 `orm:"column(unit_price)"`
 	Quantity     int
 	Status       *Status   `orm:"rel(fk);column(item_status)"`

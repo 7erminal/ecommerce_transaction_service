@@ -173,10 +173,21 @@ func (c *Order_itemsController) Put() {
 					DateCreated:  orderItem.Order.DateCreated,
 					DateModified: orderItem.Order.DateModified,
 				}
+				orderIdStr := strconv.FormatInt(o.OrderId, 10)
+
+				itemAlt := responses.ItemAlt{
+					ItemId:       orderItem.Item,
+					ItemName:     orderItem.ItemName,
+					Category:     orderItem.Category,
+					Price:        orderItem.UnitPrice,
+					Currency:     orderItem.Order.Currency,
+					DateCreated:  orderItem.DateCreated,
+					DateModified: orderItem.DateModified,
+				}
 				oi := responses.OrderItemsCustom{
 					OrderItemId: orderItem.OrderItemId,
-					Order:       &o,
-					Item:        orderItem.ItemName,
+					OrderId:     orderIdStr,
+					Item:        &itemAlt,
 					Quantity:    orderItem.Quantity,
 					Status:      orderItem.Status.Status,
 					OrderDate:   orderItem.OrderDate,

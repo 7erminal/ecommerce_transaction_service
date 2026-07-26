@@ -2,7 +2,6 @@ package responses
 
 import (
 	"time"
-	"transaction_service/models"
 )
 
 type OrdersCustom struct {
@@ -11,13 +10,13 @@ type OrdersCustom struct {
 	Quantity     int
 	Cost         float32
 	Customer     *CustomersAlt
-	Currency     string                `orm:"column(currency)"`
-	OrderDate    time.Time             `orm:"type(datetime)"`
-	OrderEndDate time.Time             `orm:"type(datetime)"`
-	ReturnedDate time.Time             `orm:"type(datetime)"`
-	DateCreated  time.Time             `orm:"type(datetime)"`
-	DateModified time.Time             `orm:"type(datetime)"`
-	OrderDetails []*models.Order_items `orm:"reverse(many);null;"`
+	Currency     string
+	OrderDate    time.Time
+	OrderEndDate time.Time
+	ReturnedDate time.Time
+	DateCreated  time.Time
+	DateModified time.Time
+	OrderDetails []OrderItemsCustom
 }
 
 type OrderResponseDTO struct {
@@ -32,10 +31,21 @@ type OrdersResponseDTO struct {
 	StatusDesc string
 }
 
+type ItemAlt struct {
+	ItemId       string
+	ItemName     string
+	Description  string
+	Price        float32
+	Category     string
+	Currency     string
+	DateCreated  time.Time
+	DateModified time.Time
+}
+
 type OrderItemsCustom struct {
 	OrderItemId int64
-	Order       *OrdersCustom
-	Item        string
+	OrderId     string
+	Item        *ItemAlt
 	Quantity    int
 	Status      string
 	OrderDate   time.Time

@@ -290,6 +290,32 @@ func (c *OrdersController) Post() {
 										CustomerName:  customer.FullName,
 										CustomerEmail: customer.Email,
 										CustomerPhone: customer.PhoneNumber}
+
+									orderDetails := []responses.OrderItemsCustom{}
+									if transaction_.Order.OrderDetails != nil {
+										for _, orderItem := range transaction_.Order.OrderDetails {
+											itemData := responses.ItemAlt{
+												ItemId:       orderItem.Item,
+												ItemName:     orderItem.ItemName,
+												Description:  "",
+												Price:        orderItem.TotalPrice,
+												Currency:     orderItem.Order.Currency,
+												Category:     orderItem.Category,
+												DateCreated:  orderItem.DateCreated,
+												DateModified: orderItem.DateModified}
+
+											orderIdStr := strconv.FormatInt(orderItem.Order.OrderId, 10)
+											orderItemsCustom := responses.OrderItemsCustom{
+												OrderItemId: orderItem.OrderItemId,
+												OrderId:     orderIdStr,
+												Item:        &itemData,
+												Quantity:    orderItem.Quantity,
+												OrderDate:   orderItem.OrderDate,
+												Status:      orderItem.Status.Status}
+
+											orderDetails = append(orderDetails, orderItemsCustom)
+										}
+									}
 									var customOrder responses.OrdersCustom = responses.OrdersCustom{
 										OrderId:      order_.OrderId,
 										OrderNumber:  order_.OrderNumber,
@@ -301,7 +327,7 @@ func (c *OrdersController) Post() {
 										DateModified: order_.DateModified,
 										OrderEndDate: order_.OrderEndDate,
 										Customer:     &customerData,
-										OrderDetails: orderItems,
+										OrderDetails: orderDetails,
 										ReturnedDate: order_.ReturnedDate,
 									}
 									var customTxn responses.TransactionsCustom = responses.TransactionsCustom{
@@ -397,6 +423,32 @@ func (c *OrdersController) ConfirmOrder() {
 					CustomerName:  txn.Order.CustomerName,
 					CustomerEmail: txn.Order.CustomerEmail,
 					CustomerPhone: txn.Order.CustomerPhone}
+
+				orderDetails := []responses.OrderItemsCustom{}
+				if txn.Order.OrderDetails != nil {
+					for _, orderItem := range txn.Order.OrderDetails {
+						itemData := responses.ItemAlt{
+							ItemId:       orderItem.Item,
+							ItemName:     orderItem.ItemName,
+							Description:  "",
+							Price:        orderItem.TotalPrice,
+							Currency:     orderItem.Order.Currency,
+							Category:     orderItem.Category,
+							DateCreated:  orderItem.DateCreated,
+							DateModified: orderItem.DateModified}
+
+						orderIdStr := strconv.FormatInt(orderItem.Order.OrderId, 10)
+						orderItemsCustom := responses.OrderItemsCustom{
+							OrderItemId: orderItem.OrderItemId,
+							OrderId:     orderIdStr,
+							Item:        &itemData,
+							Quantity:    orderItem.Quantity,
+							OrderDate:   orderItem.OrderDate,
+							Status:      orderItem.Status.Status}
+
+						orderDetails = append(orderDetails, orderItemsCustom)
+					}
+				}
 				var customOrder responses.OrdersCustom = responses.OrdersCustom{
 					OrderId:      txn.Order.OrderId,
 					OrderNumber:  txn.Order.OrderNumber,
@@ -407,7 +459,7 @@ func (c *OrdersController) ConfirmOrder() {
 					DateCreated:  txn.Order.DateCreated,
 					DateModified: txn.Order.DateModified,
 					Customer:     &customerData,
-					OrderDetails: txn.Order.OrderDetails}
+					OrderDetails: orderDetails}
 				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{
 					TransactionId:       txn.TransactionId,
 					Order:               &customOrder,
@@ -496,6 +548,31 @@ func (c *OrdersController) ReturnOrder() {
 					CustomerEmail: txn.Order.CustomerEmail,
 					CustomerPhone: txn.Order.CustomerPhone}
 
+				orderDetails := []responses.OrderItemsCustom{}
+				if txn.Order.OrderDetails != nil {
+					for _, orderItem := range txn.Order.OrderDetails {
+						itemData := responses.ItemAlt{
+							ItemId:       orderItem.Item,
+							ItemName:     orderItem.ItemName,
+							Description:  "",
+							Price:        orderItem.TotalPrice,
+							Currency:     orderItem.Order.Currency,
+							Category:     orderItem.Category,
+							DateCreated:  orderItem.DateCreated,
+							DateModified: orderItem.DateModified}
+
+						orderIdStr := strconv.FormatInt(orderItem.Order.OrderId, 10)
+						orderItemsCustom := responses.OrderItemsCustom{
+							OrderItemId: orderItem.OrderItemId,
+							OrderId:     orderIdStr,
+							Item:        &itemData,
+							Quantity:    orderItem.Quantity,
+							OrderDate:   orderItem.OrderDate,
+							Status:      orderItem.Status.Status}
+
+						orderDetails = append(orderDetails, orderItemsCustom)
+					}
+				}
 				var customOrder responses.OrdersCustom = responses.OrdersCustom{
 					OrderId:      txn.Order.OrderId,
 					OrderNumber:  txn.Order.OrderNumber,
@@ -506,7 +583,7 @@ func (c *OrdersController) ReturnOrder() {
 					DateCreated:  txn.Order.DateCreated,
 					DateModified: txn.Order.DateModified,
 					Customer:     &customerData,
-					OrderDetails: txn.Order.OrderDetails,
+					OrderDetails: orderDetails,
 					ReturnedDate: txn.Order.ReturnedDate,
 					OrderEndDate: txn.Order.OrderEndDate}
 				var customTxn responses.TransactionsCustom = responses.TransactionsCustom{
@@ -615,6 +692,32 @@ func (c *OrdersController) GetUserOrders() {
 				CustomerName:  order.CustomerName,
 				CustomerEmail: order.CustomerEmail,
 				CustomerPhone: order.CustomerPhone}
+
+			orderDetails := []responses.OrderItemsCustom{}
+			if order.OrderDetails != nil {
+				for _, orderItem := range order.OrderDetails {
+					itemData := responses.ItemAlt{
+						ItemId:       orderItem.Item,
+						ItemName:     orderItem.ItemName,
+						Description:  "",
+						Price:        orderItem.TotalPrice,
+						Currency:     orderItem.Order.Currency,
+						Category:     orderItem.Category,
+						DateCreated:  orderItem.DateCreated,
+						DateModified: orderItem.DateModified}
+
+					orderIdStr := strconv.FormatInt(orderItem.Order.OrderId, 10)
+					orderItemsCustom := responses.OrderItemsCustom{
+						OrderItemId: orderItem.OrderItemId,
+						OrderId:     orderIdStr,
+						Item:        &itemData,
+						Quantity:    orderItem.Quantity,
+						OrderDate:   orderItem.OrderDate,
+						Status:      orderItem.Status.Status}
+
+					orderDetails = append(orderDetails, orderItemsCustom)
+				}
+			}
 			var customOrder responses.OrdersCustom = responses.OrdersCustom{
 				OrderId:      order.OrderId,
 				OrderNumber:  order.OrderNumber,
@@ -626,7 +729,7 @@ func (c *OrdersController) GetUserOrders() {
 				DateModified: order.DateModified,
 				OrderEndDate: order.OrderEndDate,
 				Customer:     &customerData,
-				OrderDetails: order.OrderDetails,
+				OrderDetails: orderDetails,
 				ReturnedDate: order.ReturnedDate}
 			ordersResponse = append(ordersResponse, customOrder)
 		}
@@ -665,6 +768,31 @@ func (c *OrdersController) GetOne() {
 			CustomerEmail: v.CustomerEmail,
 			CustomerPhone: v.CustomerPhone}
 
+		orderDetails := []responses.OrderItemsCustom{}
+		if v.OrderDetails != nil {
+			for _, orderItem := range v.OrderDetails {
+				itemData := responses.ItemAlt{
+					ItemId:       orderItem.Item,
+					ItemName:     orderItem.ItemName,
+					Description:  "",
+					Price:        orderItem.TotalPrice,
+					Currency:     orderItem.Order.Currency,
+					Category:     orderItem.Category,
+					DateCreated:  orderItem.DateCreated,
+					DateModified: orderItem.DateModified}
+
+				orderIdStr := strconv.FormatInt(orderItem.Order.OrderId, 10)
+				orderItemsCustom := responses.OrderItemsCustom{
+					OrderItemId: orderItem.OrderItemId,
+					OrderId:     orderIdStr,
+					Item:        &itemData,
+					Quantity:    orderItem.Quantity,
+					OrderDate:   orderItem.OrderDate,
+					Status:      orderItem.Status.Status}
+
+				orderDetails = append(orderDetails, orderItemsCustom)
+			}
+		}
 		var orderData = responses.OrdersCustom{
 			OrderId:      v.OrderId,
 			OrderNumber:  v.OrderNumber,
@@ -676,7 +804,7 @@ func (c *OrdersController) GetOne() {
 			DateModified: v.DateModified,
 			OrderEndDate: v.OrderEndDate,
 			Customer:     &customerData,
-			OrderDetails: v.OrderDetails,
+			OrderDetails: orderDetails,
 			ReturnedDate: v.ReturnedDate,
 		}
 		v.OrderDetails = nil
@@ -757,6 +885,31 @@ func (c *OrdersController) GetAll() {
 				CustomerEmail: m.CustomerEmail,
 				CustomerPhone: m.CustomerPhone}
 
+			orderDetails := []responses.OrderItemsCustom{}
+			if m.OrderDetails != nil {
+				for _, orderItem := range m.OrderDetails {
+					itemData := responses.ItemAlt{
+						ItemId:       orderItem.Item,
+						ItemName:     orderItem.ItemName,
+						Description:  "",
+						Price:        orderItem.TotalPrice,
+						Currency:     orderItem.Order.Currency,
+						Category:     orderItem.Category,
+						DateCreated:  orderItem.DateCreated,
+						DateModified: orderItem.DateModified}
+
+					orderIdStr := strconv.FormatInt(orderItem.Order.OrderId, 10)
+					orderItemsCustom := responses.OrderItemsCustom{
+						OrderItemId: orderItem.OrderItemId,
+						OrderId:     orderIdStr,
+						Item:        &itemData,
+						Quantity:    orderItem.Quantity,
+						OrderDate:   orderItem.OrderDate,
+						Status:      orderItem.Status.Status}
+
+					orderDetails = append(orderDetails, orderItemsCustom)
+				}
+			}
 			var orderData = responses.OrdersCustom{
 				OrderId:      m.OrderId,
 				OrderNumber:  m.OrderNumber,
@@ -768,7 +921,7 @@ func (c *OrdersController) GetAll() {
 				DateModified: m.DateModified,
 				OrderEndDate: m.OrderEndDate,
 				Customer:     &customerData,
-				OrderDetails: m.OrderDetails,
+				OrderDetails: orderDetails,
 				ReturnedDate: m.ReturnedDate,
 			}
 			ordersResponse = append(ordersResponse, orderData)
