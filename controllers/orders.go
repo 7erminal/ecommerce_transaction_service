@@ -221,6 +221,8 @@ func (c *OrdersController) Post() {
 									}
 								}
 							} else {
+								message = "Error adding order item. Could not find status"
+								statusCode = 612
 								logs.Error("Error adding order item. Could not find status::: ", err.Error())
 							}
 
@@ -245,10 +247,14 @@ func (c *OrdersController) Post() {
 							// 	message = "Error updating the item quantity"
 							// }
 						} else {
+							message = "Error adding order item. Could not find item"
+							statusCode = 610
 							logs.Error("Could not find this item ", err.Error())
 						}
 					}
 				} else {
+					message = "Error updating order"
+					statusCode = 611
 					logs.Error("There was an error adding the order number ", err.Error())
 					panic(err)
 				}
