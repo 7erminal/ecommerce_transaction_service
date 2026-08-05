@@ -23,8 +23,8 @@ type Orders struct {
 	OrderLocation string         `orm:"size(255);column(order_location)"`
 	Currency      string         `orm:"size(100);column(currency)"`
 	OrderDate     time.Time      `orm:"type(datetime)"`
-	OrderEndDate  time.Time      `orm:"type(datetime)"`
-	ReturnedDate  time.Time      `orm:"type(datetime)"`
+	OrderEndDate  time.Time      `orm:"type(datetime);null"`
+	ReturnedDate  time.Time      `orm:"type(datetime);null"`
 	DateCreated   time.Time      `orm:"type(datetime)"`
 	DateModified  time.Time      `orm:"type(datetime)"`
 	CreatedBy     string         `orm:"column(created_by)"`
