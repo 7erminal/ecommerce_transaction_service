@@ -185,6 +185,7 @@ CREATE TABLE IF NOT EXISTS order_items (
     order_id BIGINT NOT NULL,
     item_id VARCHAR(255) NOT NULL,
     item_name VARCHAR(255) NOT NULL,
+    item_category VARCHAR(255) NOT NULL,
     unit_price FLOAT NOT NULL,
     quantity INT NOT NULL,
     item_status BIGINT NOT NULL,
