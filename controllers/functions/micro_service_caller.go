@@ -132,7 +132,7 @@ func GetUserWithUsername(c *beego.Controller, req requests.GetUserWithUsernameRe
 	return data, nil
 }
 
-func GetCustomer(c *beego.Controller, req requests.GetCustomerRequest) (responses.CustomerResponseDTO, error) {
+func GetCustomer(c *beego.Controller, req requests.GetCustomerRequest) (responses.CustomerResponseAltDTO, error) {
 	host, _ := beego.AppConfig.String("customerBaseUrl")
 
 	reqText, _ := json.Marshal(req)
@@ -153,13 +153,13 @@ func GetCustomer(c *beego.Controller, req requests.GetCustomerRequest) (response
 	if err != nil {
 		logs.Error("client.Error: %v", err)
 		setControllerJSON(c, err.Error())
-		return responses.CustomerResponseDTO{}, err
+		return responses.CustomerResponseAltDTO{}, err
 	}
 	defer res.Body.Close()
 	read, err := io.ReadAll(res.Body)
 	if err != nil {
 		setControllerJSON(c, err.Error())
-		return responses.CustomerResponseDTO{}, err
+		return responses.CustomerResponseAltDTO{}, err
 	}
 
 	var prettyJSON bytes.Buffer
@@ -170,10 +170,10 @@ func GetCustomer(c *beego.Controller, req requests.GetCustomerRequest) (response
 	}
 	// data := map[string]interface{}{}
 	// var dataOri responses.UserOriResponseDTO
-	var data responses.CustomerResponseDTO
+	var data responses.CustomerResponseAltDTO
 	if err := json.Unmarshal(read, &data); err != nil {
 		setControllerJSON(c, err.Error())
-		return responses.CustomerResponseDTO{}, err
+		return responses.CustomerResponseAltDTO{}, err
 	}
 	setControllerJSON(c, data)
 

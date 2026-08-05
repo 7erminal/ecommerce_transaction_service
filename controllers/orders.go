@@ -118,7 +118,7 @@ func (c *OrdersController) Post() {
 			if cust, err := functions.GetCustomer(&c.Controller, requests.GetCustomerRequest{CustomerId: customerId}); err != nil {
 				logs.Error("Customer not found ", err.Error())
 			} else {
-				customer = *cust.Customer
+				customer = *cust.Result
 			}
 
 			customerIdStr := strconv.FormatInt(customer.CustomerId, 10)
