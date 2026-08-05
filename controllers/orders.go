@@ -127,6 +127,9 @@ func (c *OrdersController) Post() {
 			var order_ = models.Orders{
 				OrderDesc:     v.RequestType,
 				CustomerId:    customerIdStr,
+				CustomerName:  customer.FullName,
+				CustomerEmail: customer.Email,
+				CustomerPhone: customer.PhoneNumber,
 				OrderLocation: v.OrderLocation,
 				Quantity:      quantity_,
 				Cost:          float32(cost_),
@@ -175,6 +178,7 @@ func (c *OrdersController) Post() {
 							tempQuantity := item.Item.ItemQuantity.Quantity
 							tempQuantity = tempQuantity - int(each_quantity_)
 							finalQuantity = tempQuantity
+							totalPrice := item.Item.ItemPrice.ItemPrice * float32(each_quantity_)
 
 							if tempQuantity < 0 {
 								logs.Error("Quantity is less ", tempQuantity)
@@ -190,7 +194,11 @@ func (c *OrdersController) Post() {
 								var order_items = models.Order_items{
 									Order:        &order_,
 									Item:         itemIdStr,
+									ItemName:     item.Item.ItemName,
+									Category:     item.Item.Category.CategoryName,
+									UnitPrice:    item.Item.ItemPrice.ItemPrice,
 									Quantity:     each_quantity_,
+									TotalPrice:   totalPrice,
 									OrderDate:    time.Now(),
 									DateCreated:  time.Now(),
 									DateModified: time.Now(),
