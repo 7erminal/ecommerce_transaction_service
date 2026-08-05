@@ -497,7 +497,7 @@ func GetStatus(c *beego.Controller, req requests.GetStatusRequest) (responses.St
 }
 
 func GetItem(c *beego.Controller, req requests.GetItemRequest) (responses.ItemResponseDTO, error) {
-	host, _ := beego.AppConfig.String("itemBaseUrl")
+	host, _ := beego.AppConfig.String("itemsBaseUrl")
 
 	reqText, _ := json.Marshal(req)
 
