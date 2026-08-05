@@ -163,17 +163,18 @@ func (c *Order_itemsController) Put() {
 					// 	logs.Error("An Error occurred while updating item: ", err.Error())
 					// }
 				}
-				o := responses.OrdersCustom{
-					OrderId:      orderItem.Order.OrderId,
-					OrderNumber:  orderItem.Order.OrderNumber,
-					Quantity:     orderItem.Order.Quantity,
-					Cost:         orderItem.Order.Cost,
-					Currency:     orderItem.Order.Currency,
-					OrderDate:    orderItem.Order.OrderDate,
-					DateCreated:  orderItem.Order.DateCreated,
-					DateModified: orderItem.Order.DateModified,
-				}
-				orderIdStr := strconv.FormatInt(o.OrderId, 10)
+				orderIdStr := strconv.FormatInt(orderItem.Order.OrderId, 10)
+				// o := responses.OrdersCustom{
+				// 	OrderId:      orderIdStr,
+				// 	OrderNumber:  orderItem.Order.OrderNumber,
+				// 	Quantity:     orderItem.Order.Quantity,
+				// 	Cost:         orderItem.Order.Cost,
+				// 	Currency:     orderItem.Order.Currency,
+				// 	OrderDate:    orderItem.Order.OrderDate,
+				// 	DateCreated:  orderItem.Order.DateCreated,
+				// 	DateModified: orderItem.Order.DateModified,
+				// }
+				// orderIdStr := strconv.FormatInt(o.OrderId, 10)
 
 				itemAlt := responses.ItemAlt{
 					ItemId:       orderItem.Item,

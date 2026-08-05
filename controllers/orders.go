@@ -350,8 +350,9 @@ func (c *OrdersController) Post() {
 											orderDetails = append(orderDetails, orderItemsCustom)
 										}
 									}
+									orderIdStr := strconv.FormatInt(transaction_.Order.OrderId, 10)
 									var customOrder responses.OrdersCustom = responses.OrdersCustom{
-										OrderId:      order_.OrderId,
+										OrderId:      orderIdStr,
 										OrderNumber:  order_.OrderNumber,
 										Quantity:     order_.Quantity,
 										Cost:         order_.Cost,
@@ -483,8 +484,9 @@ func (c *OrdersController) ConfirmOrder() {
 						orderDetails = append(orderDetails, orderItemsCustom)
 					}
 				}
+				orderIdStr := strconv.FormatInt(txn.Order.OrderId, 10)
 				var customOrder responses.OrdersCustom = responses.OrdersCustom{
-					OrderId:      txn.Order.OrderId,
+					OrderId:      orderIdStr,
 					OrderNumber:  txn.Order.OrderNumber,
 					Quantity:     txn.Order.Quantity,
 					Cost:         txn.Order.Cost,
@@ -607,8 +609,9 @@ func (c *OrdersController) ReturnOrder() {
 						orderDetails = append(orderDetails, orderItemsCustom)
 					}
 				}
+				orderIdStr := strconv.FormatInt(txn.Order.OrderId, 10)
 				var customOrder responses.OrdersCustom = responses.OrdersCustom{
-					OrderId:      txn.Order.OrderId,
+					OrderId:      orderIdStr,
 					OrderNumber:  txn.Order.OrderNumber,
 					Quantity:     txn.Order.Quantity,
 					Cost:         txn.Order.Cost,
@@ -752,8 +755,9 @@ func (c *OrdersController) GetUserOrders() {
 					orderDetails = append(orderDetails, orderItemsCustom)
 				}
 			}
+			orderIdStr := strconv.FormatInt(order.OrderId, 10)
 			var customOrder responses.OrdersCustom = responses.OrdersCustom{
-				OrderId:      order.OrderId,
+				OrderId:      orderIdStr,
 				OrderNumber:  order.OrderNumber,
 				Quantity:     order.Quantity,
 				Cost:         order.Cost,
@@ -827,8 +831,9 @@ func (c *OrdersController) GetOne() {
 				orderDetails = append(orderDetails, orderItemsCustom)
 			}
 		}
+		orderIdStr := strconv.FormatInt(v.OrderId, 10)
 		var orderData = responses.OrdersCustom{
-			OrderId:      v.OrderId,
+			OrderId:      orderIdStr,
 			OrderNumber:  v.OrderNumber,
 			Quantity:     v.Quantity,
 			Cost:         v.Cost,
@@ -944,8 +949,9 @@ func (c *OrdersController) GetAll() {
 					orderDetails = append(orderDetails, orderItemsCustom)
 				}
 			}
+			orderIdStr := strconv.FormatInt(m.OrderId, 10)
 			var orderData = responses.OrdersCustom{
-				OrderId:      m.OrderId,
+				OrderId:      orderIdStr,
 				OrderNumber:  m.OrderNumber,
 				Quantity:     m.Quantity,
 				Cost:         m.Cost,

@@ -5,7 +5,7 @@ import (
 )
 
 type OrdersCustom struct {
-	OrderId      int64 `orm:"auto"`
+	OrderId      string
 	OrderNumber  string
 	Quantity     int
 	Cost         float32

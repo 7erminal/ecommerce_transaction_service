@@ -81,8 +81,9 @@ func (c *TransactionsController) GetUserTransactionsByDate() {
 		var customTxns []responses.TransactionsCustom = []responses.TransactionsCustom{}
 
 		for _, r := range *transactions {
+			orderIdStr := strconv.FormatInt(r.Order.OrderId, 10)
 			var customOrder responses.OrdersCustom = responses.OrdersCustom{
-				OrderId:      r.Order.OrderId,
+				OrderId:      orderIdStr,
 				OrderNumber:  r.Order.OrderNumber,
 				Quantity:     r.Order.Quantity,
 				Cost:         r.Order.Cost,
@@ -133,7 +134,16 @@ func (c *TransactionsController) GetUserTransactions() {
 		var customTxns []responses.TransactionsCustom = []responses.TransactionsCustom{}
 
 		for _, r := range *transactions {
-			var customOrder responses.OrdersCustom = responses.OrdersCustom{OrderId: r.Order.OrderId, Quantity: r.Order.Quantity, Cost: r.Order.Cost, Currency: r.Order.Currency, OrderDate: r.Order.OrderDate, DateCreated: r.Order.DateCreated, DateModified: r.Order.DateModified}
+			orderIdStr := strconv.FormatInt(r.Order.OrderId, 10)
+			var customOrder responses.OrdersCustom = responses.OrdersCustom{
+				OrderId:      orderIdStr,
+				Quantity:     r.Order.Quantity,
+				Cost:         r.Order.Cost,
+				Currency:     r.Order.Currency,
+				OrderDate:    r.Order.OrderDate,
+				DateCreated:  r.Order.DateCreated,
+				DateModified: r.Order.DateModified}
+
 			var customTxn responses.TransactionsCustom = responses.TransactionsCustom{
 				TransactionId:       r.TransactionId,
 				Order:               &customOrder,
