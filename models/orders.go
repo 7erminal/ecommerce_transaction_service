@@ -148,6 +148,19 @@ func GetAllOrders(query map[string]string, fields []string, sortby []string, ord
 	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
+			for i := range l {
+				orderItems := []Order_items{}
+				if _, relErr := o.QueryTable(new(Order_items)).Filter("Order", l[i]).RelatedSel().All(&orderItems); relErr != nil {
+					return nil, relErr
+				}
+				l[i].OrderDetails = make([]*Order_items, 0, len(orderItems))
+				for j := range orderItems {
+					l[i].OrderDetails = append(l[i].OrderDetails, &orderItems[j])
+				}
+			}
+		}
+
+		if len(fields) == 0 {
 			for _, v := range l {
 				ml = append(ml, v)
 			}
