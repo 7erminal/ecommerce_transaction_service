@@ -548,7 +548,7 @@ func GetItem(c *beego.Controller, req requests.GetItemRequest) (responses.ItemRe
 }
 
 func GetItemQuantity(c *beego.Controller, req requests.GetItemRequest) (responses.ItemQuantityResponseDTO, error) {
-	host, _ := beego.AppConfig.String("itemBaseUrl")
+	host, _ := beego.AppConfig.String("itemsBaseUrl")
 
 	reqText, _ := json.Marshal(req)
 
@@ -599,7 +599,7 @@ func GetItemQuantity(c *beego.Controller, req requests.GetItemRequest) (response
 }
 
 func UpdateItemQuantity(c *beego.Controller, req requests.UpdateItemQuantityRequest) (responses.ItemResponseDTO, error) {
-	host, _ := beego.AppConfig.String("itemBaseUrl")
+	host, _ := beego.AppConfig.String("itemsBaseUrl")
 
 	reqText, _ := json.Marshal(req)
 
@@ -805,7 +805,7 @@ func GetOperator(c *beego.Controller, req requests.GetOperatorRequest) (response
 }
 
 func GetServices(c *beego.Controller) (responses.ServicesResponseDTO, error) {
-	host, _ := beego.AppConfig.String("itemBaseUrl")
+	host, _ := beego.AppConfig.String("itemsBaseUrl")
 
 	logs.Info("Request to get Service")
 
