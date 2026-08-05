@@ -243,6 +243,7 @@ func (c *TransactionsController) GetAll() {
 	}
 	// order: desc,asc
 	if v := c.GetString("order"); v != "" {
+		logs.Info("Order is ", v)
 		order = strings.Split(v, ",")
 	}
 	// query: k:v,k:v
