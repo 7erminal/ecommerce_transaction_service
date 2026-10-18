@@ -31,7 +31,6 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-
         ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
           set -e
           cd /usr/app/mobile-application/transaction-service
