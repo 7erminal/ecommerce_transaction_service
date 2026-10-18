@@ -888,6 +888,7 @@ func (c *OrdersController) GetAll() {
 	}
 	// sortby: col1,col2
 	if v := c.GetString("sortby"); v != "" {
+
 		sortby = strings.Split(v, ",")
 	}
 	// order: desc,asc
