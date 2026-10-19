@@ -14,6 +14,7 @@ type BilTransactionRequestDTO struct {
 	Reference       string
 	ClientReference string
 	Package         string
+	TransactionType string
 	ServiceCode     string
 	RequestId       string
 	ExtraData       ExtraData

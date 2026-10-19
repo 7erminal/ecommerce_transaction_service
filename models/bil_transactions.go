@@ -17,6 +17,7 @@ type Bil_transactions struct {
 	BillerCode              string     `orm:"size(255)"`
 	Request                 *Request   `orm:"rel(fk)"`
 	TransactionBy           *Customers `orm:"rel(fk);column(transaction_by)"`
+	TransactionType         string     `orm:"size(255)"`
 	Amount                  float64
 	TransactingCurrency     string `orm:"size(255)"`
 	SourceChannel           string `orm:"size(255)"`
